@@ -1,0 +1,7 @@
+.claude/
+audit/
+assets/_originals/
+Hifi.png
+Hifi.txt
+node_modules/
+.netlify/

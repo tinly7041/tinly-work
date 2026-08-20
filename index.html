@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tin Ly — Fractional Brand Management for Tech Products</title>
+<meta name="description" content="Fractional brand management for seed-to-Series B tech companies. FMCG concept-testing discipline applied to Web3, AI and fintech.">
+<meta property="og:title" content="Tin Ly — Fractional Brand Management for Tech Products">
+<meta property="og:description" content="Fractional brand management for seed-to-Series B tech companies. FMCG concept-testing discipline applied to Web3, AI and fintech.">
+<meta property="og:image" content="assets/Header - web.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tin Ly — Fractional Brand Management for Tech Products">
+<meta name="twitter:description" content="Fractional brand management for seed-to-Series B tech companies.">
+<meta name="twitter:image" content="assets/Header - web.png">
+<link rel="icon" href="assets/favicon.ico"><!-- TODO: supply favicon.ico -->
+
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   TOKENS — sampled from approved aura render
+   ============================================================ */
+:root{
+  --navy-ink:#080C3F;
+  --royal:#142E99;
+  --deep-blue:#152DB8;
+  --signal-blue:#3058F3;
+  --azure:#87BEFD;
+  --azure-light:#87BEFD;
+  --mist:#F0ECE4;
+  --ink:#141414;
+  --inverse:#F5F3EF;
+  --gray:#6B6560;
+
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px;
+  --s5:48px; --s6:64px; --s7:96px; --s8:128px;
+
+  --prose:720px;
+  --wide:1120px;
+
+  --display:'Clash Display','Helvetica Neue',Arial,sans-serif;
+  --body:'Be Vietnam Pro','Helvetica Neue',Arial,sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  margin:0;background:var(--mist);color:var(--ink);
+  font-family:var(--body);font-size:18px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+img{max-width:100%;display:block;}
+a{color:inherit;}
+
+/* ============================================================
+   SECTION SHELL — every layer is a real <div> (Figma-importable)
+   ============================================================ */
+.section{position:relative;padding:var(--s8) var(--s3);scroll-margin-top:88px;}
+.section-warm{background:var(--mist);}
+
+.layer-aura{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;}
+.layer-aura-hero{background-image:url('assets/aura-hero.jpg');}
+.layer-aura-case{background-image:url('assets/aura-case.jpg');}
+.layer-aura-contact{background-image:url('assets/aura-contact.jpg');}
+
+.layer-grain{
+  position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.30;
+  mix-blend-mode:overlay;
+  background-repeat:repeat;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+.layer-figure{position:absolute;z-index:2;pointer-events:none;}
+.layer-scrim{position:absolute;inset:0;z-index:3;pointer-events:none;}
+.layer-content{position:relative;z-index:4;}
+
+.section-blue{color:var(--inverse);overflow:hidden;}
+
+.prose{max-width:var(--prose);margin:0 auto;}
+.wide{max-width:var(--wide);margin:0 auto;}
+
+/* ============================================================
+   TYPE
+   ============================================================ */
+h1,h2,h3,.eyebrow,.gate-label,.model-line,.stat-line{font-family:var(--display);}
+h1{font-size:clamp(44px,8vw,88px);font-weight:600;line-height:.98;letter-spacing:-.025em;margin:0 0 var(--s3);}
+h2{font-size:clamp(28px,4vw,40px);font-weight:500;line-height:1.18;letter-spacing:-.015em;margin:0 0 var(--s4);}
+h3{font-size:20px;font-weight:500;line-height:1.3;margin:0 0 var(--s1);}
+p{margin:0 0 var(--s3);}
+p:last-child{margin-bottom:0;}
+.lede{font-size:clamp(17px,2.3vw,22px);line-height:1.5;}
+.small{font-size:15px;line-height:1.55;}
+
+.eyebrow{font-size:13px;font-weight:500;letter-spacing:.10em;text-transform:uppercase;margin:0 0 var(--s3);opacity:.8;}
+.gate-label{font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--signal-blue);margin:0 0 var(--s2);}
+.section-blue .gate-label{color:var(--azure-light);}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;
+  justify-content:space-between;padding:var(--s2) var(--s3);
+  border-bottom:1px solid transparent;transition:background .3s,backdrop-filter .3s,border-color .3s;}
+.nav.is-scrolled{background:rgba(8,12,63,.92);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);border-bottom-color:rgba(255,255,255,.08);}
+.nav-brand{font-family:var(--display);font-weight:500;font-size:18px;letter-spacing:-.01em;
+  color:var(--inverse);text-decoration:none;transition:color .3s;
+  display:inline-flex;align-items:center;min-height:44px;min-width:44px;}
+.nav .btn-sm{min-height:44px;display:inline-flex;align-items:center;}
+
+/* ============================================================
+   LIQUID GLASS
+   ============================================================ */
+/* Glass tint is deliberately heavier than the Figma export: over the aura's
+   bright bloom the exported opacity measured 1.42:1 against white label text.
+   The navy underlay anchors the pill wherever it lands on the gradient. */
+.btn{display:inline-block;font-family:var(--display);font-weight:500;font-size:15px;line-height:1;
+  text-decoration:none;border-radius:999px;padding:16px 34px;cursor:pointer;
+  background:linear-gradient(135deg,rgba(8,12,63,.52),rgba(8,12,63,.38));
+  backdrop-filter:blur(12px) saturate(115%);-webkit-backdrop-filter:blur(12px) saturate(115%);
+  border:1px solid rgba(255,255,255,.38);color:var(--inverse);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26),inset 0 -1px 0 rgba(0,0,0,.10),0 4px 18px rgba(8,12,63,.20);
+  transition:background .3s,border-color .3s,box-shadow .3s,transform .3s;}
+.btn:hover{background:linear-gradient(135deg,rgba(8,12,63,.64),rgba(8,12,63,.50));
+  border-color:rgba(255,255,255,.55);transform:translateY(-1px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 6px 26px rgba(8,12,63,.28);}
+.btn-sm{padding:11px 22px;font-size:14px;}
+.btn-light{background:linear-gradient(135deg,rgba(48,88,243,.09),rgba(48,88,243,.03));
+  border-color:rgba(48,88,243,.16);color:var(--signal-blue);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 2px 10px rgba(48,88,243,.07);}
+.btn-light:hover{background:linear-gradient(135deg,rgba(48,88,243,.15),rgba(48,88,243,.06));
+  border-color:rgba(48,88,243,.26);}
+
+.link{font-family:var(--display);font-weight:500;font-size:15px;text-decoration:none;
+  border-bottom:1px solid transparent;padding-bottom:2px;transition:border-color .25s;}
+.link:hover{border-bottom-color:currentColor;}
+/* secondary hero CTA — text link, no glass (DESIGN.md §4); still a 44px target */
+.link-hero{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--inverse);}
+
+.glass{background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.05));
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:var(--s4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 8px 34px rgba(8,12,63,.10);}
+.glass-light{background:linear-gradient(145deg,rgba(255,255,255,.74),rgba(255,255,255,.44));
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(0,0,0,.06);border-radius:20px;padding:var(--s4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 4px 18px rgba(0,0,0,.03);}
+
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .btn,.glass{background:rgba(48,88,243,.85);}
+  .btn-light,.glass-light{background:rgba(255,255,255,.94);}
+  .nav.is-scrolled{background:var(--navy-ink);}
+}
+
+/* ============================================================
+   HERO — immersive, full viewport
+   ============================================================ */
+.hero{min-height:100svh;display:flex;align-items:center;padding-top:var(--s8);padding-bottom:var(--s7);}
+.hero .layer-content{width:100%;max-width:var(--wide);margin:0 auto;}
+.hero h1{max-width:12ch;}
+.hero .lede{max-width:648px;color:rgba(245,243,239,.90);}
+.hero-cta{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin-top:var(--s6);}
+.hero-credibility{margin-top:var(--s7);padding-top:var(--s3);
+  border-top:1px solid rgba(255,255,255,.20);font-size:15px;
+  color:var(--inverse);max-width:477px;}
+
+/* figure — spec: 709x875 at right 3.44vw, bleeding 1.1vh past the fold.
+   Sits ABOVE the scrim so the face stays at full opacity; the type is on the
+   opposite side of the composition so it needs no scrim protection here. */
+.layer-figure-hero{right:3.44vw;bottom:-1.1vh;height:81vh;display:flex;align-items:flex-end;z-index:4;}
+.layer-figure-hero img{height:100%;width:auto;object-fit:contain;object-position:bottom right;
+  opacity:1;}
+/* scrim keeps type legible over the figure — spec stops, vertical axis */
+.layer-scrim-hero{background:linear-gradient(180deg,
+  rgba(8,12,63,.55) 0%, rgba(8,12,63,.32) 34%, rgba(8,12,63,0) 62%);}
+
+/* Below 768 the figure sits behind the credibility copy and fights it — drop it. */
+@media (max-width:767px){
+  .layer-figure-hero{display:none;}
+  .layer-scrim-hero{background:linear-gradient(180deg,
+    rgba(8,12,63,.30) 0%, rgba(8,12,63,.48) 55%, rgba(8,12,63,.62) 100%);}
+}
+
+/* ============================================================
+   MULTIPLIER DIAGRAM
+   ============================================================ */
+.stmt{max-width:32ch;font-family:var(--display);font-weight:500;
+  font-size:clamp(21px,3.1vw,30px);line-height:1.28;letter-spacing:-.015em;}
+/* side padding gives the outer captions room to centre without clipping */
+.diagram{margin:var(--s7) auto;max-width:1164px;padding:0 64px;}
+.plate{position:relative;}
+.plate + .plate{margin-top:var(--s5);}
+.plate-img{width:100%;height:auto;display:block;}
+.plate-labels{position:relative;height:0;}
+.plate-label{position:absolute;top:2px;transform:translateX(-50%);
+  width:20ch;text-align:center;font-size:14px;line-height:18px;color:var(--gray);}
+/* horizontal art: left offsets are the measured centroids of the blue marks */
+@media (min-width:768px){
+  .plate-vague .plate-label-1{left:4.8%;}
+  .plate-vague .plate-label-2{left:40.6%;}
+  .plate-vague .plate-label-3{left:81.9%;}
+  .plate-sharp .plate-label-1{left:5.3%;}
+  .plate-sharp .plate-label-2{left:40.6%;}
+  .plate-sharp .plate-label-3{left:80.9%;}
+}
+.plate-caption{font-family:var(--display);font-size:13px;font-weight:500;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--signal-blue);
+  margin:0 0 var(--s2);}
+
+/* ============================================================
+   GATE SPINE
+   ============================================================ */
+.spine-wrap{margin-top:var(--s7);}
+.spine{position:relative;padding:var(--s6) 0 0;}
+
+/* axis removed — the four columns already read as one row; the rule added
+   clutter without carrying meaning. Element kept for the Figma layer parity. */
+.spine-axis{display:none;}
+
+.spine-marks{position:relative;display:grid;grid-template-columns:repeat(4,1fr);}
+.mark{display:flex;flex-direction:column;align-items:center;text-align:center;}
+
+/* Spec sizes icons 80/80/80/116 — gate 4 is deliberately larger because the
+   aura around it is soft and transparent, so it reads smaller than it measures.
+   All four bottom-align on a common baseline so the axis clears them cleanly. */
+.glyph-img{width:80px;height:80px;object-fit:contain;margin:36px 0 var(--s4);}
+.glyph-img-4{width:116px;height:116px;margin-top:0;}
+
+.mark-label{font-family:var(--display);font-size:13px;font-weight:500;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--signal-blue);}
+.mark-name{font-family:var(--display);font-size:19px;font-weight:500;
+  letter-spacing:-.01em;margin-top:4px;}
+.mark-body{font-size:14px;line-height:1.5;color:var(--gray);
+  margin-top:var(--s2);max-width:22ch;}
+
+/* stage brackets sit UNDER the axis — annotation, not division */
+.stage-brackets{display:grid;grid-template-columns:1fr 1fr;
+  gap:var(--s4);margin-top:var(--s6);}
+.bracket{padding-top:var(--s3);border-top:1px solid rgba(48,88,243,.28);}
+.bracket-name{font-family:var(--display);font-size:17px;font-weight:500;margin:0 0 4px;}
+.bracket-note{font-size:14px;line-height:1.5;color:var(--gray);margin:0;}
+
+/* ============================================================
+   TRACK RECORD
+   ============================================================ */
+#track-record h2{font-weight:500;}
+.track-group{margin-bottom:var(--s5);}
+.track-group-label{font-family:var(--display);font-size:23px;font-weight:600;
+  letter-spacing:-.01em;color:var(--inverse);margin:0 0 var(--s3);}
+.track-logos{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3);}
+/* Per-logo boxes, normalised to a ~128px optical height (spec Frame 5/6).
+   No blanket filter: brightness(0) destroys any logo that is not already a
+   single-colour silhouette. Only the black Viction lockup is inverted. */
+.track-logo{width:auto;height:auto;object-fit:contain;}
+.track-logo-unilever{max-height:96px;max-width:96px;}
+.track-logo-omo{max-height:95px;max-width:112px;}
+.track-logo-sunlight{max-height:96px;max-width:95px;}
+.track-logo-conviction{max-height:64px;max-width:210px;}
+.track-logo-coin98{max-height:88px;max-width:120px;}
+.track-logo-viction{max-height:44px;max-width:150px;filter:invert(1) brightness(2);}
+
+/* ============================================================
+   SERVICES
+   ============================================================ */
+.model-line{font-weight:500;font-size:clamp(25px,3.5vw,36px);line-height:1.12;
+  letter-spacing:-.02em;color:var(--signal-blue);margin:0 0 var(--s3);}
+.svc-list{margin-top:var(--s5);border-top:1px solid rgba(0,0,0,.1);}
+.svc{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3);
+  padding:var(--s3) 0;border-bottom:1px solid rgba(0,0,0,.1);}
+.svc-name{font-size:17px;font-weight:500;}
+.svc-gate{font-family:var(--display);font-size:13px;font-weight:500;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--signal-blue);white-space:nowrap;}
+.svc-note{margin-top:var(--s3);color:var(--gray);font-size:15px;}
+.offers{display:grid;gap:var(--s3);margin-top:var(--s6);}
+.offer p{margin:0 0 var(--s3);color:var(--gray);font-size:15px;}
+.offer-price{font-family:var(--display);font-weight:700;font-size:23px;line-height:37px;color:var(--signal-blue);}
+
+/* ============================================================
+   COMPARISON TABLE
+   ============================================================ */
+.compare-table{margin-top:var(--s6);overflow-x:auto;}
+.compare-table table{width:100%;border-collapse:collapse;font-size:15px;}
+.compare-table th{font-family:var(--display);font-weight:500;font-size:14px;
+  letter-spacing:.06em;text-transform:uppercase;text-align:left;
+  padding:var(--s2) var(--s3);border-bottom:2px solid rgba(0,0,0,.12);color:var(--signal-blue);}
+.compare-table td{padding:var(--s2) var(--s3);border-bottom:1px solid rgba(0,0,0,.08);
+  vertical-align:top;}
+.compare-table td:first-child{font-weight:500;white-space:nowrap;}
+.compare-table .not-included{color:var(--gray);}
+.compare-table .offer-price{font-size:15px;}
+.compare-cards{display:none;margin-top:var(--s5);}
+.compare-card{margin-bottom:var(--s3);}
+.compare-card dl{margin:0;}
+.compare-card dt{font-weight:500;font-size:14px;margin-top:var(--s2);color:var(--signal-blue);
+  font-family:var(--display);letter-spacing:.04em;text-transform:uppercase;}
+.compare-card dd{margin:4px 0 0 0;font-size:15px;color:var(--gray);
+  padding-bottom:var(--s2);border-bottom:1px solid rgba(0,0,0,.06);}
+.compare-card dd.offer-price{color:var(--signal-blue);border-bottom:none;font-size:15px;}
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact h2{font-size:clamp(34px,6vw,58px);font-weight:700;line-height:1.17;letter-spacing:-.025em;max-width:15ch;}
+.contact-links{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s6) 0;}
+.contact-note{max-width:486px;font-size:14px;line-height:22px;color:var(--inverse);
+  padding-top:var(--s4);border-top:1px solid rgba(255,255,255,.18);}
+.footer{margin-top:var(--s6);padding-top:var(--s3);border-top:1px solid rgba(255,255,255,.18);
+  display:flex;flex-wrap:wrap;gap:var(--s2);justify-content:space-between;
+  font-size:14px;color:rgba(245,243,239,.88);}
+
+/* ============================================================
+   SECTION REVEAL — one per section, once, on entry
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(12px);
+  transition:opacity .4s cubic-bezier(.22,.61,.36,1),transform .4s cubic-bezier(.22,.61,.36,1);}
+.reveal.is-revealed{opacity:1;transform:none;}
+
+:focus-visible{outline:2px solid currentColor;outline-offset:3px;border-radius:4px;}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;}
+  *{transition-duration:.01ms !important;}
+  .reveal{opacity:1 !important;transform:none !important;}
+}
+
+@media (min-width:768px){
+  .section{padding-left:var(--s5);padding-right:var(--s5);}
+  .nav{padding:var(--s3) var(--s5);}
+  .offers{grid-template-columns:1fr 1fr;}
+}
+@media (min-width:1024px){
+  .section{padding-left:var(--s6);padding-right:var(--s6);}
+  .nav{padding:var(--s3) var(--s6);}
+}
+@media (max-width:768px){
+  .compare-table{display:none;}
+  .compare-cards{display:block;}
+}
+@media (max-width:767px){
+  /* no room for the type to breathe under a transparent bar — opaque from the top */
+  .nav{background:rgba(8,12,63,.94);backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);border-bottom-color:rgba(255,255,255,.08);}
+  .hero{min-height:0;padding-top:calc(var(--s7) + 44px);padding-bottom:var(--s7);}
+  .hero-cta{margin-top:var(--s5);}
+  .link-hero{padding-left:0;}
+  .hero-credibility{margin-top:var(--s6);}
+  .section{padding-top:var(--s7);padding-bottom:var(--s7);}
+  /* vertical diagram art (see <picture>) — a caption sits under each stacked mark.
+     Offsets are the measured mark bottoms as a % of each bitmap's height. */
+  .diagram{margin:var(--s6) auto;overflow:visible;padding:0;max-width:340px;}
+  .plate{min-width:0;padding-bottom:56px;}
+  .plate + .plate{margin-top:var(--s6);}
+  .plate-labels{position:absolute;left:0;right:0;top:0;bottom:56px;height:auto;}
+  .plate-label{position:absolute;left:50%;transform:translateX(-50%);
+    width:100%;max-width:100%;font-size:14px;line-height:18px;
+    background:var(--mist);padding:3px 0;}
+  .plate-vague .plate-label-1{top:11.8%;}
+  .plate-vague .plate-label-2{top:48.4%;}
+  .plate-vague .plate-label-3{top:101.5%;}
+  .plate-sharp .plate-label-1{top:12.5%;}
+  .plate-sharp .plate-label-2{top:44.9%;}
+  .plate-sharp .plate-label-3{top:101.2%;}
+  .spine{padding:0 0 0 0;}
+  .spine-marks{grid-template-columns:1fr;gap:var(--s5);}
+  .mark{display:grid;grid-template-columns:64px 1fr;column-gap:var(--s3);
+    align-items:start;text-align:left;}
+  .glyph-img,.glyph-img-4{grid-column:1;grid-row:1 / span 3;width:64px;height:64px;margin:0;}
+  .mark-label{grid-column:2;grid-row:1;}
+  .mark-name{grid-column:2;grid-row:2;margin-top:2px;}
+  .mark-body{grid-column:2;grid-row:3;max-width:none;margin-top:var(--s1);}
+  .stage-brackets{grid-template-columns:1fr;gap:var(--s3);}
+  .svc{flex-direction:column;gap:var(--s1);}
+  .svc-gate{align-self:flex-start;}
+  /* keep each group on a single line at 390 */
+  .track-logos{gap:var(--s2);flex-wrap:nowrap;}
+  .track-logo-unilever{max-height:64px;max-width:64px;}
+  .track-logo-omo{max-height:64px;max-width:76px;}
+  .track-logo-sunlight{max-height:64px;max-width:64px;}
+  .track-logo-conviction{max-height:40px;max-width:132px;}
+  .track-logo-coin98{max-height:56px;max-width:76px;}
+  .track-logo-viction{max-height:28px;max-width:96px;}
+  .track-group-label{font-size:19px;}
+  .contact-links{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);}
+  .contact-links .btn{text-align:center;min-height:44px;display:flex;
+    align-items:center;justify-content:center;padding:14px 16px;}
+  .footer{font-size:14px;}
+}
+@media (max-width:390px){
+  h1{font-size:36px;}
+  .hero-cta{flex-direction:column;align-items:stretch;}
+  .hero-cta .btn{text-align:center;}
+}
+</style>
+
+<!-- GA4 — replace G-XXXXXXXXXX with your Measurement ID -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());
+gtag('config','G-XXXXXXXXXX');
+</script>
+</head>
+<body>
+
+<div class="nav" id="nav">
+  <a href="#hero" class="nav-brand">tin ly</a>
+  <a href="mailto:tinly.work@gmail.com" class="btn btn-sm" data-ga-event="cta_work_with_me" data-ga-location="nav">Work with me</a>
+</div>
+
+<!-- ========== SCROLL 1 — HERO ========== -->
+<div class="section section-blue hero" id="hero">
+  <div class="layer-aura layer-aura-hero"></div>
+  <div class="layer-grain"></div>
+  <div class="layer-figure layer-figure-hero">
+    <img src="assets/tin-figure.webp" width="750" height="1600" alt="Tin Ly">
+  </div>
+  <div class="layer-scrim layer-scrim-hero"></div>
+
+  <div class="layer-content">
+    <h1>Package Your Tech Product</h1>
+    <p class="lede">Good product, soft traction. Usually it's how the product branding &amp; communication is packaged, not the channel.</p>
+    <div class="hero-cta">
+      <a href="#method" class="btn" data-ga-event="cta_see_how">See how it's done</a>
+      <a href="mailto:tinly.work@gmail.com" class="link link-hero" data-ga-event="cta_work_with_me" data-ga-location="hero">Work with me</a>
+    </div>
+    <p class="hero-credibility">From Unilever Vietnam, Homecare to Ninety Eight: Coin98, Conviction, Viction — 7+ years of experience</p>
+  </div>
+</div>
+
+<!-- ========== SCROLL 2 — MULTIPLIER ========== -->
+<div class="section section-warm" id="multiplier">
+  <div class="layer-content">
+    <div class="prose">
+      <p class="stmt">Distribution alone doesn't create value.<br>It multiplies whatever legibility you already had.</p>
+    </div>
+
+    <div class="diagram">
+      <div class="plate plate-vague">
+        <picture>
+          <source media="(max-width:767px)" srcset="assets/diagram-vague-v.jpg">
+          <img class="plate-img" src="assets/diagram-vague.jpg" width="1438" height="517" alt="A vague value positioning, amplified by distribution, remains blurred" loading="lazy">
+        </picture>
+        <div class="plate-labels">
+          <span class="plate-label plate-label-1">A vague Value Positioning Package</span>
+          <span class="plate-label plate-label-2">Distribution</span>
+          <span class="plate-label plate-label-3">Projected but Blurred and Washed Out for Anyone</span>
+        </div>
+      </div>
+
+      <div class="plate plate-sharp">
+        <picture>
+          <source media="(max-width:767px)" srcset="assets/diagram-sharp-v.jpg">
+          <img class="plate-img" src="assets/diagram-sharp.jpg" width="1551" height="594" alt="A sharp value positioning, amplified by distribution, is felt and remembered" loading="lazy">
+        </picture>
+        <div class="plate-labels">
+          <span class="plate-label plate-label-1">Sharp Value Positioning Package</span>
+          <span class="plate-label plate-label-2">Distribution</span>
+          <span class="plate-label plate-label-3">The Product is Felt and Remembered</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p class="stmt">If positioning is vague, spending more to spread gets wasted.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCROLL 3 — HOW I WORK ========== -->
+<div class="section section-warm" id="method">
+  <div class="layer-content wide">
+    <p class="eyebrow" style="max-width:720px;margin-left:auto;margin-right:auto;">How I work</p>
+    <p style="max-width:720px;margin-left:auto;margin-right:auto;">I learned this back when I was working as Brand Manager in an FMCG Conglomerate in Vietnam. In FMCG you don't get to find out after launch. The whole package is tested before it ships, against a number the whole team agreed in advance.<br>Concept testing, action standards, gate reviews.<br>I adapted that standard practice into a more agile approach in tech.</p>
+
+    <div class="spine-wrap">
+      <div class="spine">
+        <div class="spine-axis"></div>
+        <div class="spine-marks">
+
+          <div class="mark">
+            <img class="glyph-img" src="assets/gate-1.png" alt="" loading="lazy">
+            <span class="mark-label">Gate 1</span>
+            <span class="mark-name">Audience</span>
+            <p class="mark-body">Who is actually buying or attracted, named and evidenced</p>
+          </div>
+
+          <div class="mark">
+            <img class="glyph-img" src="assets/gate-2.png" alt="" loading="lazy">
+            <span class="mark-label">Gate 2</span>
+            <span class="mark-name">Concept</span>
+            <p class="mark-body">Up to three routes of concept. Tested against the target segment, scored against a number set beforehand</p>
+          </div>
+
+          <div class="mark">
+            <img class="glyph-img" src="assets/gate-3.png" alt="" loading="lazy">
+            <span class="mark-label">Gate 3</span>
+            <span class="mark-name">Assets</span>
+            <p class="mark-body">One set of visual identity &amp; messaging packaged across brand and product</p>
+          </div>
+
+          <div class="mark">
+            <img class="glyph-img glyph-img-4" src="assets/gate-4.png" alt="" loading="lazy">
+            <span class="mark-label">Gate 4</span>
+            <span class="mark-name">Launch</span>
+            <p class="mark-body">The package only works where the buyer actually looks: Website, search, app store, socials</p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="stage-brackets">
+        <div class="bracket">
+          <p class="bracket-name">Stage One — Prove the package</p>
+          <p class="bracket-note">Before anything gets amplified, the message has to hold up against real people.</p>
+        </div>
+        <div class="bracket">
+          <p class="bracket-name">Stage Two — Make it travel</p>
+          <p class="bracket-note">A proven message still dies if the assets are inconsistent and nobody can find them.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCROLL 4 — TRACK RECORD ========== -->
+<div class="section section-blue" id="track-record">
+  <div class="layer-aura layer-aura-case"></div>
+  <div class="layer-grain"></div>
+
+  <div class="layer-content prose">
+    <p class="eyebrow">Track Record</p>
+    <h2>7+ Years Of Experience in Brand &amp; Marketing Management</h2>
+
+    <div class="track-group">
+      <p class="track-group-label">FMCG Fundamentals &middot; 6 YoE</p>
+      <div class="track-logos">
+        <img src="assets/[CITYPNG.COM]PNG Unilever White Logo - 2000x2000.png" alt="Unilever" class="track-logo track-logo-unilever" loading="lazy">
+        <img src="assets/New Omo Logo.png" alt="OMO" class="track-logo track-logo-omo" loading="lazy">
+        <img src="assets/sunlight logo.png" alt="Sunlight" class="track-logo track-logo-sunlight" loading="lazy">
+      </div>
+    </div>
+
+    <div class="track-group">
+      <p class="track-group-label">Emerging Tech Leap &middot; 1.5 YoE</p>
+      <div class="track-logos">
+        <img src="assets/Conviction 2025_Logo_Horizontal_White.svg" alt="Conviction" class="track-logo track-logo-conviction" loading="lazy">
+        <img src="assets/Logo White (vertical).svg" alt="Coin98" class="track-logo track-logo-coin98" loading="lazy">
+        <img src="assets/Logo_FA_Viction_HorizontalLockup_Standard_Black (1).png" alt="Viction" class="track-logo track-logo-viction" loading="lazy">
+      </div>
+    </div>
+
+    <a href="https://tinly-work.notion.site" class="btn" target="_blank" rel="noopener" data-ga-event="case_link_click">Read more about my case here</a>
+  </div>
+</div>
+
+<!-- ========== SCROLL 5 — SERVICES ========== -->
+<div class="section section-warm" id="services">
+  <div class="layer-content prose">
+    <p class="eyebrow">Services &amp; engagement</p>
+    <p class="model-line">Fractional. Bounded. Episodic.</p>
+    <p>A full-time brand hire would be too much if flexibility is what you need. What I bring to the table is brand management discipline, taste and dedication in making your product deliberately packaged, ready to be shipped to market.</p>
+
+    <div class="svc-list">
+      <div class="svc"><span class="svc-name">Ideas &amp; Initial Tests</span><span class="svc-gate">Audience</span></div>
+      <div class="svc"><span class="svc-name">Brand &amp; Product Positioning Strategy</span><span class="svc-gate">Concept</span></div>
+      <div class="svc"><span class="svc-name">Brand Identity &amp; Brand Guidelines</span><span class="svc-gate">Assets</span></div>
+      <div class="svc"><span class="svc-name">Communication Framework &amp; Execution</span><span class="svc-gate">Launch</span></div>
+      <div class="svc"><span class="svc-name">Capability Building</span><span class="svc-gate">Resources</span></div>
+    </div>
+
+    <div class="offers">
+      <div class="offer glass-light">
+        <h3>Engagement</h3>
+        <p>Brand diagnosis and initial strategy proposal.</p>
+        <span class="offer-price">Starts at $1,000</span>
+      </div>
+      <div class="offer glass-light">
+        <h3>Full sequence</h3>
+        <p>All four gates in 50–75 days of brand audit, strategy &amp; execution planning &amp; 60-day pilot.</p>
+        <span class="offer-price">From $11,000</span>
+      </div>
+    </div>
+
+    <div class="compare-table">
+      <table>
+        <thead>
+          <tr><th></th><th>Engagement</th><th>Full Sequence</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Audience</td><td>Diagnosis</td><td>Full validation</td></tr>
+          <tr><td>Concept</td><td class="not-included">Recommendation and reference only</td><td>Full concept test against a pre-set action standard</td></tr>
+          <tr><td>Assets</td><td class="not-included">Not included</td><td>Delivered</td></tr>
+          <tr><td>Launch</td><td class="not-included">Not included</td><td>Delivered, with execution support</td></tr>
+          <tr><td>Format</td><td>Written diagnosis &amp; recommendation</td><td>Full four-gate execution and system</td></tr>
+          <tr><td>Duration</td><td>5–7 days</td><td>50–75 days, incl. 60-day execution pilot</td></tr>
+          <tr><td>Price</td><td class="offer-price">Starts at $1,000</td><td class="offer-price">From $11,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="compare-cards">
+      <div class="compare-card glass-light">
+        <h3>Engagement</h3>
+        <dl>
+          <dt>Audience</dt><dd>Diagnosis</dd>
+          <dt>Concept</dt><dd>Recommendation and reference only</dd>
+          <dt>Assets</dt><dd>Not included</dd>
+          <dt>Launch</dt><dd>Not included</dd>
+          <dt>Format</dt><dd>Written diagnosis &amp; recommendation</dd>
+          <dt>Duration</dt><dd>5–7 days</dd>
+          <dt>Price</dt><dd class="offer-price">Starts at $1,000</dd>
+        </dl>
+      </div>
+      <div class="compare-card glass-light">
+        <h3>Full Sequence</h3>
+        <dl>
+          <dt>Audience</dt><dd>Full validation</dd>
+          <dt>Concept</dt><dd>Full concept test against a pre-set action standard</dd>
+          <dt>Assets</dt><dd>Delivered</dd>
+          <dt>Launch</dt><dd>Delivered, with execution support</dd>
+          <dt>Format</dt><dd>Full four-gate execution and system</dd>
+          <dt>Duration</dt><dd>50–75 days, incl. 60-day execution pilot</dd>
+          <dt>Price</dt><dd class="offer-price">From $11,000</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCROLL 6 — CONTACT ========== -->
+<div class="section section-blue contact" id="contact">
+  <div class="layer-aura layer-aura-contact"></div>
+  <div class="layer-grain"></div>
+
+  <div class="layer-content prose">
+    <h2>Tell me what you're launching</h2>
+    <div class="contact-links">
+      <a href="https://linkedin.com/in/tinly147" class="btn" target="_blank" rel="noopener" data-ga-event="contact_click" data-ga-channel="linkedin">LinkedIn</a>
+      <a href="mailto:tinly.work@gmail.com" class="btn" data-ga-event="contact_click" data-ga-channel="email">Email</a>
+      <a href="https://t.me/tinly7041" class="btn" target="_blank" rel="noopener" data-ga-event="contact_click" data-ga-channel="telegram">Telegram</a>
+      <a href="https://x.com/tinly_work" class="btn" target="_blank" rel="noopener" data-ga-event="contact_click" data-ga-channel="x">X/Twitter</a>
+    </div>
+    <p class="contact-note">I'm cautious with unsolicited files and embedded links, so let's be transparent how we should catch up.</p>
+    <div class="footer">
+      <span>Open to senior in-house roles as well as fractional work.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var nav=document.getElementById('nav');
+  var hero=document.getElementById('hero');
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+      nav.classList.toggle('is-scrolled',!entries[0].isIntersecting);
+    },{threshold:0}).observe(hero);
+  }else{
+    window.addEventListener('scroll',function(){
+      nav.classList.toggle('is-scrolled',window.scrollY>80);
+    },{passive:true});
+  }
+
+  var prefersReduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+  var sections=document.querySelectorAll('.section');
+  if(!prefersReduced.matches && 'IntersectionObserver' in window){
+    sections.forEach(function(s){s.classList.add('reveal');});
+    var revealObs=new IntersectionObserver(function(entries,obs){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('is-revealed');
+          obs.unobserve(e.target);
+        }
+      });
+    },{threshold:0,rootMargin:'0px 0px -12% 0px'});
+    sections.forEach(function(s){revealObs.observe(s);});
+  }
+
+  document.querySelectorAll('[data-ga-event]').forEach(function(el){
+    el.addEventListener('click',function(){
+      if(typeof gtag==='function'){
+        var params={};
+        if(el.dataset.gaLocation) params.location=el.dataset.gaLocation;
+        if(el.dataset.gaChannel) params.channel=el.dataset.gaChannel;
+        gtag('event',el.dataset.gaEvent,params);
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
