@@ -75,11 +75,39 @@ async function generateStubReport({ brandName, website }) {
 async function postReportToAppsScript(fetchImpl, appsScriptUrl, appsScriptSecret, payload) {
   // Apps Script always responds 302 → native fetch follows redirects by default.
   // Do NOT set redirect: "manual" here, it breaks delivery.
-  return fetchImpl(appsScriptUrl, {
+  const res = await fetchImpl(appsScriptUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ secret: appsScriptSecret, ...payload }),
   });
+  if (!res.ok) {
+    throw new Error(`Apps Script responded ${res.status}`);
+  }
+  return res;
+}
+
+// Compare-and-swap increment via Blobs' etag conditions, so concurrent requests
+// from the same IP can't all read the same count and each write back count+1 —
+// that race would let a burst past the intended 5/day cap.
+const RATE_LIMIT_CAS_ATTEMPTS = 5;
+
+async function checkAndIncrementRateLimit(store, key) {
+  for (let attempt = 0; attempt < RATE_LIMIT_CAS_ATTEMPTS; attempt++) {
+    const existing = await store.getWithMetadata(key, { type: "json" });
+    const count = (existing && existing.data && existing.data.count) || 0;
+    if (count >= RATE_LIMIT_PER_DAY) {
+      return { limited: true };
+    }
+    const writeOptions = existing ? { onlyIfMatch: existing.etag } : { onlyIfNew: true };
+    const result = await store.setJSON(key, { count: count + 1 }, writeOptions);
+    if (result.modified) {
+      return { limited: false };
+    }
+    // Lost the race to a concurrent writer — reread and retry.
+  }
+  // Contention didn't resolve in time — fail closed rather than risk an
+  // unbounded burst getting through.
+  return { limited: true };
 }
 
 // deps injection point for tests: { fetch, getStore, env }
@@ -127,12 +155,10 @@ function createHandler(deps = {}) {
       try {
         const store = getStoreImpl(RATE_LIMIT_STORE);
         const key = rateLimitKey(ip, env.IP_SALT);
-        const existing = await store.get(key, { type: "json" });
-        const count = (existing && existing.count) || 0;
-        if (count >= RATE_LIMIT_PER_DAY) {
+        const { limited } = await checkAndIncrementRateLimit(store, key);
+        if (limited) {
           return jsonResponse(429, { error: "rate_limited" });
         }
-        await store.setJSON(key, { count: count + 1 });
       } catch (err) {
         console.error("rate limit check failed:", err);
         return jsonResponse(429, { error: "rate_limited" });
