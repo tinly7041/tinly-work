@@ -5,3 +5,6 @@ Hifi.png
 Hifi.txt
 node_modules/
 .netlify/
+.env
+.env.*
+!.env.example
