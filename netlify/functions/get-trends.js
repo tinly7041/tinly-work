@@ -1,0 +1,31 @@
+import { getStore } from "@netlify/blobs";
+import { CATEGORIES } from "./lib/categories.js";
+
+// Read path. Zero source calls. If the blob is missing or stale the caller gets
+// told plainly — it does not trigger a live crawl. A user request must never be
+// the thing that warms the cache.
+const MAX_STALE_HOURS = 36;
+
+export default async (req) => {
+  const url = new URL(req.url);
+  const cat = (url.searchParams.get("category") || "").toLowerCase();
+  if (!CATEGORIES[cat]) {
+    return json({ error: "unknown_category", known: Object.keys(CATEGORIES) }, 400);
+  }
+  const store = getStore("trends");
+  const blob = await store.get(cat, { type: "json" });
+  if (!blob) return json({ error: "cache_empty", category: cat }, 503);
+
+  const ageHours = (Date.now() - Date.parse(blob.fetched_at)) / 36e5;
+  return json({
+    category: cat,
+    label: blob.label,
+    fetched_at: blob.fetched_at,
+    stale: ageHours > MAX_STALE_HOURS,
+    health: blob.health,
+    items: blob.items,
+  });
+};
+
+const json = (b, s = 200) =>
+  new Response(JSON.stringify(b), { status: s, headers: { "content-type": "application/json" } });

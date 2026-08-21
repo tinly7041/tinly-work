@@ -1,0 +1,1735 @@
+[
+  {
+    "category": "ai",
+    "label": "AI",
+    "perSource": {
+      "hn": {
+        "count": 62,
+        "ms": 3861,
+        "sample": {
+          "title": "How I use LLMs to learn complex topics",
+          "url": "https://laurentiugabriel.github.io/blog/articles/how-i-use-llms-to-learn/",
+          "source": "hn",
+          "raw": 835,
+          "date": "2026-08-09T19:16:49Z",
+          "score": 0.5024,
+          "signal": "category"
+        }
+      },
+      "github": {
+        "count": 15,
+        "ms": 1097,
+        "sample": {
+          "title": "DietrichGebert/ponytail — Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+          "url": "https://github.com/DietrichGebert/ponytail",
+          "source": "github",
+          "raw": 107064,
+          "date": "2026-08-07T21:44:01Z",
+          "born": "2026-06-12T00:52:37Z",
+          "score": 0.4426,
+          "signal": "category"
+        }
+      },
+      "producthunt": {
+        "count": 29,
+        "ms": 143,
+        "sample": {
+          "title": "fx (by Vercel)",
+          "url": "https://www.producthunt.com/products/fx-by-vercel",
+          "source": "producthunt",
+          "raw": 48,
+          "date": "2026-08-20T01:24:52-07:00",
+          "score": 0.6408,
+          "signal": "category"
+        }
+      },
+      "coingecko": {
+        "count": 0,
+        "ms": 0,
+        "sample": null
+      },
+      "googletrends": {
+        "count": 10,
+        "ms": 473,
+        "sample": {
+          "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+          "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+          "source": "googletrends",
+          "raw": 50000,
+          "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+          "term": "xổ số miền trung thứ sáu",
+          "score": 0.5978,
+          "signal": "attention"
+        }
+      }
+    },
+    "health": {
+      "total": 40,
+      "per_source": {
+        "hn": 10,
+        "github": 10,
+        "producthunt": 10,
+        "googletrends": 10
+      },
+      "unique_sources": 4,
+      "dupes_removed": 4,
+      "median_age_days": 0.6,
+      "healthy": true
+    },
+    "items": [
+      {
+        "title": "Geolocating a random island using geometry and CUDA programming",
+        "url": "https://yassa9.github.io/osint/gralhix-004/",
+        "source": "hn",
+        "raw": 521,
+        "date": "2026-08-19T12:19:52Z",
+        "score": 0.7604,
+        "signal": "category"
+      },
+      {
+        "title": "langchain-ai/openwiki — OpenWiki is a CLI that writes and maintains agent documentation for your codebase.",
+        "url": "https://github.com/langchain-ai/openwiki",
+        "source": "github",
+        "raw": 15438,
+        "date": "2026-08-21T08:28:24Z",
+        "born": "2026-06-22T23:48:26Z",
+        "score": 0.7655,
+        "signal": "category"
+      },
+      {
+        "title": "fx (by Vercel)",
+        "url": "https://www.producthunt.com/products/fx-by-vercel",
+        "source": "producthunt",
+        "raw": 48,
+        "date": "2026-08-20T01:24:52-07:00",
+        "score": 0.6408,
+        "signal": "category"
+      },
+      {
+        "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+        "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+        "source": "googletrends",
+        "raw": 50000,
+        "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+        "term": "xổ số miền trung thứ sáu",
+        "score": 0.5978,
+        "signal": "attention"
+      },
+      {
+        "title": "Israel creates fake think tank in likely attempt to dupe AI chatbots",
+        "url": "https://responsiblestatecraft.org/israel-influence-chatgpt/",
+        "source": "hn",
+        "raw": 1053,
+        "date": "2026-08-17T20:46:10Z",
+        "score": 0.7527,
+        "signal": "category"
+      },
+      {
+        "title": "xai-org/grok-build — SpaceXAI's coding agent harness and TUI. Fullscreen, mouse interactive, extensible.",
+        "url": "https://github.com/xai-org/grok-build",
+        "source": "github",
+        "raw": 25831,
+        "date": "2026-08-19T19:55:39Z",
+        "born": "2026-07-14T20:04:23Z",
+        "score": 0.7351,
+        "signal": "category"
+      },
+      {
+        "title": "Project SKY",
+        "url": "https://www.producthunt.com/products/project-sky",
+        "source": "producthunt",
+        "raw": 42,
+        "date": "2026-08-20T20:43:53-07:00",
+        "score": 0.6102,
+        "signal": "category"
+      },
+      {
+        "title": "Lịch thi đấu bóng chuyền nữ châu Á 2026 hôm nay (21.8)",
+        "url": "https://laodong.vn/bong-chuyen/lich-thi-dau-bong-chuyen-nu-chau-a-2026-hom-nay-218-1753651.ldo",
+        "source": "googletrends",
+        "raw": 5000,
+        "date": "Thu, 20 Aug 2026 23:50:00 -0700",
+        "term": "đội tuyển bóng chuyền nữ quốc gia việt nam",
+        "score": 0.5262,
+        "signal": "attention"
+      },
+      {
+        "title": "AI companies destroy physical books – let's scan rare books before it's too late",
+        "url": "https://annas-archive.gl/blog/physical-destruction.html",
+        "source": "hn",
+        "raw": 345,
+        "date": "2026-08-21T02:37:47Z",
+        "score": 0.7494,
+        "signal": "category"
+      },
+      {
+        "title": "yc-software/qm — Multiplayer agent harness for work.",
+        "url": "https://github.com/yc-software/qm",
+        "source": "github",
+        "raw": 14027,
+        "date": "2026-08-21T00:50:14Z",
+        "born": "2026-07-29T20:03:08Z",
+        "score": 0.6836,
+        "signal": "category"
+      },
+      {
+        "title": "Actx0",
+        "url": "https://www.producthunt.com/products/actx0",
+        "source": "producthunt",
+        "raw": 45,
+        "date": "2026-08-19T15:00:59-07:00",
+        "score": 0.5976,
+        "signal": "category"
+      },
+      {
+        "title": "El Atlético acepta traspasar a Julián al Arsenal, pero el jugador dice &apos;no&apos;",
+        "url": "https://www.mundodeportivo.com/futbol/fc-barcelona/20260820/1004218109/atletico-acepta-traspasar-julian-arsenal-jugador-dice-no.html",
+        "source": "googletrends",
+        "raw": 1000,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "julian alvarez",
+        "score": 0.4602,
+        "signal": "attention"
+      },
+      {
+        "title": "Turns are Better than Radians (2022)",
+        "url": "https://www.computerenhance.com/p/turns-are-better-than-radians",
+        "source": "hn",
+        "raw": 342,
+        "date": "2026-08-20T01:29:12Z",
+        "score": 0.6751,
+        "signal": "category"
+      },
+      {
+        "title": "XiaomiMiMo/MiMo-Code — MiMo Code: Where Models and Agents Co-Evolve",
+        "url": "https://github.com/XiaomiMiMo/MiMo-Code",
+        "source": "github",
+        "raw": 12823,
+        "date": "2026-08-21T09:37:38Z",
+        "born": "2026-06-10T11:52:41Z",
+        "score": 0.6404,
+        "signal": "category"
+      },
+      {
+        "title": "Local",
+        "url": "https://www.producthunt.com/products/local-7",
+        "source": "producthunt",
+        "raw": 43,
+        "date": "2026-08-19T18:43:17-07:00",
+        "score": 0.5823,
+        "signal": "category"
+      },
+      {
+        "title": "Quang Lê: \"Qua đám tang của mẹ, tôi mới đo được lòng dạ của một số người tưởng là thân lắm\"",
+        "url": "https://cafef.vn/quang-le-qua-dam-tang-cua-me-toi-moi-do-duoc-long-da-cua-mot-so-nguoi-tuong-la-than-lam-188260821100502215.chn",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:10:00 -0700",
+        "term": "quang lê",
+        "score": 0.3951,
+        "signal": "attention"
+      },
+      {
+        "title": "Using the railway network as a flatbed scanner",
+        "url": "https://philo.gay/linecam/",
+        "source": "hn",
+        "raw": 445,
+        "date": "2026-08-18T12:43:54Z",
+        "score": 0.6693,
+        "signal": "category"
+      },
+      {
+        "title": "lidge-jun/opencodex — Universal provider proxy for OpenAI Codex & Claude Code — use any LLM (Claude, Gemini, Grok, DeepSeek, Ollama…) with Codex CLI, App, SDK, and Claude Code",
+        "url": "https://github.com/lidge-jun/opencodex",
+        "source": "github",
+        "raw": 11595,
+        "date": "2026-08-21T10:41:28Z",
+        "born": "2026-06-18T23:03:18Z",
+        "score": 0.5785,
+        "signal": "category"
+      },
+      {
+        "title": "ShogunAI",
+        "url": "https://www.producthunt.com/products/shogunai",
+        "source": "producthunt",
+        "raw": 40,
+        "date": "2026-08-21T00:04:00-07:00",
+        "score": 0.5678,
+        "signal": "category"
+      },
+      {
+        "title": "Cung hoàng đạo thứ Bảy 22/8: Kim Ngưu thư thả, Song Tử thành người kể chuyện",
+        "url": "https://ngoisao.vnexpress.net/12-cung-hoang-dao-thu-7-ngay-22-8-2026-5110374.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "22 tháng 8",
+        "score": 0.3297,
+        "signal": "attention"
+      },
+      {
+        "title": "Mojo is now open source",
+        "url": "https://www.modular.com/blog/mojo-open-source",
+        "source": "hn",
+        "raw": 396,
+        "date": "2026-08-18T16:23:24Z",
+        "score": 0.6499,
+        "signal": "category"
+      },
+      {
+        "title": "cobusgreyling/loop-engineering — Practical patterns, starters & CLI tools for loop engineering with AI coding agents. Design systems that prompt and orchestrate agents (inspired by Addy Osmani and Boris Cherny). Includes loop-audit, loop-init, loop-cost.",
+        "url": "https://github.com/cobusgreyling/loop-engineering",
+        "source": "github",
+        "raw": 10519,
+        "date": "2026-08-21T08:22:55Z",
+        "born": "2026-06-09T06:28:20Z",
+        "score": 0.5102,
+        "signal": "category"
+      },
+      {
+        "title": "PixelRead AI OCR",
+        "url": "https://www.producthunt.com/products/pixelread-ai-ocr",
+        "source": "producthunt",
+        "raw": 39,
+        "date": "2026-08-20T14:21:51-07:00",
+        "score": 0.5255,
+        "signal": "category"
+      },
+      {
+        "title": "Người cao tuổi Lâm Đồng phát huy vai trò trong tình hình mới",
+        "url": "https://baolamdong.vn/nguoi-cao-tuoi-lam-dong-phat-huy-vai-tro-trong-tinh-hinh-moi-460742.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "người cao tuổi",
+        "score": 0.2637,
+        "signal": "attention"
+      },
+      {
+        "title": "Consumer Rights Wiki",
+        "url": "https://consumerrights.wiki/w/Main_Page",
+        "source": "hn",
+        "raw": 280,
+        "date": "2026-08-20T18:19:51Z",
+        "score": 0.6202,
+        "signal": "category"
+      },
+      {
+        "title": "DietrichGebert/ponytail — Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+        "url": "https://github.com/DietrichGebert/ponytail",
+        "source": "github",
+        "raw": 107064,
+        "date": "2026-08-07T21:44:01Z",
+        "born": "2026-06-12T00:52:37Z",
+        "score": 0.4426,
+        "signal": "category"
+      },
+      {
+        "title": "OneCLI",
+        "url": "https://www.producthunt.com/products/onecli",
+        "source": "producthunt",
+        "raw": 41,
+        "date": "2026-08-19T00:59:04-07:00",
+        "score": 0.5086,
+        "signal": "category"
+      },
+      {
+        "title": "Hiệu trưởng ở Đồng Nai nêu lý do xin làm giáo viên sau sắp xếp",
+        "url": "https://thanhnien.vn/hieu-truong-o-dong-nai-neu-ly-do-xin-xuong-lam-giao-vien-sau-sap-xep-185260820133552546.htm",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 01:20:00 -0700",
+        "term": "đồng nai",
+        "score": 0.1984,
+        "signal": "attention"
+      },
+      {
+        "title": "Vomit: Clean up Claude 5's token output with a separate LLM",
+        "url": "https://github.com/zachahn/vomit",
+        "source": "hn",
+        "raw": 262,
+        "date": "2026-08-20T15:26:02Z",
+        "score": 0.5836,
+        "signal": "category"
+      },
+      {
+        "title": "omnigent-ai/omnigent — Omnigent is an open-source AI agent framework and meta-harness: orchestrate Claude Code, Codex, Cursor, Pi, and custom agents — swap harnesses without rewriting, enforce policies and sandboxing, and collaborate in real time from any device.",
+        "url": "https://github.com/omnigent-ai/omnigent",
+        "source": "github",
+        "raw": 9127,
+        "date": "2026-08-21T08:48:58Z",
+        "born": "2026-06-11T12:18:13Z",
+        "score": 0.3832,
+        "signal": "category"
+      },
+      {
+        "title": "Flunkey",
+        "url": "https://www.producthunt.com/products/flunkey",
+        "source": "producthunt",
+        "raw": 38,
+        "date": "2026-08-20T11:50:24-07:00",
+        "score": 0.4974,
+        "signal": "category"
+      },
+      {
+        "title": "Hàng loạt địa phương bác tin giả về sắp xếp đơn vị hành chính cấp xã",
+        "url": "https://laodong.vn/thoi-su/hang-loat-dia-phuong-bac-tin-gia-ve-sap-xep-don-vi-hanh-chinh-cap-xa-1753216.ldo",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:00:00 -0700",
+        "term": "đơn vị hành chính",
+        "score": 0.1325,
+        "signal": "attention"
+      },
+      {
+        "title": "Babies born under sugar rationing grew into adults with lower cancer risk",
+        "url": "https://theconversation.com/babies-born-under-sugar-rationing-grew-into-adults-with-lower-cancer-risk-289873",
+        "source": "hn",
+        "raw": 297,
+        "date": "2026-08-18T14:06:50Z",
+        "score": 0.5402,
+        "signal": "category"
+      },
+      {
+        "title": "trycompai/crm — Comp AI CRM is an open source, CRM designed for AI agents. Agentic-first CRM.",
+        "url": "https://github.com/trycompai/crm",
+        "source": "github",
+        "raw": 8750,
+        "date": "2026-08-20T20:53:16Z",
+        "born": "2026-07-31T21:38:51Z",
+        "score": 0.3066,
+        "signal": "category"
+      },
+      {
+        "title": "Antigravity IDE Extensions",
+        "url": "https://www.producthunt.com/products/google-antigravity",
+        "source": "producthunt",
+        "raw": 34,
+        "date": "2026-08-20T23:58:44-07:00",
+        "score": 0.4689,
+        "signal": "category"
+      },
+      {
+        "title": "Con số may mắn ngày 21/8 - số tài lộc 12 con giáp theo năm sinh",
+        "url": "https://suckhoedoisong.vn/con-so-may-man-ngay-21-8-so-tai-loc-12-con-giap-theo-nam-sinh-169260820180203067.htm",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:20:00 -0700",
+        "term": "con giáp may mắn hôm nay",
+        "score": 0.0663,
+        "signal": "attention"
+      },
+      {
+        "title": "Muse Glimmer: 30B-parameter model optimized for always-on local agent workflows",
+        "url": "https://research.meta.ai/blog/introducing-muse-glimmer-open-agentic-model",
+        "source": "hn",
+        "raw": 1208,
+        "date": "2026-08-10T10:10:02Z",
+        "score": 0.5302,
+        "signal": "category"
+      },
+      {
+        "title": "StarTrail-org/PixelRAG — The end of web parsing. The beginning of scalable pixel-native search. link: https://pixelrag.ai/",
+        "url": "https://github.com/StarTrail-org/PixelRAG",
+        "source": "github",
+        "raw": 9643,
+        "date": "2026-07-31T08:52:00Z",
+        "born": "2026-05-29T07:25:40Z",
+        "score": 0.1945,
+        "signal": "category"
+      },
+      {
+        "title": "Plow Latch - Local AI Desktop Manager",
+        "url": "https://www.producthunt.com/products/plow-latch",
+        "source": "producthunt",
+        "raw": 35,
+        "date": "2026-08-19T16:12:47-07:00",
+        "score": 0.4444,
+        "signal": "category"
+      },
+      {
+        "title": "&apos;Don&apos;t get too comfortable&apos;: Wall Street’s ‘fear gauge’ hits 2026 low — here&apos;s why it&apos;s unlikely to last",
+        "url": "https://www.cnbc.com/2026/08/17/stock-market-volatility-vix-wall-street.html",
+        "source": "googletrends",
+        "raw": 100,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "vix",
+        "score": 0,
+        "signal": "attention"
+      }
+    ]
+  },
+  {
+    "category": "web3",
+    "label": "Web3 / Crypto",
+    "perSource": {
+      "hn": {
+        "count": 10,
+        "ms": 2002,
+        "sample": {
+          "title": "The Trumps' Crypto Project Just Got One Step Closer to Becoming a Bank",
+          "url": "https://www.motherjones.com/politics/2026/08/donald-trump-world-liberty-regulatory-approval/",
+          "source": "hn",
+          "raw": 55,
+          "date": "2026-08-16T19:41:18Z",
+          "score": 0.1591,
+          "signal": "category"
+        }
+      },
+      "github": {
+        "count": 15,
+        "ms": 896,
+        "sample": {
+          "title": "MIgHTy-alIeN/ai-trader-bot — An arbitrage bot is a smart contract connected to an external automation script that controls its operation.",
+          "url": "https://github.com/MIgHTy-alIeN/ai-trader-bot",
+          "source": "github",
+          "raw": 2688,
+          "date": "2026-08-21T10:43:00Z",
+          "born": "2026-07-17T09:45:22Z",
+          "score": 0.9,
+          "signal": "category"
+        }
+      },
+      "producthunt": {
+        "count": 1,
+        "ms": 53,
+        "sample": {
+          "title": "Router by Ramp",
+          "url": "https://www.producthunt.com/products/ramp-router",
+          "source": "producthunt",
+          "raw": 36,
+          "date": "2026-08-20T06:50:53-07:00",
+          "score": 0.6523,
+          "signal": "category"
+        }
+      },
+      "coingecko": {
+        "count": 20,
+        "ms": 190,
+        "sample": {
+          "title": "Bitcoin (BTC) trending on CoinGecko",
+          "url": "https://www.coingecko.com/en/coins/bitcoin",
+          "source": "coingecko",
+          "raw": 20,
+          "date": "2026-08-21T10:43:06.009Z",
+          "score": 0.9,
+          "signal": "category"
+        }
+      },
+      "googletrends": {
+        "count": 10,
+        "ms": 288,
+        "sample": {
+          "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+          "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+          "source": "googletrends",
+          "raw": 50000,
+          "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+          "term": "xổ số miền trung thứ sáu",
+          "score": 0.5978,
+          "signal": "attention"
+        }
+      }
+    },
+    "health": {
+      "total": 40,
+      "per_source": {
+        "hn": 9,
+        "github": 10,
+        "coingecko": 10,
+        "producthunt": 1,
+        "googletrends": 10
+      },
+      "unique_sources": 5,
+      "dupes_removed": 1,
+      "median_age_days": 0.2,
+      "healthy": true
+    },
+    "items": [
+      {
+        "title": "Malicious Rust crate Arrayref runs a build-time payload",
+        "url": "https://safedep.io/arrayref-proc-macro1-rust-build-time-malware/",
+        "source": "hn",
+        "raw": 505,
+        "date": "2026-08-20T13:23:12Z",
+        "score": 0.9304,
+        "signal": "category"
+      },
+      {
+        "title": "MIgHTy-alIeN/ai-trader-bot — An arbitrage bot is a smart contract connected to an external automation script that controls its operation.",
+        "url": "https://github.com/MIgHTy-alIeN/ai-trader-bot",
+        "source": "github",
+        "raw": 2688,
+        "date": "2026-08-21T10:43:00Z",
+        "born": "2026-07-17T09:45:22Z",
+        "score": 0.9,
+        "signal": "category"
+      },
+      {
+        "title": "Bitcoin (BTC) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/bitcoin",
+        "source": "coingecko",
+        "raw": 20,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.9,
+        "signal": "category"
+      },
+      {
+        "title": "Router by Ramp",
+        "url": "https://www.producthunt.com/products/ramp-router",
+        "source": "producthunt",
+        "raw": 36,
+        "date": "2026-08-20T06:50:53-07:00",
+        "score": 0.6523,
+        "signal": "category"
+      },
+      {
+        "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+        "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+        "source": "googletrends",
+        "raw": 50000,
+        "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+        "term": "xổ số miền trung thứ sáu",
+        "score": 0.5978,
+        "signal": "attention"
+      },
+      {
+        "title": "Going Dark, and the era of law enforcement hacking",
+        "url": "https://blog.cryptographyengineering.com/2026/08/14/everything-is-about-to-go-dark/",
+        "source": "hn",
+        "raw": 460,
+        "date": "2026-08-14T20:52:44Z",
+        "score": 0.5699,
+        "signal": "category"
+      },
+      {
+        "title": "painn-n/onchainsms",
+        "url": "https://github.com/painn-n/onchainsms",
+        "source": "github",
+        "raw": 1153,
+        "date": "2026-08-18T19:24:22Z",
+        "born": "2026-06-07T19:21:25Z",
+        "score": 0.6821,
+        "signal": "category"
+      },
+      {
+        "title": "Ethena (ENA) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/ethena",
+        "source": "coingecko",
+        "raw": 19,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.8526,
+        "signal": "category"
+      },
+      {
+        "title": "Lịch thi đấu bóng chuyền nữ châu Á 2026 hôm nay (21.8)",
+        "url": "https://laodong.vn/bong-chuyen/lich-thi-dau-bong-chuyen-nu-chau-a-2026-hom-nay-218-1753651.ldo",
+        "source": "googletrends",
+        "raw": 5000,
+        "date": "Thu, 20 Aug 2026 23:50:00 -0700",
+        "term": "đội tuyển bóng chuyền nữ quốc gia việt nam",
+        "score": 0.5262,
+        "signal": "attention"
+      },
+      {
+        "title": "Show HN: Open-source Stripe Connect alternative",
+        "url": "https://zoneless.com",
+        "source": "hn",
+        "raw": 74,
+        "date": "2026-08-20T14:38:45Z",
+        "score": 0.5191,
+        "signal": "category"
+      },
+      {
+        "title": "VoltiusApp/voltius — A lightning-fast, modern, local-first SSH/SFTP/Serial client. Real-time E2EE sync, Team vaults, live sharing, plugins and more. Open-source Termius alternative for Windows, Linux, macOS & Android. Built with Rust/Tauri.",
+        "url": "https://github.com/VoltiusApp/voltius",
+        "source": "github",
+        "raw": 503,
+        "date": "2026-08-20T17:23:04Z",
+        "born": "2026-04-17T16:54:34Z",
+        "score": 0.6061,
+        "signal": "category"
+      },
+      {
+        "title": "Aligned (ALIGN) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/aligned",
+        "source": "coingecko",
+        "raw": 18,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.8053,
+        "signal": "category"
+      },
+      {
+        "title": "El Atlético acepta traspasar a Julián al Arsenal, pero el jugador dice &apos;no&apos;",
+        "url": "https://www.mundodeportivo.com/futbol/fc-barcelona/20260820/1004218109/atletico-acepta-traspasar-julian-arsenal-jugador-dice-no.html",
+        "source": "googletrends",
+        "raw": 1000,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "julian alvarez",
+        "score": 0.4602,
+        "signal": "attention"
+      },
+      {
+        "title": "A quick look at zero-knowledge proofs",
+        "url": "https://bernsteinbear.com/blog/zkp/",
+        "source": "hn",
+        "raw": 89,
+        "date": "2026-08-14T19:52:05Z",
+        "score": 0.4265,
+        "signal": "category"
+      },
+      {
+        "title": "Gabson0x/bountyforge — All-round bug bounty skill for Claude Code  parallelized agents for smart contract audits (EVM, Move, Solana, TRON), web/API security, and submission-ready reports for HackerOne, Bugcrowd, Intigriti & Immunefi.",
+        "url": "https://github.com/Gabson0x/bountyforge",
+        "source": "github",
+        "raw": 384,
+        "date": "2026-08-20T04:46:26Z",
+        "born": "2026-04-16T09:59:03Z",
+        "score": 0.5234,
+        "signal": "category"
+      },
+      {
+        "title": "Hyperliquid (HYPE) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/hyperliquid",
+        "source": "coingecko",
+        "raw": 17,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.7579,
+        "signal": "category"
+      },
+      {
+        "title": "Quang Lê: \"Qua đám tang của mẹ, tôi mới đo được lòng dạ của một số người tưởng là thân lắm\"",
+        "url": "https://cafef.vn/quang-le-qua-dam-tang-cua-me-toi-moi-do-duoc-long-da-cua-mot-so-nguoi-tuong-la-than-lam-188260821100502215.chn",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:10:00 -0700",
+        "term": "quang lê",
+        "score": 0.3951,
+        "signal": "attention"
+      },
+      {
+        "title": "Ask HN: In your experience, what are sound conventions for e-ink UI development?",
+        "url": "https://news.ycombinator.com/item?id=49213660",
+        "source": "hn",
+        "raw": 219,
+        "date": "2026-08-07T17:29:16Z",
+        "score": 0.3808,
+        "signal": "category"
+      },
+      {
+        "title": "okx/onchainos-skills — Skills for AI agents to integrate with the OKX OnchainOS API — Wallet, token discovery, market data, DEX swap, and transaction broadcasting.",
+        "url": "https://github.com/okx/onchainos-skills",
+        "source": "github",
+        "raw": 324,
+        "date": "2026-08-21T10:12:55Z",
+        "born": "2026-02-28T08:41:21Z",
+        "score": 0.3209,
+        "signal": "category"
+      },
+      {
+        "title": "Pump.fun (PUMP) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/pump-fun",
+        "source": "coingecko",
+        "raw": 16,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.7105,
+        "signal": "category"
+      },
+      {
+        "title": "Cung hoàng đạo thứ Bảy 22/8: Kim Ngưu thư thả, Song Tử thành người kể chuyện",
+        "url": "https://ngoisao.vnexpress.net/12-cung-hoang-dao-thu-7-ngay-22-8-2026-5110374.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "22 tháng 8",
+        "score": 0.3296,
+        "signal": "attention"
+      },
+      {
+        "title": "Chain-of-Thought Reasoning in the Wild Is Not Always Faithful (2025)",
+        "url": "https://arxiv.org/abs/2503.08679",
+        "source": "hn",
+        "raw": 64,
+        "date": "2026-08-19T16:18:57Z",
+        "score": 0.2899,
+        "signal": "category"
+      },
+      {
+        "title": "adshao/flounder — Autonomous white-hat security auditor for AI-driven code review, bug bounty research, exploit construction, and execution-grounded verification.",
+        "url": "https://github.com/adshao/flounder",
+        "source": "github",
+        "raw": 330,
+        "date": "2026-08-18T14:04:22Z",
+        "born": "2026-06-05T14:47:32Z",
+        "score": 0.31,
+        "signal": "category"
+      },
+      {
+        "title": "pipedog (PIPEDOG) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/pipedog",
+        "source": "coingecko",
+        "raw": 15,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.6632,
+        "signal": "category"
+      },
+      {
+        "title": "Người cao tuổi Lâm Đồng phát huy vai trò trong tình hình mới",
+        "url": "https://baolamdong.vn/nguoi-cao-tuoi-lam-dong-phat-huy-vai-tro-trong-tinh-hinh-moi-460742.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "người cao tuổi",
+        "score": 0.2637,
+        "signal": "attention"
+      },
+      {
+        "title": "The Trumps' Crypto Project Just Got One Step Closer to Becoming a Bank",
+        "url": "https://www.motherjones.com/politics/2026/08/donald-trump-world-liberty-regulatory-approval/",
+        "source": "hn",
+        "raw": 55,
+        "date": "2026-08-16T19:41:18Z",
+        "score": 0.1591,
+        "signal": "category"
+      },
+      {
+        "title": "moltlaunch/cashclaw — An autonomous agent that takes work, does work, gets paid, and gets better at it.",
+        "url": "https://github.com/moltlaunch/cashclaw",
+        "source": "github",
+        "raw": 1095,
+        "date": "2026-03-14T01:41:27Z",
+        "born": "2026-03-10T03:25:46Z",
+        "score": 0.3086,
+        "signal": "category"
+      },
+      {
+        "title": "Ethereum (ETH) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/ethereum",
+        "source": "coingecko",
+        "raw": 14,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.6158,
+        "signal": "category"
+      },
+      {
+        "title": "Hiệu trưởng ở Đồng Nai nêu lý do xin làm giáo viên sau sắp xếp",
+        "url": "https://thanhnien.vn/hieu-truong-o-dong-nai-neu-ly-do-xin-xuong-lam-giao-vien-sau-sap-xep-185260820133552546.htm",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 01:20:00 -0700",
+        "term": "đồng nai",
+        "score": 0.1984,
+        "signal": "attention"
+      },
+      {
+        "title": "Binance gave Russia crypto donation records for Ukraine fundraisers",
+        "url": "https://www.reuters.com/legal/government/binance-gave-moscow-client-details-used-charge-russian-over-ukraine-donations-2026-08-17/",
+        "source": "hn",
+        "raw": 42,
+        "date": "2026-08-17T14:13:55Z",
+        "score": 0.0835,
+        "signal": "category"
+      },
+      {
+        "title": "ZhangJinHaHaHa/AgentLens — Agentlens is a trusted agent trading platform.  Here, you can quickly find the Agent that meets your needs, and you can also publish your own Agent to turn it into your digital asset.  We encourage everyone to transform their areas of expertise into Agents and turn them into digital assets, allowing others to see your unique strengths.",
+        "url": "https://github.com/ZhangJinHaHaHa/AgentLens",
+        "source": "github",
+        "raw": 1035,
+        "date": "2026-07-27T14:19:49Z",
+        "born": "2026-04-15T16:21:03Z",
+        "score": 0.2964,
+        "signal": "category"
+      },
+      {
+        "title": "XRP (XRP) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/ripple",
+        "source": "coingecko",
+        "raw": 13,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.5684,
+        "signal": "category"
+      },
+      {
+        "title": "Hàng loạt địa phương bác tin giả về sắp xếp đơn vị hành chính cấp xã",
+        "url": "https://laodong.vn/thoi-su/hang-loat-dia-phuong-bac-tin-gia-ve-sap-xep-don-vi-hanh-chinh-cap-xa-1753216.ldo",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:00:00 -0700",
+        "term": "đơn vị hành chính",
+        "score": 0.1325,
+        "signal": "attention"
+      },
+      {
+        "title": "Supply Chain Attack on Arrayref",
+        "url": "https://blog.rust-lang.org/2026/08/20/supply-chain-attack-on-arrayref/",
+        "source": "hn",
+        "raw": 33,
+        "date": "2026-08-20T10:46:56Z",
+        "score": 0,
+        "signal": "category"
+      },
+      {
+        "title": "Skyfay/SkySend — Minimalist, end-to-end encrypted, self-hostable file and note sharing. Zero-knowledge server - files and notes are encrypted in the browser before upload. No accounts, no telemetry, built for speed and security.",
+        "url": "https://github.com/Skyfay/SkySend",
+        "source": "github",
+        "raw": 373,
+        "date": "2026-07-30T20:58:26Z",
+        "born": "2026-04-06T17:24:04Z",
+        "score": 0.2212,
+        "signal": "category"
+      },
+      {
+        "title": "Monad (MON) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/monad",
+        "source": "coingecko",
+        "raw": 12,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.5211,
+        "signal": "category"
+      },
+      {
+        "title": "Con số may mắn ngày 21/8 - số tài lộc 12 con giáp theo năm sinh",
+        "url": "https://suckhoedoisong.vn/con-so-may-man-ngay-21-8-so-tai-loc-12-con-giap-theo-nam-sinh-169260820180203067.htm",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:20:00 -0700",
+        "term": "con giáp may mắn hôm nay",
+        "score": 0.0663,
+        "signal": "attention"
+      },
+      {
+        "title": "Wadoozie/SmartContracts",
+        "url": "https://github.com/Wadoozie/SmartContracts",
+        "source": "github",
+        "raw": 368,
+        "date": "2026-05-31T07:18:47Z",
+        "born": "2026-04-02T16:34:58Z",
+        "score": 0.18,
+        "signal": "category"
+      },
+      {
+        "title": "Zcash (ZEC) trending on CoinGecko",
+        "url": "https://www.coingecko.com/en/coins/zcash",
+        "source": "coingecko",
+        "raw": 11,
+        "date": "2026-08-21T10:43:06.009Z",
+        "score": 0.4737,
+        "signal": "category"
+      },
+      {
+        "title": "&apos;Don&apos;t get too comfortable&apos;: Wall Street’s ‘fear gauge’ hits 2026 low — here&apos;s why it&apos;s unlikely to last",
+        "url": "https://www.cnbc.com/2026/08/17/stock-market-volatility-vix-wall-street.html",
+        "source": "googletrends",
+        "raw": 100,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "vix",
+        "score": 0,
+        "signal": "attention"
+      }
+    ]
+  },
+  {
+    "category": "fintech",
+    "label": "FinTech",
+    "perSource": {
+      "hn": {
+        "count": 6,
+        "ms": 2015,
+        "sample": {
+          "title": "Moderna reports first positive Phase 3 for mRNA neoantigen therapy in melanoma",
+          "url": "https://twitter.com/NoubarAfeyan/status/2090050162441752787",
+          "source": "hn",
+          "raw": 592,
+          "date": "2026-08-19T13:33:35Z",
+          "score": 0.8622,
+          "signal": "category"
+        }
+      },
+      "github": {
+        "count": 15,
+        "ms": 790,
+        "sample": {
+          "title": "xrpcommunity/XRP-community-wallet — Fully decentralized and the most secure XRP &  EVM wallet - built by the community, for the community.",
+          "url": "https://github.com/xrpcommunity/XRP-community-wallet",
+          "source": "github",
+          "raw": 1924,
+          "date": "2026-07-09T14:26:11Z",
+          "born": "2026-05-12T07:09:25Z",
+          "score": 0.3614,
+          "signal": "category"
+        }
+      },
+      "producthunt": {
+        "count": 0,
+        "ms": 48,
+        "sample": null
+      },
+      "coingecko": {
+        "count": 0,
+        "ms": 0,
+        "sample": null
+      },
+      "googletrends": {
+        "count": 10,
+        "ms": 147,
+        "sample": {
+          "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+          "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+          "source": "googletrends",
+          "raw": 50000,
+          "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+          "term": "xổ số miền trung thứ sáu",
+          "score": 0.5978,
+          "signal": "attention"
+        }
+      }
+    },
+    "health": {
+      "total": 31,
+      "per_source": {
+        "hn": 6,
+        "github": 15,
+        "googletrends": 10
+      },
+      "unique_sources": 3,
+      "dupes_removed": 0,
+      "median_age_days": 2,
+      "healthy": true
+    },
+    "items": [
+      {
+        "title": "Moderna reports first positive Phase 3 for mRNA neoantigen therapy in melanoma",
+        "url": "https://twitter.com/NoubarAfeyan/status/2090050162441752787",
+        "source": "hn",
+        "raw": 592,
+        "date": "2026-08-19T13:33:35Z",
+        "score": 0.8622,
+        "signal": "category"
+      },
+      {
+        "title": "Leutenegger/coldcard-airgap — Offline utilities for Coldcard hardware wallet users: PSBT inspection, BIP39/dice entropy, Seed XOR split/combine, BBQr encode/decode, output descriptors, and firmware verification guidance. Companion to official Coldcard firmware. Not affiliated with Coinkite.",
+        "url": "https://github.com/Leutenegger/coldcard-airgap",
+        "source": "github",
+        "raw": 608,
+        "date": "2026-08-20T23:24:07Z",
+        "born": "2026-08-20T23:14:34Z",
+        "score": 0.804,
+        "signal": "category"
+      },
+      {
+        "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+        "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+        "source": "googletrends",
+        "raw": 50000,
+        "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+        "term": "xổ số miền trung thứ sáu",
+        "score": 0.5978,
+        "signal": "attention"
+      },
+      {
+        "title": "Show HN: Woxi - Open-source Mathematica / Wolfram Language reimplementation",
+        "url": "https://woxi.ad-si.com",
+        "source": "hn",
+        "raw": 314,
+        "date": "2026-08-12T10:06:29Z",
+        "score": 0.4574,
+        "signal": "category"
+      },
+      {
+        "title": "auscaster/frantic-board — HELP WANTED: AI AGENTS. Real bounties, real money, every payout sealed to a public ledger. The notice board for gofrantic.com",
+        "url": "https://github.com/auscaster/frantic-board",
+        "source": "github",
+        "raw": 231,
+        "date": "2026-08-21T07:09:50Z",
+        "born": "2026-06-11T11:18:38Z",
+        "score": 0.6985,
+        "signal": "category"
+      },
+      {
+        "title": "Lịch thi đấu bóng chuyền nữ châu Á 2026 hôm nay (21.8)",
+        "url": "https://laodong.vn/bong-chuyen/lich-thi-dau-bong-chuyen-nu-chau-a-2026-hom-nay-218-1753651.ldo",
+        "source": "googletrends",
+        "raw": 5000,
+        "date": "Thu, 20 Aug 2026 23:50:00 -0700",
+        "term": "đội tuyển bóng chuyền nữ quốc gia việt nam",
+        "score": 0.5262,
+        "signal": "attention"
+      },
+      {
+        "title": "Launch HN: Speko (YC S26) – OpenRouter for Voice AI",
+        "url": "https://speko.ai/",
+        "source": "hn",
+        "raw": 118,
+        "date": "2026-08-17T15:36:18Z",
+        "score": 0.4527,
+        "signal": "category"
+      },
+      {
+        "title": "Helius-Finance/helius-finance-tracker — Local-first personal finance tracker for with a Rust CLI/TUI, SQLite ledger, budgets, recurring bills, reconciliation, and cashflow forecasting.",
+        "url": "https://github.com/Helius-Finance/helius-finance-tracker",
+        "source": "github",
+        "raw": 168,
+        "date": "2026-08-19T09:54:23Z",
+        "born": "2026-03-17T10:46:34Z",
+        "score": 0.4933,
+        "signal": "category"
+      },
+      {
+        "title": "El Atlético acepta traspasar a Julián al Arsenal, pero el jugador dice &apos;no&apos;",
+        "url": "https://www.mundodeportivo.com/futbol/fc-barcelona/20260820/1004218109/atletico-acepta-traspasar-julian-arsenal-jugador-dice-no.html",
+        "source": "googletrends",
+        "raw": 1000,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "julian alvarez",
+        "score": 0.4602,
+        "signal": "attention"
+      },
+      {
+        "title": "Launch HN: OneCLI (YC S26) – OSS sandboxed agent harness for teams",
+        "url": "https://github.com/onecli/onecli",
+        "source": "hn",
+        "raw": 86,
+        "date": "2026-08-19T16:29:02Z",
+        "score": 0.348,
+        "signal": "category"
+      },
+      {
+        "title": "xrpcommunity/XRP-community-wallet — Fully decentralized and the most secure XRP &  EVM wallet - built by the community, for the community.",
+        "url": "https://github.com/xrpcommunity/XRP-community-wallet",
+        "source": "github",
+        "raw": 1924,
+        "date": "2026-07-09T14:26:11Z",
+        "born": "2026-05-12T07:09:25Z",
+        "score": 0.3614,
+        "signal": "category"
+      },
+      {
+        "title": "Quang Lê: \"Qua đám tang của mẹ, tôi mới đo được lòng dạ của một số người tưởng là thân lắm\"",
+        "url": "https://cafef.vn/quang-le-qua-dam-tang-cua-me-toi-moi-do-duoc-long-da-cua-mot-so-nguoi-tuong-la-than-lam-188260821100502215.chn",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:10:00 -0700",
+        "term": "quang lê",
+        "score": 0.3951,
+        "signal": "attention"
+      },
+      {
+        "title": "Launch HN: machine0 (YC S26) – Persistent CPU and GPU VMs from the CLI",
+        "url": "https://machine0.io",
+        "source": "hn",
+        "raw": 81,
+        "date": "2026-08-18T16:26:42Z",
+        "score": 0.1618,
+        "signal": "category"
+      },
+      {
+        "title": "hashgraph-online/standards-sdk-go — The official HOL SDK for Go, implementing the Hiero Consensus Specifications (https://github.com/hiero-ledger/hiero-consensus-specifications).   See official documentation found in https://hol.org/docs/standards",
+        "url": "https://github.com/hashgraph-online/standards-sdk-go",
+        "source": "github",
+        "raw": 306,
+        "date": "2026-04-10T15:14:14Z",
+        "born": "2026-02-28T15:02:00Z",
+        "score": 0.3086,
+        "signal": "category"
+      },
+      {
+        "title": "Cung hoàng đạo thứ Bảy 22/8: Kim Ngưu thư thả, Song Tử thành người kể chuyện",
+        "url": "https://ngoisao.vnexpress.net/12-cung-hoang-dao-thu-7-ngay-22-8-2026-5110374.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "22 tháng 8",
+        "score": 0.3296,
+        "signal": "attention"
+      },
+      {
+        "title": "Ask HN: I've quit six systems for tracking my illness. What works?",
+        "url": "https://news.ycombinator.com/item?id=49313346",
+        "source": "hn",
+        "raw": 52,
+        "date": "2026-08-15T19:09:42Z",
+        "score": 0,
+        "signal": "category"
+      },
+      {
+        "title": "kaihv/open-banking-chile — Open source scrapers para bancos chilenos. Obtén tus movimientos y saldo como JSON. Contribuye con tu banco!",
+        "url": "https://github.com/kaihv/open-banking-chile",
+        "source": "github",
+        "raw": 203,
+        "date": "2026-05-13T02:50:37Z",
+        "born": "2026-03-08T12:02:38Z",
+        "score": 0.2571,
+        "signal": "category"
+      },
+      {
+        "title": "Người cao tuổi Lâm Đồng phát huy vai trò trong tình hình mới",
+        "url": "https://baolamdong.vn/nguoi-cao-tuoi-lam-dong-phat-huy-vai-tro-trong-tinh-hinh-moi-460742.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "người cao tuổi",
+        "score": 0.2637,
+        "signal": "attention"
+      },
+      {
+        "title": "zh667/TokenLedger — Relay-site attributed token usage for DeepSeek Harness — zero config, no credentials",
+        "url": "https://github.com/zh667/TokenLedger",
+        "source": "github",
+        "raw": 123,
+        "date": "2026-08-17T09:36:20Z",
+        "born": "2026-08-14T08:32:47Z",
+        "score": 0.2386,
+        "signal": "category"
+      },
+      {
+        "title": "Hiệu trưởng ở Đồng Nai nêu lý do xin làm giáo viên sau sắp xếp",
+        "url": "https://thanhnien.vn/hieu-truong-o-dong-nai-neu-ly-do-xin-xuong-lam-giao-vien-sau-sap-xep-185260820133552546.htm",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 01:20:00 -0700",
+        "term": "đồng nai",
+        "score": 0.1984,
+        "signal": "attention"
+      },
+      {
+        "title": "meamaturinlove221/TuringResearch_plus — Turn messy research goals into evidence ledgers, method cards, experiment routes, artifact audits, and advisor-ready reports.",
+        "url": "https://github.com/meamaturinlove221/TuringResearch_plus",
+        "source": "github",
+        "raw": 138,
+        "date": "2026-06-02T11:59:39Z",
+        "born": "2026-05-20T03:06:04Z",
+        "score": 0.2057,
+        "signal": "category"
+      },
+      {
+        "title": "Hàng loạt địa phương bác tin giả về sắp xếp đơn vị hành chính cấp xã",
+        "url": "https://laodong.vn/thoi-su/hang-loat-dia-phuong-bac-tin-gia-ve-sap-xep-don-vi-hanh-chinh-cap-xa-1753216.ldo",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:00:00 -0700",
+        "term": "đơn vị hành chính",
+        "score": 0.1325,
+        "signal": "attention"
+      },
+      {
+        "title": "PatrickSUDO/fadacai-portfolio — Claude Code 投資研究與組合管理框架：skills + MCP + 第一性原理紀律 + thesis ledger",
+        "url": "https://github.com/PatrickSUDO/fadacai-portfolio",
+        "source": "github",
+        "raw": 137,
+        "date": "2026-07-30T16:11:02Z",
+        "born": "2026-05-31T09:48:15Z",
+        "score": 0.1932,
+        "signal": "category"
+      },
+      {
+        "title": "Con số may mắn ngày 21/8 - số tài lộc 12 con giáp theo năm sinh",
+        "url": "https://suckhoedoisong.vn/con-so-may-man-ngay-21-8-so-tai-loc-12-con-giap-theo-nam-sinh-169260820180203067.htm",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:20:00 -0700",
+        "term": "con giáp may mắn hôm nay",
+        "score": 0.0663,
+        "signal": "attention"
+      },
+      {
+        "title": "mergeos-bounties/mergeos — MergeOS — bounty marketplace, ledger, scan, and agent protocol platform",
+        "url": "https://github.com/mergeos-bounties/mergeos",
+        "source": "github",
+        "raw": 131,
+        "date": "2026-07-21T01:44:29Z",
+        "born": "2026-05-26T04:55:11Z",
+        "score": 0.1573,
+        "signal": "category"
+      },
+      {
+        "title": "&apos;Don&apos;t get too comfortable&apos;: Wall Street’s ‘fear gauge’ hits 2026 low — here&apos;s why it&apos;s unlikely to last",
+        "url": "https://www.cnbc.com/2026/08/17/stock-market-volatility-vix-wall-street.html",
+        "source": "googletrends",
+        "raw": 100,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "vix",
+        "score": 0,
+        "signal": "attention"
+      },
+      {
+        "title": "TNT-Likely/BeeCount-Cloud — Self-hosted cloud for BeeCount — one Docker image runs the sync server + web app · multi-device realtime sync · shared ledgers | 蜜蜂记账自建云:一个 Docker 镜像跑齐同步服务与 Web 端 · 多端实时同步 · 共享账本",
+        "url": "https://github.com/TNT-Likely/BeeCount-Cloud",
+        "source": "github",
+        "raw": 111,
+        "date": "2026-08-13T12:54:07Z",
+        "born": "2026-04-18T10:55:09Z",
+        "score": 0.1544,
+        "signal": "category"
+      },
+      {
+        "title": "Anionex/dsh-turn-rewind — deepseek harness对话和代码状态回退插件 | DSH — rewind conversation and workspace state, powered by a persistent Change Ledger",
+        "url": "https://github.com/Anionex/dsh-turn-rewind",
+        "source": "github",
+        "raw": 94,
+        "date": "2026-08-16T17:17:17Z",
+        "born": "2026-08-13T12:36:53Z",
+        "score": 0.1372,
+        "signal": "category"
+      },
+      {
+        "title": "Justin0504/Sovereign-OS — Constitution-first AI orchestration: one Charter (YAML) defines mission, budget & rules. CEO plans → CFO approves → Ledger tracks every cent & token → Auditor scores. 16 workers, Stripe, MCP. Think. Audit. Execute.",
+        "url": "https://github.com/Justin0504/Sovereign-OS",
+        "source": "github",
+        "raw": 90,
+        "date": "2026-08-18T21:04:58Z",
+        "born": "2026-03-04T11:58:01Z",
+        "score": 0.1055,
+        "signal": "category"
+      },
+      {
+        "title": "xiaolai/no-one-did-it — No One Did It: Responsibility Laundering, from the Scapegoat to the Algorithm — published manuscript, 292-card source ledger, and the 13-agent apparatus that built it.",
+        "url": "https://github.com/xiaolai/no-one-did-it",
+        "source": "github",
+        "raw": 85,
+        "date": "2026-05-31T07:43:33Z",
+        "born": "2026-05-31T05:43:50Z",
+        "score": 0.0257,
+        "signal": "category"
+      },
+      {
+        "title": "gviiisen/repo-context-ledger — Open Agent Skill that keeps repository context, feature specs, change handoffs, and README summaries synchronized across AI coding tools.",
+        "url": "https://github.com/gviiisen/repo-context-ledger",
+        "source": "github",
+        "raw": 72,
+        "date": "2026-08-21T07:18:56Z",
+        "born": "2026-08-11T10:14:00Z",
+        "score": 0,
+        "signal": "category"
+      }
+    ]
+  },
+  {
+    "category": "saas",
+    "label": "B2B SaaS / DevTools",
+    "perSource": {
+      "hn": {
+        "count": 11,
+        "ms": 2041,
+        "sample": {
+          "title": "Launch HN: Vendo (YC S26) – Let users build features on top of your product",
+          "url": "https://github.com/runvendo/vendo",
+          "source": "hn",
+          "raw": 39,
+          "date": "2026-08-20T15:29:52Z",
+          "score": 0.2811,
+          "signal": "category"
+        }
+      },
+      "github": {
+        "count": 15,
+        "ms": 864,
+        "sample": {
+          "title": "DietrichGebert/ponytail — Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+          "url": "https://github.com/DietrichGebert/ponytail",
+          "source": "github",
+          "raw": 107064,
+          "date": "2026-08-07T21:44:01Z",
+          "born": "2026-06-12T00:52:37Z",
+          "score": 0.4426,
+          "signal": "category"
+        }
+      },
+      "producthunt": {
+        "count": 2,
+        "ms": 49,
+        "sample": {
+          "title": "Hermai Brand API",
+          "url": "https://www.producthunt.com/products/hermai-brand-api",
+          "source": "producthunt",
+          "raw": 16,
+          "date": "2026-08-19T18:12:56-07:00",
+          "score": 0.6261,
+          "signal": "category"
+        }
+      },
+      "coingecko": {
+        "count": 0,
+        "ms": 0,
+        "sample": null
+      },
+      "googletrends": {
+        "count": 10,
+        "ms": 219,
+        "sample": {
+          "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+          "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+          "source": "googletrends",
+          "raw": 50000,
+          "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+          "term": "xổ số miền trung thứ sáu",
+          "score": 0.5978,
+          "signal": "attention"
+        }
+      }
+    },
+    "health": {
+      "total": 36,
+      "per_source": {
+        "hn": 9,
+        "github": 15,
+        "producthunt": 2,
+        "googletrends": 10
+      },
+      "unique_sources": 4,
+      "dupes_removed": 2,
+      "median_age_days": 0.4,
+      "healthy": true
+    },
+    "items": [
+      {
+        "title": "Launch HN: OneCLI (YC S26) – OSS sandboxed agent harness for teams",
+        "url": "https://github.com/onecli/onecli",
+        "source": "hn",
+        "raw": 86,
+        "date": "2026-08-19T16:29:02Z",
+        "score": 0.7831,
+        "signal": "category"
+      },
+      {
+        "title": "odysseus-dev/odysseus — Self-hosted AI workspace. ",
+        "url": "https://github.com/odysseus-dev/odysseus",
+        "source": "github",
+        "raw": 85854,
+        "date": "2026-08-20T17:39:01Z",
+        "born": "2026-05-31T14:05:51Z",
+        "score": 0.7886,
+        "signal": "category"
+      },
+      {
+        "title": "Hermai Brand API",
+        "url": "https://www.producthunt.com/products/hermai-brand-api",
+        "source": "producthunt",
+        "raw": 16,
+        "date": "2026-08-19T18:12:56-07:00",
+        "score": 0.6261,
+        "signal": "category"
+      },
+      {
+        "title": "Kết quả xổ số miền Nam hôm nay 20.8",
+        "url": "https://laodong.vn/ldt/tin-tuc/ket-qua-xo-so-mien-nam-hom-nay-208-1753386.ldo",
+        "source": "googletrends",
+        "raw": 50000,
+        "date": "Fri, 21 Aug 2026 02:40:00 -0700",
+        "term": "xổ số miền trung thứ sáu",
+        "score": 0.5978,
+        "signal": "attention"
+      },
+      {
+        "title": "Self hosted email continues to steeply decline",
+        "url": "https://labs.ripe.net/author/artem-berezin/two-providers-a-stubborn-plateau-and-a-very-long-tail-email-in-the-tranco-top-1m/",
+        "source": "hn",
+        "raw": 123,
+        "date": "2026-08-17T10:45:14Z",
+        "score": 0.7447,
+        "signal": "category"
+      },
+      {
+        "title": "lidge-jun/opencodex — Universal provider proxy for OpenAI Codex & Claude Code — use any LLM (Claude, Gemini, Grok, DeepSeek, Ollama…) with Codex CLI, App, SDK, and Claude Code",
+        "url": "https://github.com/lidge-jun/opencodex",
+        "source": "github",
+        "raw": 11595,
+        "date": "2026-08-21T10:41:28Z",
+        "born": "2026-06-18T23:03:18Z",
+        "score": 0.7714,
+        "signal": "category"
+      },
+      {
+        "title": "MeetStream AI",
+        "url": "https://www.producthunt.com/products/meetstream-ai",
+        "source": "producthunt",
+        "raw": 12,
+        "date": "2026-08-18T23:15:44-07:00",
+        "score": 0,
+        "signal": "category"
+      },
+      {
+        "title": "Lịch thi đấu bóng chuyền nữ châu Á 2026 hôm nay (21.8)",
+        "url": "https://laodong.vn/bong-chuyen/lich-thi-dau-bong-chuyen-nu-chau-a-2026-hom-nay-218-1753651.ldo",
+        "source": "googletrends",
+        "raw": 5000,
+        "date": "Thu, 20 Aug 2026 23:50:00 -0700",
+        "term": "đội tuyển bóng chuyền nữ quốc gia việt nam",
+        "score": 0.5262,
+        "signal": "attention"
+      },
+      {
+        "title": "An Engineer's Old Cooking Trick Is Going Viral, Divides the Internet",
+        "url": "https://pleated-jeans.com/2026/08/15/engineers-forgotten-recipe-hack-viral-divides-internet/",
+        "source": "hn",
+        "raw": 62,
+        "date": "2026-08-18T14:40:42Z",
+        "score": 0.5635,
+        "signal": "category"
+      },
+      {
+        "title": "openai/codex-security — OpenAI's Codex Security CLI and TypeScript SDK for finding, validating, and fixing security vulnerabilities. npm: https://www.npmjs.com/package/@openai/codex-security",
+        "url": "https://github.com/openai/codex-security",
+        "source": "github",
+        "raw": 10026,
+        "date": "2026-08-21T06:58:31Z",
+        "born": "2026-07-13T22:00:13Z",
+        "score": 0.6981,
+        "signal": "category"
+      },
+      {
+        "title": "El Atlético acepta traspasar a Julián al Arsenal, pero el jugador dice &apos;no&apos;",
+        "url": "https://www.mundodeportivo.com/futbol/fc-barcelona/20260820/1004218109/atletico-acepta-traspasar-julian-arsenal-jugador-dice-no.html",
+        "source": "googletrends",
+        "raw": 1000,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "julian alvarez",
+        "score": 0.4602,
+        "signal": "attention"
+      },
+      {
+        "title": "Self-hosted web push Cloudflare Worker, works on iOS",
+        "url": "https://kukuroo.cc/",
+        "source": "hn",
+        "raw": 76,
+        "date": "2026-08-14T15:03:12Z",
+        "score": 0.5065,
+        "signal": "category"
+      },
+      {
+        "title": "omnigent-ai/omnigent — Omnigent is an open-source AI agent framework and meta-harness: orchestrate Claude Code, Codex, Cursor, Pi, and custom agents — swap harnesses without rewriting, enforce policies and sandboxing, and collaborate in real time from any device.",
+        "url": "https://github.com/omnigent-ai/omnigent",
+        "source": "github",
+        "raw": 9127,
+        "date": "2026-08-21T08:48:58Z",
+        "born": "2026-06-11T12:18:13Z",
+        "score": 0.6386,
+        "signal": "category"
+      },
+      {
+        "title": "Quang Lê: \"Qua đám tang của mẹ, tôi mới đo được lòng dạ của một số người tưởng là thân lắm\"",
+        "url": "https://cafef.vn/quang-le-qua-dam-tang-cua-me-toi-moi-do-duoc-long-da-cua-mot-so-nguoi-tuong-la-than-lam-188260821100502215.chn",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:10:00 -0700",
+        "term": "quang lê",
+        "score": 0.3951,
+        "signal": "attention"
+      },
+      {
+        "title": "Launch HN: Vendo (YC S26) – Let users build features on top of your product",
+        "url": "https://github.com/runvendo/vendo",
+        "source": "hn",
+        "raw": 39,
+        "date": "2026-08-20T15:29:52Z",
+        "score": 0.4685,
+        "signal": "category"
+      },
+      {
+        "title": "oomol-lab/open-connector — Open-source auth gateway connecting 1000+ SaaS providers to AI agents through SDK, CLI, MCP, HTTP, and OpenAPI.",
+        "url": "https://github.com/oomol-lab/open-connector",
+        "source": "github",
+        "raw": 4834,
+        "date": "2026-08-21T09:42:19Z",
+        "born": "2026-06-29T10:49:36Z",
+        "score": 0.5765,
+        "signal": "category"
+      },
+      {
+        "title": "Cung hoàng đạo thứ Bảy 22/8: Kim Ngưu thư thả, Song Tử thành người kể chuyện",
+        "url": "https://ngoisao.vnexpress.net/12-cung-hoang-dao-thu-7-ngay-22-8-2026-5110374.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "22 tháng 8",
+        "score": 0.3296,
+        "signal": "attention"
+      },
+      {
+        "title": "AI Can Now Design Functional Viruses. Should We Worry?",
+        "url": "https://spectrum.ieee.org/ai-designed-virus",
+        "source": "hn",
+        "raw": 61,
+        "date": "2026-08-15T15:32:25Z",
+        "score": 0.4011,
+        "signal": "category"
+      },
+      {
+        "title": "nyblnet/bento — Bento, the office suite that fits in a file",
+        "url": "https://github.com/nyblnet/bento",
+        "source": "github",
+        "raw": 4311,
+        "date": "2026-08-21T02:09:42Z",
+        "born": "2026-07-17T16:55:09Z",
+        "score": 0.4994,
+        "signal": "category"
+      },
+      {
+        "title": "Người cao tuổi Lâm Đồng phát huy vai trò trong tình hình mới",
+        "url": "https://baolamdong.vn/nguoi-cao-tuoi-lam-dong-phat-huy-vai-tro-trong-tinh-hinh-moi-460742.html",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 00:30:00 -0700",
+        "term": "người cao tuổi",
+        "score": 0.2637,
+        "signal": "attention"
+      },
+      {
+        "title": "Show HN: Grafana agent observability for Hermes Agent",
+        "url": "https://github.com/alexander-akhmetov/grafana-agento11y-hermes",
+        "source": "hn",
+        "raw": 28,
+        "date": "2026-08-16T08:40:50Z",
+        "score": 0.1393,
+        "signal": "category"
+      },
+      {
+        "title": "DietrichGebert/ponytail — Makes your AI agent think like the laziest senior dev in the room. The best code is the code you never wrote.",
+        "url": "https://github.com/DietrichGebert/ponytail",
+        "source": "github",
+        "raw": 107064,
+        "date": "2026-08-07T21:44:01Z",
+        "born": "2026-06-12T00:52:37Z",
+        "score": 0.4426,
+        "signal": "category"
+      },
+      {
+        "title": "Hiệu trưởng ở Đồng Nai nêu lý do xin làm giáo viên sau sắp xếp",
+        "url": "https://thanhnien.vn/hieu-truong-o-dong-nai-neu-ly-do-xin-xuong-lam-giao-vien-sau-sap-xep-185260820133552546.htm",
+        "source": "googletrends",
+        "raw": 500,
+        "date": "Fri, 21 Aug 2026 01:20:00 -0700",
+        "term": "đồng nai",
+        "score": 0.1984,
+        "signal": "attention"
+      },
+      {
+        "title": "Show HN: Mocktail – Free, open-source mock API server with a built-in dashboard",
+        "url": "https://getmocktail.com/",
+        "source": "hn",
+        "raw": 25,
+        "date": "2026-08-14T20:20:24Z",
+        "score": 0.064,
+        "signal": "category"
+      },
+      {
+        "title": "Jia-Ethan/codex-keysmith — Versioned Codex instruction deployment with preview, ownership manifests, hook isolation, scenario evaluation, and recovery.",
+        "url": "https://github.com/Jia-Ethan/codex-keysmith",
+        "source": "github",
+        "raw": 3890,
+        "date": "2026-08-20T11:27:05Z",
+        "born": "2026-06-28T04:38:07Z",
+        "score": 0.416,
+        "signal": "category"
+      },
+      {
+        "title": "Hàng loạt địa phương bác tin giả về sắp xếp đơn vị hành chính cấp xã",
+        "url": "https://laodong.vn/thoi-su/hang-loat-dia-phuong-bac-tin-gia-ve-sap-xep-don-vi-hanh-chinh-cap-xa-1753216.ldo",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:00:00 -0700",
+        "term": "đơn vị hành chính",
+        "score": 0.1325,
+        "signal": "attention"
+      },
+      {
+        "title": "Celld: Self-hosted, distributed Durable Objects",
+        "url": "https://celld.dev/",
+        "source": "hn",
+        "raw": 22,
+        "date": "2026-08-13T04:37:31Z",
+        "score": 0,
+        "signal": "category"
+      },
+      {
+        "title": "NanoNets/Graft — Turbocharge Claude Code, Cursor, Codex, Gemini & every coding agent: faster, cheaper, with contextual understanding specific to your codebase.",
+        "url": "https://github.com/NanoNets/Graft",
+        "source": "github",
+        "raw": 3884,
+        "date": "2026-08-21T08:22:11Z",
+        "born": "2026-07-03T13:44:21Z",
+        "score": 0.3826,
+        "signal": "category"
+      },
+      {
+        "title": "Con số may mắn ngày 21/8 - số tài lộc 12 con giáp theo năm sinh",
+        "url": "https://suckhoedoisong.vn/con-so-may-man-ngay-21-8-so-tai-loc-12-con-giap-theo-nam-sinh-169260820180203067.htm",
+        "source": "googletrends",
+        "raw": 200,
+        "date": "Fri, 21 Aug 2026 02:20:00 -0700",
+        "term": "con giáp may mắn hôm nay",
+        "score": 0.0663,
+        "signal": "attention"
+      },
+      {
+        "title": "shy3130/tickflow-stock-panel — TSP自托管、零运维的 A 股「选股 + 监控 + 回测」量化工作台 | 基于 TickFlow 数据源  | LLM能力驱使策略定制+个股分析+复盘 | 自由接入第三方数据源与个性化扩展数据 | 个人开源 ,非TickFlow官方项目",
+        "url": "https://github.com/shy3130/tickflow-stock-panel",
+        "source": "github",
+        "raw": 3336,
+        "date": "2026-08-21T09:41:46Z",
+        "born": "2026-06-18T06:18:29Z",
+        "score": 0.2562,
+        "signal": "category"
+      },
+      {
+        "title": "&apos;Don&apos;t get too comfortable&apos;: Wall Street’s ‘fear gauge’ hits 2026 low — here&apos;s why it&apos;s unlikely to last",
+        "url": "https://www.cnbc.com/2026/08/17/stock-market-volatility-vix-wall-street.html",
+        "source": "googletrends",
+        "raw": 100,
+        "date": "Thu, 20 Aug 2026 23:40:00 -0700",
+        "term": "vix",
+        "score": 0,
+        "signal": "attention"
+      },
+      {
+        "title": "tutti-os/tutti — Where people and agents build in tune.",
+        "url": "https://github.com/tutti-os/tutti",
+        "source": "github",
+        "raw": 3318,
+        "date": "2026-08-21T10:40:05Z",
+        "born": "2026-06-12T12:29:05Z",
+        "score": 0.1928,
+        "signal": "category"
+      },
+      {
+        "title": "UditAkhourii/adhd — ADHD — a skill for coding agents. Tree-of-thought with pruning, built on the Claude & Codex Agent SDK. Fans out parallel divergent thoughts under different cognitive frames, scores, prunes traps, deepens the survivors. The no-brainer skill for creative and interdisciplinary work.",
+        "url": "https://github.com/UditAkhourii/adhd",
+        "source": "github",
+        "raw": 3880,
+        "date": "2026-08-05T06:14:01Z",
+        "born": "2026-05-25T11:06:35Z",
+        "score": 0.149,
+        "signal": "category"
+      },
+      {
+        "title": "code-yeongyu/lazycodex — The one and only agent harness for complex codebases. Project memory, planning, execution, and verified completion inside Codex.",
+        "url": "https://github.com/code-yeongyu/lazycodex",
+        "source": "github",
+        "raw": 3280,
+        "date": "2026-08-09T08:51:31Z",
+        "born": "2026-05-25T07:56:45Z",
+        "score": 0.0659,
+        "signal": "category"
+      },
+      {
+        "title": "Tiger3807861189/J-Space-Cognition-Suite-V3.6 — J-Space Cognition Suite V3.6 - AI cognitive-enhancement Skills based on Anthropic's J-space global workspace research. | 哔哩哔哩：Tiger380 (UID 3494375382321675) — https://space.bilibili.com/3494375382321675",
+        "url": "https://github.com/Tiger3807861189/J-Space-Cognition-Suite-V3.6",
+        "source": "github",
+        "raw": 2997,
+        "date": "2026-08-19T01:51:18Z",
+        "born": "2026-07-22T00:34:24Z",
+        "score": 0.0535,
+        "signal": "category"
+      },
+      {
+        "title": "org2AI/ORG2 — System of record for how agents build software: Built-in rust harness & 20+ CLIs.",
+        "url": "https://github.com/org2AI/ORG2",
+        "source": "github",
+        "raw": 2721,
+        "date": "2026-08-21T08:22:21Z",
+        "born": "2026-06-01T12:52:57Z",
+        "score": 0,
+        "signal": "category"
+      }
+    ]
+  }
+]
