@@ -90,7 +90,8 @@ exports.handler = async (event) => {
     });
 
     if (!res.ok) {
-      throw new Error(`Anthropic API error: ${res.status}`);
+      const errBody = await res.text();
+      throw new Error(`Anthropic API error: ${res.status} ${errBody}`);
     }
 
     const data = await res.json();
