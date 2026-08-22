@@ -1,0 +1,238 @@
+{
+  "lobsters": {
+    "status": 200,
+    "parseError": null,
+    "count": 25,
+    "sample": [
+      {
+        "title": "Enabling the next-generation trait solver on nightly",
+        "url": "https://blog.rust-lang.org/2026/08/21/enabling-next-solver-on-nightly/",
+        "score": 77,
+        "created_at": "2026-08-21T10:15:16.747-05:00",
+        "comments": 17
+      },
+      {
+        "title": "I accidentally logged hundreds of thousands of phone calls to military bases",
+        "url": "https://lina.sh/blog/hijacking-e164-arpa",
+        "score": 147,
+        "created_at": "2026-08-21T07:05:00.528-05:00",
+        "comments": 6
+      },
+      {
+        "title": "Japan tried to build an operating system for the entire world, then the US government intervened",
+        "url": "https://www.xda-developers.com/japan-tried-build-operating-system-entire-world-us-government-intervened/",
+        "score": 79,
+        "created_at": "2026-08-21T07:47:30.402-05:00",
+        "comments": 12
+      }
+    ],
+    "verdict": "EVENT — hottest.json is a live, continuously-reranked feed (score = active upvotes right now); created_at is a real submission timestamp."
+  },
+  "bluesky": {
+    "trendingTopics": {
+      "status": 200,
+      "count": 10,
+      "sample": [
+        {
+          "link": "/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/1086315c763f",
+          "description": "Users riff on the classic half-full/half-empty joke with new punchline characters.",
+          "topic": "Optimist-pessimist cup meme",
+          "displayName": "Optimist-pessimist cup meme"
+        },
+        {
+          "link": "/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/9ba59fa99102",
+          "description": "Her remark sparked debate over whether it's genuine support or exclusion.",
+          "topic": "JK Rowling comments on trans adults",
+          "displayName": "JK Rowling comments on trans adults"
+        },
+        {
+          "link": "/profile/did:plc:qrz3lhbyuxbeilrc6nekdqme/feed/b28e21eec571",
+          "description": "Carney says Canada will match new 50% US tariffs dollar for dollar.",
+          "topic": "US-Canada trade talks collapse",
+          "displayName": "US-Canada trade talks collapse"
+        }
+      ]
+    },
+    "postSearch": {
+      "status": 403,
+      "count": 0,
+      "sample": []
+    },
+    "verdict": "getTrendingTopics = ARTIFACT (bare hashtag/phrase, same defect as X). searchPosts = EVENT (real post text, real engagement counts, real timestamp) — the search endpoint is the one worth adapting, not the trending-topics one."
+  },
+  "dexscreener": {
+    "tokenBoosts": {
+      "status": 200,
+      "count": 30,
+      "sample": [
+        {
+          "url": "https://dexscreener.com/solana/918p2grydlkhsrvtahakzg8yrp5kxse6cyustqtcpump",
+          "chainId": "solana",
+          "tokenAddress": "918p2GRyDLkhsRvtAHaKZg8yrP5kXSe6CYustqTcpump",
+          "description": "The cats have arrived, $CATSZN community is growing, and the season has officially begun.",
+          "icon": "OIpWWvJrqZBWSiSC",
+          "header": "https://cdn.dexscreener.com/cms/images/Ky5lrsOlA_2n1gTy?width=900&height=300&fit=crop&quality=95&format=auto",
+          "openGraph": "https://cdn.dexscreener.com/token-images/og/solana/918p2GRyDLkhsRvtAHaKZg8yrP5kXSe6CYustqTcpump?timestamp=1787399100000",
+          "links": [
+            {
+              "url": "https://catszn.world"
+            },
+            {
+              "type": "twitter",
+              "url": "https://x.com/CATSZNSOL"
+            },
+            {
+              "type": "telegram",
+              "url": "https://t.me/catsznsol"
+            }
+          ],
+          "totalAmount": 500
+        },
+        {
+          "url": "https://dexscreener.com/robinhood/0x82da7c5d756210ec89d139defd430549018dc68d",
+          "chainId": "robinhood",
+          "tokenAddress": "0x82DA7C5D756210ec89d139Defd430549018dC68d",
+          "description": "\"At some point, looking toward the future means traveling into it.\"\n- Vlad Tenev, CEO of Robinhood",
+          "icon": "tGhreB81-icFFfjU",
+          "header": "https://cdn.dexscreener.com/cms/images/BS2mJHnlExKZy1MY?width=900&height=300&fit=crop&quality=95&format=auto",
+          "openGraph": "https://cdn.dexscreener.com/token-images/og/robinhood/0x82da7c5d756210ec89d139defd430549018dc68d?timestamp=1787399100000",
+          "links": [
+            {
+              "url": "https://mooncoinrobin.space"
+            },
+            {
+              "type": "twitter",
+              "url": "https://x.com/mooncoinrobin"
+            }
+          ],
+          "totalAmount": 500
+        }
+      ]
+    },
+    "tokenProfiles": {
+      "status": 200,
+      "count": 30,
+      "sample": [
+        {
+          "url": "https://dexscreener.com/base/0xb200000000000000000000424cf3b55cc74c2c01",
+          "chainId": "base",
+          "tokenAddress": "0xb200000000000000000000424Cf3B55cc74c2C01",
+          "icon": "https://cdn.dexscreener.com/cms/images/2sVsl_C2nYj9WNxc?width=64&height=64&fit=crop&quality=95&format=auto",
+          "header": "https://cdn.dexscreener.com/cms/images/GKmLvy_z7Y2bwx2K?width=600&height=200&fit=crop&quality=95&format=auto",
+          "openGraph": "https://cdn.dexscreener.com/token-images/og/base/0xb200000000000000000000424cf3b55cc74c2c01?timestamp=1787398800000",
+          "description": "A tiny blue signal in a very loud internet. No grand promises. No fake utility. Just a mascot, a community, and an unreasonable amount of blue.",
+          "links": [
+            {
+              "label": "Website",
+              "url": "https://basebobo.fun"
+            },
+            {
+              "type": "twitter",
+              "url": "https://x.com/baseboboonbase"
+            }
+          ],
+          "cto": false
+        },
+        {
+          "url": "https://dexscreener.com/bsc/0x38a4ad244827542e3aa6c9c23eb6a5688c627777",
+          "chainId": "bsc",
+          "tokenAddress": "0x38A4Ad244827542E3Aa6C9c23eB6A5688c627777",
+          "icon": "https://cdn.dexscreener.com/cms/images/tE9Ujv-ig5_5xJac?width=64&height=64&fit=crop&quality=95&format=auto",
+          "openGraph": "https://cdn.dexscreener.com/token-images/og/bsc/0x38a4ad244827542e3aa6c9c23eb6a5688c627777?timestamp=1787398800000",
+          "description": "The bitcoin mascot.\n\nHold bitty, earn BTC.",
+          "links": [
+            {
+              "type": "twitter",
+              "url": "https://x.com/bittycoinbnb?s=11"
+            }
+          ],
+          "cto": false
+        }
+      ]
+    },
+    "dexSearch": {
+      "status": 200,
+      "count": 30,
+      "sample": [
+        {
+          "name": "SOL/USDC",
+          "priceChange_h1": 0.12,
+          "priceChange_h24": 3.27,
+          "volume_h24": 12211779.17,
+          "url": "https://dexscreener.com/base/0x1131db5977242a03ebead1acd18f80a9a29e5922"
+        },
+        {
+          "name": "SOL/cbBTC",
+          "priceChange_h1": 0.34,
+          "priceChange_h24": 3.17,
+          "volume_h24": 15111857.32,
+          "url": "https://dexscreener.com/base/0xccfa472815563ff9eb2de95c7b2be1ccf91f7f31"
+        },
+        {
+          "name": "SOL/cbBTC",
+          "priceChange_h1": 0.09,
+          "priceChange_h24": 3.24,
+          "volume_h24": 4774737.54,
+          "pairCreatedAt": 1780076661000,
+          "url": "https://dexscreener.com/base/0x8df6dd38d718bd726374521c2dcfe90eb9cb7d43"
+        }
+      ]
+    },
+    "verdict": "token-boosts / token-profiles = ARTIFACT (a listing existing or being paid-promoted, not a market move). /latest/dex/search = EVENT (priceChange.h1/h24 and volume.h24 are genuine momentum signals — 'this moved X% in the last hour' is a real why_now)."
+  },
+  "arxiv": {
+    "status": 200,
+    "count": 10,
+    "sample": [
+      {
+        "title": "Information on trajectories: martingales and random times",
+        "url": "https://arxiv.org/abs/2608.20337v1",
+        "published": "2026-08-20T17:59:57Z"
+      },
+      {
+        "title": "ConceptGuard: Benchmarking Context-Sensitive Unlearning in Large Language Models",
+        "url": "https://arxiv.org/abs/2608.20338v1",
+        "published": "2026-08-20T17:59:57Z"
+      },
+      {
+        "title": "G-CARL: Grounded Checklist-Aligned Reward Learning for Patient-Oriented Medical Report Interpretation",
+        "url": "https://arxiv.org/abs/2608.20331v1",
+        "published": "2026-08-20T17:59:46Z"
+      }
+    ],
+    "verdict": "EVENT — sorted by submittedDate descending; published is the real submission timestamp. 'A new paper on this topic just dropped' is a genuine why_now, unlike a repo that's simply existed since 2019."
+  },
+  "indie_hackers": {
+    "api": {
+      "status": 200,
+      "parseError": "Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "rawSample": "<!DOCTYPE html><html lang=en-US><head><script src=https://cdn.cookielaw.org/consent/f297b688-9e8b-4c3c-bee2-338878d82ce5/OtAutoBlock.js data-concern=onetrust></script><script src=https://cdn.cookielaw.org/scripttemplates/otSDKStub.js data-concern=onetrust charset=UTF-8 data-domain-script=f297b688-9e",
+      "count": null
+    },
+    "scrapeFallback": {
+      "status": null,
+      "matchCount": 0,
+      "sample": []
+    },
+    "verdict": null
+  },
+  "linkedin_trending": {
+    "voyager": {
+      "status": 404,
+      "parseError": "Unexpected token '<', \"<!-- EF of\"... is not valid JSON",
+      "rawSample": "<!-- EF of static content included-->\n<html>\n<head>\n  <title>Error</title>\n  <meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\n  <style type=\"text/css\">\n/* GLOBAL */\nbody { margin: 0; padding: 0 0 10px 0; background: #FFF; color: #000; font: 82% arial, helvetica, \"Nimbus Sans L\", s"
+    },
+    "newsPageScrape": {
+      "status": 200,
+      "matchCount": 5,
+      "sample": [
+        "Top products",
+        "Industries",
+        "Why post a job on LinkedIn?",
+        "Unique Talent",
+        "Smarter Matches"
+      ]
+    },
+    "verdict": null
+  }
+}

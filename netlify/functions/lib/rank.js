@@ -33,13 +33,28 @@ function jaccard(a, b) {
 // 27,000 GitHub stars and 300 HN points are not comparable numbers. Percentile is.
 // Verified live: the top Web3 GitHub repo had 1,153 stars while the top AI repo had
 // 107,048. Any absolute floor would have deleted Web3 entirely.
+// TASK 5 FIX — proposed and applied: add-one (Laplace) rank smoothing.
+// Old formula (idx / (n-1)) put the bottom item of ANY source at a literal
+// 0.000 and the top at a literal 1.000 whenever n>1. At small n that's not
+// "the weaker of two items," it reads as "worth nothing" — observed live:
+// [0.000] producthunt — MeetStream AI, from a source with only 2 items —
+// and round-robin then serves it into the top 40 anyway, since rank() only
+// orders within a source bucket and doesn't know the score is degenerate.
+// (idx+1)/(n+1) keeps every percentile in the open interval (0,1), preserves
+// the exact same relative ordering, and converges to the old formula as n
+// grows (they differ by O(1/n)). n=1 now yields 0.5 (neutral) instead of a
+// forced 1.0 — a lone item from a thin source shouldn't auto-rank as that
+// source's best just because it's the only one.
+// Alternatives considered and rejected: a hard floor constant (arbitrary,
+// doesn't scale with n) and dropping small-n sources outright (destroys real
+// data instead of just declining to zero it out).
 function percentileBySource(items) {
   const groups = {};
   for (const i of items) (groups[i.source] ||= []).push(i);
   for (const list of Object.values(groups)) {
     const sorted = [...list].sort((a, b) => (a.raw || 0) - (b.raw || 0));
     const n = sorted.length;
-    sorted.forEach((it, idx) => { it._pct = n <= 1 ? 1 : idx / (n - 1); });
+    sorted.forEach((it, idx) => { it._pct = (idx + 1) / (n + 1); });
   }
   return items;
 }
@@ -65,6 +80,16 @@ export function score(items, cfg = {}) {
 }
 
 // ---------- dedupe ----------
+// TASK 4 — cross-source corroboration is now recorded, not just counted and
+// thrown away. Merging two items keeps the higher-scored one as canonical but
+// unions their `corroborated_sources` so the signal survives; a canonical
+// item's own source is included so `corroborated_sources.length` is always a
+// true source count (1 = uncorroborated).
+function mergeCorroboration(a, b) {
+  const sources = new Set([...(a.corroborated_sources || [a.source]), ...(b.corroborated_sources || [b.source])]);
+  return [...sources];
+}
+
 export function dedupe(items) {
   const byUrl = new Map();
   let removed = 0;
@@ -72,16 +97,37 @@ export function dedupe(items) {
     const k = canonUrl(i.url);
     const prev = byUrl.get(k);
     if (!prev) byUrl.set(k, i);
-    else { removed++; if ((i.score || 0) > (prev.score || 0)) byUrl.set(k, i); }
+    else {
+      removed++;
+      const winner = (i.score || 0) > (prev.score || 0) ? i : prev;
+      byUrl.set(k, { ...winner, corroborated_sources: mergeCorroboration(i, prev) });
+    }
   }
   const kept = [];
   for (const i of byUrl.values()) {
     const tk = tokens(i.title);
-    const dup = kept.find((k) => jaccard(tokens(k.title), tk) >= 0.8);
-    if (dup) { removed++; if ((i.score || 0) > (dup.score || 0)) kept[kept.indexOf(dup)] = i; }
-    else kept.push(i);
+    const dupIdx = kept.findIndex((k) => jaccard(tokens(k.title), tk) >= 0.8);
+    if (dupIdx === -1) kept.push(i);
+    else {
+      removed++;
+      const dup = kept[dupIdx];
+      const winner = (i.score || 0) > (dup.score || 0) ? i : dup;
+      kept[dupIdx] = { ...winner, corroborated_sources: mergeCorroboration(i, dup) };
+    }
   }
   return { items: kept, removed };
+}
+
+// Boost applied AFTER dedupe, once corroboration is known. Modest and
+// additive (+0.05 per extra corroborating source, capped at 1.0) rather than
+// multiplicative, so one lucky duplicate can't catapult an otherwise-weak
+// item to the top on corroboration alone — it nudges rank, it doesn't decide it.
+export function applyCorroborationBoost(items) {
+  for (const i of items) {
+    const n = i.corroborated_sources?.length ?? 1;
+    if (n > 1) i.score = Number(Math.min(1, (i.score || 0) + 0.05 * (n - 1)).toFixed(4));
+  }
+  return items;
 }
 
 // ---------- rank ----------
@@ -116,11 +162,13 @@ export function health(items, removed) {
   const perSource = {};
   for (const i of items) perSource[i.source] = (perSource[i.source] || 0) + 1;
   const ages = items.map((i) => (Date.now() - Date.parse(i.date)) / 864e5).filter(Number.isFinite).sort((a, b) => a - b);
+  const corroborated = items.filter((i) => (i.corroborated_sources?.length ?? 1) > 1).length;
   return {
     total: items.length,
     per_source: perSource,
     unique_sources: Object.keys(perSource).length,
     dupes_removed: removed,
+    corroborated_items: corroborated, // Task 4: items confirmed by 2+ sources
     median_age_days: ages.length ? Number(ages[Math.floor(ages.length / 2)].toFixed(1)) : null,
     // gate: below this, the category is quiet. Route to the "I'll email you when
     // it moves" path rather than letting Sonnet pad.
@@ -131,6 +179,7 @@ export function health(items, removed) {
 export function pipeline(rawItems, limit = CACHE_TARGET, cfg = {}) {
   score(rawItems, cfg);
   const { items, removed } = dedupe(rawItems);
+  applyCorroborationBoost(items);
   const ranked = rank(items, limit);
   return { items: ranked, health: health(ranked, removed) };
 }
