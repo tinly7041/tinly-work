@@ -1,0 +1,16 @@
+{
+  "hasToken": false,
+  "result": {
+    "geo": "",
+    "woeid": 1,
+    "steps": [
+      {
+        "step": "guest_token",
+        "skipped": true,
+        "reason": "no X_BEARER_TOKEN set"
+      }
+    ],
+    "items": null,
+    "rawTrendsResponse": null
+  }
+}
