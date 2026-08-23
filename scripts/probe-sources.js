@@ -17,6 +17,9 @@ import { fetchGoogleTrends } from "../netlify/functions/lib/sources/google-trend
 import { fetchProductHunt } from "../netlify/functions/lib/sources/product-hunt.js";
 import { fetchCoinGecko } from "../netlify/functions/lib/sources/coingecko.js";
 import { fetchXList, getXListBilling } from "../netlify/functions/lib/sources/x-list.js";
+import { fetchLobsters } from "../netlify/functions/lib/sources/lobsters.js";
+import { fetchArxiv } from "../netlify/functions/lib/sources/arxiv.js";
+import { fetchDexScreener } from "../netlify/functions/lib/sources/dexscreener.js";
 import { pipeline } from "../netlify/functions/lib/rank.js";
 
 const args = process.argv.slice(2);
@@ -32,6 +35,9 @@ const ADAPTERS = {
   coingecko: fetchCoinGecko,
   googletrends: fetchGoogleTrends,
   xlist: (cfg, cat) => fetchXList(cfg, cat),
+  lobsters: fetchLobsters,
+  arxiv: fetchArxiv,
+  dexscreener: fetchDexScreener,
 };
 
 const out = [];

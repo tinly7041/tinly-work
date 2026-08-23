@@ -18,6 +18,7 @@ export const CATEGORIES = {
     coingecko: false,
     googleTrends: true,
     xList: true,
+    arxiv: true,
   },
   web3: {
     label: "Web3 / Crypto",
@@ -30,6 +31,7 @@ export const CATEGORIES = {
     coingecko: true,
     googleTrends: true,
     xList: true,
+    dexscreener: true,
     // See BUILD NOTE 1c in sources/github.js — GitHub web3 results are low quality.
     // CoinGecko and HN carry this category. Do not remove GitHub entirely; it still
     // contributes to the >=3 unique-source health check.
@@ -55,6 +57,7 @@ export const CATEGORIES = {
     coingecko: false,
     googleTrends: true,
     xList: true,
+    lobsters: true,
   },
   // Tier 2, still undecided (Notion open item). Off by default so it cannot
   // silently ship half-sourced. Flip `enabled` when you decide.
@@ -92,6 +95,9 @@ export const SOURCE_WEIGHT = {
   hn: 1.0,          // strongest category signal, real human ranking
   github: 0.9,      // strong, but "new repo with stars" != "trend" without the created: filter
   coingecko: 0.9,   // Web3 only, but the highest-intent Web3 signal available
+  dexscreener: 0.85,// Web3 only — real priceChange/volume momentum, not a promo listing
+  lobsters: 0.85,   // SaaS/DevTools only — same "real human ranking" shape as HN, smaller community
+  arxiv: 0.8,       // AI only — legit research signal, but rank-position proxy only (no vote count)
   producthunt: 0.7, // launch signal, no vote count exposed in RSS
   xlist: 0.65,      // curated-list attention signal — real posts + real engagement,
                      // higher-intent than a raw national search feed, but still an
@@ -107,6 +113,9 @@ export const SOURCE_SIGNAL = {
   hn: "category",
   github: "category",
   coingecko: "category",
+  dexscreener: "category",
+  lobsters: "category",
+  arxiv: "category",
   producthunt: "category",
   xlist: "attention",
   googletrends: "attention",

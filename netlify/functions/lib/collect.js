@@ -5,6 +5,9 @@ import { fetchGoogleTrends } from "./sources/google-trends.js";
 import { fetchProductHunt } from "./sources/product-hunt.js";
 import { fetchCoinGecko } from "./sources/coingecko.js";
 import { fetchXList } from "./sources/x-list.js";
+import { fetchLobsters } from "./sources/lobsters.js";
+import { fetchArxiv } from "./sources/arxiv.js";
+import { fetchDexScreener } from "./sources/dexscreener.js";
 import { pipeline } from "./rank.js";
 
 export async function collect(catKey) {
@@ -13,6 +16,9 @@ export async function collect(catKey) {
   const jobs = [fetchHN(cfg), fetchGitHub(cfg), fetchProductHunt(cfg), fetchCoinGecko(cfg)];
   if (cfg.googleTrends) jobs.push(fetchGoogleTrends(cfg));
   if (cfg.xList) jobs.push(fetchXList(cfg, catKey));
+  if (cfg.lobsters) jobs.push(fetchLobsters(cfg));
+  if (cfg.arxiv) jobs.push(fetchArxiv(cfg));
+  if (cfg.dexscreener) jobs.push(fetchDexScreener(cfg));
   const all = (await Promise.all(jobs)).flat();
 
   // Google Trends is still fetched every crawl (cheap, kept as a raw record)
