@@ -5,6 +5,9 @@ import { CATEGORIES } from "./lib/categories.js";
 // told plainly — it does not trigger a live crawl. A user request must never be
 // the thing that warms the cache.
 const MAX_STALE_HOURS = 36;
+// Must match crawl-trends.js's STORE_NAME exactly, or the read path silently
+// reads a different store than the one the crawl just wrote.
+const STORE_NAME = process.env.BLOBS_STORE_NAME || "trends";
 
 export default async (req) => {
   const url = new URL(req.url);
@@ -12,7 +15,7 @@ export default async (req) => {
   if (!CATEGORIES[cat]) {
     return json({ error: "unknown_category", known: Object.keys(CATEGORIES) }, 400);
   }
-  const store = getStore("trends");
+  const store = getStore(STORE_NAME);
   const blob = await store.get(cat, { type: "json" });
   if (!blob) return json({ error: "cache_empty", category: cat }, 503);
 
