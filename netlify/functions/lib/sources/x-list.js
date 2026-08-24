@@ -1,4 +1,5 @@
 import { safe } from "./_http.js";
+import { categorize } from "../matcher.js";
 
 const LIST_ID = "2091104892089946244";
 const API = `https://api.twitter.com/2/lists/${LIST_ID}/tweets`;
@@ -21,16 +22,15 @@ const API = `https://api.twitter.com/2/lists/${LIST_ID}/tweets`;
 // posts, since that would blow the stated budget without being asked.
 const MAX_RESULTS = 40;
 
-// CATEGORY ASSIGNMENT (documented per instruction): keyword match against
-// each category's own `hn` + `productHunt` keyword arrays from categories.js
-// (github's config is a boolean-query string, not a plain keyword list, so
-// it's not reused here). A tweet can match more than one category — kept in
-// both, since corroboration across categories isn't the same claim as
-// corroboration across sources. A tweet matching NO category's keywords is
-// dropped entirely, never defaulted into a catch-all.
-function buildKeywords(cfg) {
-  return [...(cfg.hn || []), ...(cfg.productHunt || [])].map((k) => k.toLowerCase());
-}
+// CATEGORY ASSIGNMENT (documented per instruction): each tweet runs through
+// the same shared taxonomy matcher every other adapter uses — include, or
+// ambiguous+context, minus exclude — against categories.js's per-category
+// three-list config (the old separate `hn`/`productHunt` keyword arrays this
+// used to read no longer exist; there is only one keyword surface now). A
+// tweet can match more than one category — kept in both, since corroboration
+// across categories isn't the same claim as corroboration across sources. A
+// tweet matching no category's taxonomy is dropped entirely, never defaulted
+// into a catch-all.
 
 let _listCache = null;
 // Billing visibility: how many posts were actually pulled from the ONE
@@ -83,14 +83,9 @@ export async function fetchXList(cfg, catKey) {
   if (!process.env.X_BEARER_TOKEN) return [];
 
   const tweets = await fetchListOnce();
-  const keywords = buildKeywords(cfg);
-  if (!keywords.length) return [];
 
   return tweets
-    .filter((t) => {
-      const text = (t.text || "").toLowerCase();
-      return keywords.some((k) => text.includes(k));
-    })
+    .filter((t) => categorize({ title: t.text || "", description: "" }, cfg).matched)
     .map((t) => {
       const metrics = t.public_metrics || {};
       const engagement = (metrics.like_count || 0) + (metrics.retweet_count || 0);

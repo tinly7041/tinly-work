@@ -1,4 +1,5 @@
-import { SOURCE_WEIGHT, SOURCE_SIGNAL, CACHE_TARGET } from "./categories.js";
+import { SOURCE_WEIGHT, SOURCE_SIGNAL, CACHE_TARGET, SOURCE_SHARE_CAP } from "./categories.js";
+import { recordShareCapDrop } from "./telemetry.js";
 
 // ---------- normalize ----------
 const STRIP = /^(the|a|an|show hn|ask hn)\s+/i;
@@ -135,19 +136,38 @@ export function applyCorroborationBoost(items) {
 // A flat score sort lets one source own the whole cache. The Phase 2.5 action
 // standard needs >=2 unique sources in the served 5, and >=3 as a cache health
 // check — that has to be guaranteed here, in the 40, not hoped for downstream.
-export function rank(items, limit = CACHE_TARGET) {
+//
+// STEP 7 — source share cap. GitHub was 65% of FinTech in the 23 Aug dump;
+// round-robin alone doesn't prevent that when one source simply has far more
+// candidates than everyone else (round-robin still keeps filling from the
+// same source once every other bucket is exhausted). SOURCE_SHARE_CAP (0.4)
+// is enforced here, generally, for every source — once a source hits its
+// cap for this crawl it stops contributing, even if slots remain and it has
+// more candidates. A category that can't fill to CACHE_TARGET without
+// breaching the cap ends up with a smaller, honest cache rather than a
+// padded, lopsided one — see Step 8: a shrinking pool is not a regression.
+export function rank(items, limit = CACHE_TARGET, { telemetry } = {}) {
   const buckets = {};
   for (const i of items) (buckets[i.source] ||= []).push(i);
   for (const b of Object.values(buckets)) b.sort((a, z) => z.score - a.score);
   const names = Object.keys(buckets).sort((a, z) => (SOURCE_WEIGHT[z] ?? 0) - (SOURCE_WEIGHT[a] ?? 0));
+  const cap = Math.floor(limit * SOURCE_SHARE_CAP);
+  const perSourceCount = {};
   const out = [];
   let round = 0;
   while (out.length < limit) {
     let added = 0;
     for (const n of names) {
-      const it = buckets[n][round];
-      if (it) { out.push(it); added++; }
       if (out.length >= limit) break;
+      const it = buckets[n][round];
+      if (!it) continue;
+      if ((perSourceCount[n] || 0) >= cap) {
+        if (telemetry) recordShareCapDrop(telemetry, n);
+        continue;
+      }
+      out.push(it);
+      perSourceCount[n] = (perSourceCount[n] || 0) + 1;
+      added++;
     }
     if (!added) break;
     round++;
@@ -176,10 +196,10 @@ export function health(items, removed) {
   };
 }
 
-export function pipeline(rawItems, limit = CACHE_TARGET, cfg = {}) {
+export function pipeline(rawItems, limit = CACHE_TARGET, cfg = {}, { telemetry } = {}) {
   score(rawItems, cfg);
   const { items, removed } = dedupe(rawItems);
   applyCorroborationBoost(items);
-  const ranked = rank(items, limit);
+  const ranked = rank(items, limit, { telemetry });
   return { items: ranked, health: health(ranked, removed) };
 }

@@ -1,20 +1,99 @@
 // categories.js — single source of truth for Phase 2 crawl config.
-// Extracted from trendpulse-category-taxonomy.xlsx (Sheet 1: category -> source map).
 //
-// Contract: every category MUST list its sources explicitly. No implicit fallback
-// source set. If a category has no source for something, that is a visible gap,
-// not a silent degrade. (This is the whole reason the 28-sector taxonomy was rejected.)
+// Category-gates rework (see category-gates brief): the 23 Aug pool dump
+// showed the filters were the problem, not the sources. FinTech was 15/23
+// GitHub repos matching the bare word "ledger"; Web3 was 18/40 items with no
+// magnitude attached. Three fixes, in order:
+//   1. matcher.js — word-boundary, case-aware, phrase-aware, exclusion-first
+//      matching (see that file). Every adapter uses it; nothing reimplements it.
+//   2. Each category's flat keyword array is replaced by three lists —
+//      include / ambiguous / exclude — plus a context list that validates
+//      ambiguous matches. A bare ambiguous hit (e.g. "ledger") is not enough;
+//      it needs a context term (e.g. "bank") in the same title or description.
+//   3. Numeric source gates (see sources/dexscreener.js, sources/coingecko.js,
+//      sources/github.js) and a 40% source-share cap on the ranked cache.
+//
+// Contract unchanged from Phase 2: every category MUST list its sources
+// explicitly, no implicit fallback source set. categories.js is the system —
+// the taxonomy spreadsheet is a record; no code reads it.
+//
+// The keyword sets below were argued over line by line and are implemented
+// as specified, not re-derived. Two things worth flagging plainly rather
+// than silently patching around (matcher.js rule 2: terms of <=4 characters
+// match case-sensitively, exactly as written):
+//   - A handful of ordinary short words are used as context validators —
+//     "bank", "card" (fintech), "team", "seat", "org" (saas), "git" (fintech
+//     exclude) — all exactly 4 characters or fewer and written lowercase.
+//     Per rule 2 they only match their lowercase form, so a sentence-initial
+//     "Bank of X..." or "Git repository" will not validate through that
+//     specific term (other, longer context/exclude terms usually still
+//     cover the same ground — e.g. "financial", "regulator" for fintech;
+//     "MCP server", "coding agent" for the git-adjacent exclusions).
+//   - AI's include list has bare "eval" (4 chars, lowercase, case-sensitive
+//     per rule 2) — it qualifies an item outright with no context check,
+//     same shape of risk "ledger" was for fintech before this rework, just
+//     smaller blast radius (case-sensitive lowercase-only narrows it
+//     somewhat). Flagged for the Step 8 report to watch for false positives,
+//     not altered — the brief is explicit that these sets are final.
 
 export const GEO = "VN"; // Google Trends passthrough — verified working in trend-pulse source
+
+// ---------- security facet (Step 3) ----------
+//
+// Cybersecurity is a facet across all four categories, not a fifth category —
+// security news is always security OF something. SECURITY_TERMS is appended
+// to every category's `ambiguous` list below and validated by that same
+// category's OWN `context` list, unchanged. So "prompt injection" + "LLM" ->
+// AI; "drainer contract" + "on-chain" -> Web3; "transaction monitoring" +
+// "bank" -> FinTech; "SOC 2" + "enterprise" -> SaaS. Security terms alone
+// never qualify an item — matching only, no downstream tagging. No `facet`
+// field, no security-aware ranking, no signal passed to Sonnet: security
+// brands are not the ICP, so facet-aware ranking would be building for a
+// buyer this product does not want.
+export const SECURITY_TERMS = [
+  "prompt injection", "indirect prompt injection", "jailbreak", "system prompt leakage",
+  "data poisoning", "RAG poisoning", "excessive agency", "red teaming", "guardrails",
+  "OWASP LLM Top 10", "NIST AI RMF", "CVE", "bug bounty", "whitehat", "threat model",
+  "zero trust", "penetration test", "supply chain attack", "credential stuffing",
+  "injection", "leakage", "bypass", "payload", "trigger", "exfiltration", "hardening",
+];
+
+const withSecurity = (ambiguous) => [...ambiguous, ...SECURITY_TERMS];
 
 export const CATEGORIES = {
   ai: {
     label: "AI",
-    // Keywords are per-source. GitHub uses its own query grammar; HN is looser.
-    hn: ["LLM", "AI agents", "inference", "open source model", "RAG"],
+    include: [
+      "foundation model", "open-weight", "model weights", "frontier model",
+      "inference", "fine-tuning", "distillation", "quantization", "RAG", "retrieval augmented",
+      "context window", "tokenizer", "training run", "GPU cluster", "TPU", "model release",
+      "agent framework", "tool use", "function calling", "MCP", "eval", "benchmark",
+      "multimodal", "diffusion model", "text-to-video", "voice AI", "model routing",
+      "AI regulation", "AI Act", "compute export", "chip export",
+      "test-time compute", "reasoning model", "chain of thought", "RLHF", "DPO", "GRPO",
+      "LoRA", "QLoRA", "synthetic data",
+      "mixture of experts", "MoE", "Mamba", "state space model", "KV cache", "prompt caching",
+      "speculative decoding", "structured output",
+      "computer use", "browser use", "vision language model", "VLM", "action model",
+      "vLLM", "Ollama", "TensorRT-LLM", "NPU", "LPU", "Blackwell", "B200",
+      "sovereign AI", "constitutional AI", "model alignment",
+    ],
+    ambiguous: withSecurity([
+      "agent", "model", "prompt", "embedding", "harness", "router", "gateway", "pipeline",
+      "boundary", "isolation", "refusal", "alignment", "steering", "cache", "adapter", "inversion",
+      "smuggling",
+    ]),
+    context: [
+      "AI", "LLM", "machine learning", "neural", "transformer", "inference", "GPT", "Claude",
+      "Gemini", "Llama", "Qwen", "DeepSeek", "model", "OpenAI", "Anthropic", "Nvidia",
+    ],
+    exclude: [
+      "token price", "market cap", "trending on CoinGecko", "memecoin", "airdrop",
+      "SQL injection", "XSS", "cross-site scripting", "botnet", "ransomware",
+      "crypto drainer", "smart contract exploit", "traditional WAF",
+    ],
     github: '"llm" OR "agent" OR "inference" OR "fine-tune"',
     githubWindowDays: 90,
-    productHunt: ["ai", "agent", "llm", "gpt", "model", "copilot", "assistant"],
     coingecko: false,
     googleTrends: true,
     xList: true,
@@ -22,55 +101,117 @@ export const CATEGORIES = {
   },
   web3: {
     label: "Web3 / Crypto",
-    hn: ["crypto", "onchain", "stablecoin", "zero knowledge proof", "smart contract"],
-    // NOTE: bare "zk" was tested and pulls junk (a k8s console, an unrelated CN repo).
-    // Tightened to phrases. See build note 3.
+    include: [
+      "DEX", "AMM", "liquidity pool", "TVL", "L2", "L3", "rollup", "zk-rollup", "optimistic rollup",
+      "sovereign rollup", "appchain", "modular blockchain", "data availability", "Celestia",
+      "parallel EVM", "alt-VM",
+      "bridge exploit", "cross-chain bridge", "staking", "restaking", "liquid restaking", "LRT",
+      "AVS", "EigenLayer", "Symbiotic", "shared security", "validator", "slashing",
+      "smart contract audit", "rug pull", "MEV", "tokenomics", "token unlock",
+      "on-chain governance", "DAO proposal", "governance vote",
+      "NFT marketplace", "depeg", "EVM", "Solana program", "account abstraction", "ERC-4337",
+      "mainnet launch", "testnet", "protocol upgrade", "hard fork", "airdrop",
+      "crypto regulation", "CLARITY Act", "MiCA", "VASP", "spot ETF", "custody licence",
+      "stablecoin", "yield-bearing stablecoin",
+      "RWA", "real world assets", "tokenized treasuries", "tokenized gold", "private credit",
+      "perpetual DEX", "perps", "intent-based architecture", "solvers", "flash loan",
+      "batch auction", "liquidity rebalancing", "liquidity migration",
+      "Ordinals", "Runes", "Bitcoin L2", "Babylon staking", "BRC-20",
+      "DePIN", "decentralized AI", "DeAI", "zkML",
+      "DeSo", "decentralized social", "Farcaster", "Frames", "Lens Protocol", "TON mini-apps",
+      "Sybil protection",
+      "memecoin", "fair launch", "FDV", "circulating supply ratio",
+      "flash loan exploit", "sandwich attack", "private mempool", "drainer contract",
+      "reentrancy", "infinite approval",
+      "grant program", "developer grant", "ecosystem fund",
+    ],
+    // AI-agent terms sit in ambiguous, not include, deliberately — Session 3
+    // cut GitHub's Web3 results because they were agent bots and wallet
+    // clones; as include terms these readmit them.
+    ambiguous: withSecurity([
+      "wallet", "token", "chain", "gas", "mint", "layer", "node", "protocol", "vault", "oracle",
+      "agent", "agentic commerce", "autonomous agent", "GPU compute", "passkeys", "cabals",
+    ]),
+    context: [
+      "crypto", "blockchain", "on-chain", "onchain", "DeFi", "Ethereum", "Solana", "Bitcoin",
+      "web3", "smart contract", "decentralized", "decentralised", "ledger", "staking", "DEX",
+      "Hyperliquid", "Aptos",
+    ],
+    exclude: [
+      "Claude Code", "MCP server", "agent harness", "coding agent", "skill for",
+      "SSH client", "file sharing", "bug bounty skill", "arbitrage bot", "trading bot",
+      "wallet clone", "memecoin sniper", "phishing bot",
+    ],
+    // Bare tickers (ETH, BTC, SOL, HYPE, APT) are deliberately excluded from
+    // `include` — APT is the Debian package manager, SOL appears in Spanish
+    // text and as a Unix constant, HYPE is an ordinary word, and a bare
+    // ticker signals nothing about what changed. Full names sit in `context`
+    // instead. Do not add tickers back.
     github: 'solidity OR "smart contract" OR "zero-knowledge" OR "onchain"',
     githubWindowDays: 180, // wider: Web3 repo creation volume is ~6% of AI's
-    productHunt: ["crypto", "web3", "onchain", "wallet", "defi", "token", "stablecoin"],
+    // See BUILD NOTE 1c in sources/github.js — GitHub web3 results are low
+    // quality. CoinGecko and HN carry this category.
+    weightOverride: { github: 0.5 },
     coingecko: true,
     googleTrends: true,
     xList: true,
     dexscreener: true,
-    // See BUILD NOTE 1c in sources/github.js — GitHub web3 results are low quality.
-    // CoinGecko and HN carry this category. Do not remove GitHub entirely; it still
-    // contributes to the >=3 unique-source health check.
-    weightOverride: { github: 0.5 },
   },
   fintech: {
     label: "FinTech",
-    hn: ["fintech", "payments infrastructure", "neobank", "open banking", "cross-border payments"],
-    // "payments" alone pulled an iCloud-bypass tool. Qualified.
+    include: [
+      "payments", "payment rails", "payment gateway", "neobank", "digital bank", "challenger bank",
+      "stablecoin", "remittance", "cross-border payment", "money transfer",
+      "KYC", "KYB", "AML", "sanctions screening", "open banking", "PSD2", "PSD3",
+      "ISO 20022", "SWIFT", "ACH", "SEPA", "RTP", "FedNow", "UPI", "PromptPay", "QRIS", "VietQR", "NAPAS",
+      "card issuing", "merchant acquiring", "interchange", "chargeback", "PCI DSS",
+      "BNPL", "embedded finance", "banking-as-a-service", "e-money licence", "EMI licence",
+      "underwriting", "credit scoring", "lending platform", "treasury management",
+      "payment fraud", "transaction monitoring", "core banking", "payout", "payment orchestration",
+    ],
+    ambiguous: withSecurity([
+      "ledger", "wallet", "settlement", "custody", "compliance", "invoice", "banking",
+      "onboarding", "reconciliation", "escrow", "payout", "rails", "clearing",
+    ]),
+    context: [
+      "payment", "bank", "financial", "finance", "money", "currency", "transaction", "fiat",
+      "merchant", "card", "remittance", "regulator", "licence", "license", "fintech", "capital", "credit",
+    ],
+    exclude: [
+      "Claude Code", "MCP server", "agent harness", "LLM", "prompt", "skill for", "coding agent",
+      "repo context", "SDK for AI", "git", "CLI tool", "self-hosted note",
+      "mRNA", "clinical trial", "Phase 3", "therapy", "protein", "oncology", "melanoma", "neuroscience",
+    ],
     github: '"payments api" OR "open banking" OR "payment orchestration" OR ledger',
     githubWindowDays: 180,
-    productHunt: ["finance", "payment", "banking", "invoice", "payroll", "fintech"],
     coingecko: false,
     googleTrends: true,
     xList: true,
   },
   saas: {
     label: "B2B SaaS / DevTools",
-    hn: ["developer tools", "observability", "internal tooling", "API design", "self-hosted"],
+    include: [
+      "B2B SaaS", "ARR", "NRR", "net revenue retention", "PLG", "product-led growth",
+      "churn", "seat-based pricing", "usage-based pricing", "enterprise tier",
+      "internal tools", "admin panel", "workflow automation", "RBAC", "SSO", "SAML", "SCIM",
+      "multi-tenant", "API-first", "integration platform", "iPaaS", "no-code", "low-code",
+      "observability", "feature flag", "developer experience", "DX",
+      "SOC 2", "GDPR compliance", "data residency",
+    ],
+    ambiguous: withSecurity([
+      "platform", "dashboard", "workflow", "integration", "automation", "connector", "governance",
+    ]),
+    context: [
+      "SaaS", "B2B", "enterprise", "team", "workspace", "org", "seat", "subscription",
+      "internal tool", "developer", "engineering team", "customer",
+    ],
+    exclude: ["memecoin", "token price", "trending on CoinGecko", "clinical trial", "therapy"],
     github: '"developer-tools" OR sdk OR observability OR "self-hosted"',
     githubWindowDays: 90,
-    productHunt: ["developer", "api", "saas", "no-code", "automation", "analytics"],
     coingecko: false,
     googleTrends: true,
     xList: true,
     lobsters: true,
-  },
-  // Tier 2, still undecided (Notion open item). Off by default so it cannot
-  // silently ship half-sourced. Flip `enabled` when you decide.
-  cybersecurity: {
-    label: "Cybersecurity",
-    enabled: false,
-    hn: ["security audit", "vulnerability", "supply chain attack", "pentest"],
-    github: '"security audit" OR pentest OR "vulnerability scanner"',
-    githubWindowDays: 180,
-    productHunt: ["security", "privacy", "auth"],
-    coingecko: false,
-    googleTrends: false,
-    xList: false,
   },
 };
 
@@ -87,6 +228,11 @@ export const ACTIVE = Object.entries(CATEGORIES)
 // passing on a source contributing nothing; this is the fix, not a relaxed
 // gate. See collect.js.
 export const REFERENCE_ONLY_SOURCES = ["googletrends"];
+
+// Step 7: no source may contribute more than this share of a category's
+// ranked cache. GitHub was 65% of FinTech in the 23 Aug dump. Enforced in
+// rank.js's rank(), generally, for every source — not a GitHub-only patch.
+export const SOURCE_SHARE_CAP = 0.4;
 
 // Source weights. Applied AFTER per-source rank-percentile, never to raw values.
 // Rationale: a 2015 repo with 27k stars and an HN post with 300 points are not
