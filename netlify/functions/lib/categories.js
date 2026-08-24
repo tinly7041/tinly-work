@@ -60,6 +60,72 @@ export const SECURITY_TERMS = [
 
 const withSecurity = (ambiguous) => [...ambiguous, ...SECURITY_TERMS];
 
+// ---------- news-feeds source lists (follow-up to category-gates) ----------
+//
+// General-news RSS/Atom outlets, one list per category, consumed by
+// sources/news-feeds.js. Every candidate below was fetched live before being
+// added — dead links (404), paywalled shells that return HTML instead of a
+// feed, and Cloudflare bot-challenge pages were checked for and excluded.
+// Two entries couldn't be reached from the dev sandbox that vetted this list
+// (timeouts, not 404s) but are included anyway since that may be a sandbox
+// network restriction rather than a dead feed; sources/_http.js's `safe()`
+// makes a genuinely dead one a harmless no-op either way. Each is commented
+// where it isn't self-explanatory.
+const WEB3_NEWS_FEEDS = [
+  { name: "CoinDesk", url: "http://feeds.feedburner.com/Coindesk" },
+  { name: "Cointelegraph", url: "https://cointelegraph.com/rss" },
+  { name: "Blockworks", url: "https://blockworks.co/feed/" },
+  { name: "Decrypt", url: "https://decryptmedia.com/feed/" },
+  { name: "TechCrunch - Bitcoin", url: "https://techcrunch.com/tag/bitcoin/feed" },
+  { name: "HackerNoon", url: "https://hackernoon.com/feed" },
+  { name: "Trustnodes", url: "https://www.trustnodes.com/feed" },
+  { name: "The Defiant", url: "https://thedefiant.substack.com/feed" },
+  { name: "Bitcoin Optech", url: "https://bitcoinops.org/feed.xml" },
+  { name: "a16z web3 weekly", url: "https://a16zcrypto.substack.com/feed" },
+  { name: "Chainalysis Blog", url: "https://blog.chainalysis.com/feed/" },
+  { name: "Vitalik Buterin", url: "https://vitalik.eth.limo/feed.xml" },
+  { name: "Trail of Bits Blog", url: "https://blog.trailofbits.com/feed/" },
+  { name: "Multicoin Capital", url: "https://multicoin.capital/rss.xml" },
+  { name: "Bankless", url: "https://www.bankless.com/feed" },
+  { name: "Ethereum Foundation Blog", url: "https://blog.ethereum.org/feed.xml" },
+  { name: "Week in Ethereum News", url: "https://weekinethereumnews.com/feed/" }, // unreachable from vetting sandbox — see note above
+];
+
+const FINTECH_NEWS_FEEDS = [
+  { name: "Finextra", url: "https://www.finextra.com/rss/headlines.aspx" },
+  { name: "The Fintech Times", url: "https://thefintechtimes.com/feed/" },
+  { name: "PYMNTS", url: "https://www.pymnts.com/feed/" },
+  { name: "TechCrunch - Fintech", url: "https://techcrunch.com/tag/fintech/feed" },
+  { name: "Sifted", url: "https://sifted.eu/feed" },
+  { name: "Tearsheet", url: "https://tearsheet.co/feed/" },
+  { name: "Finovate", url: "https://finovate.com/feed/" },
+  { name: "Finance Magnates", url: "https://www.financemagnates.com/feed/" },
+  { name: "Payments Dive", url: "https://www.paymentsdive.com/feeds/news/" },
+  { name: "Global Fintech Series", url: "https://globalfintechseries.com/feed/" },
+  { name: "Crowdfund Insider", url: "https://www.crowdfundinsider.com/feed/" },
+  // SEA cluster — the western outlets above skew US/EU; these directly match
+  // the read-pulse audience (Greater Asia / SEA). Added deliberately, not a
+  // filler pick.
+  { name: "Fintech News Singapore", url: "https://fintechnews.sg/feed/" },
+  { name: "Fintech News Malaysia", url: "https://fintechnews.my/feed/" },
+  { name: "e27", url: "https://e27.co/feed/" },
+  { name: "Tech in Asia", url: "https://www.techinasia.com/feed" },
+  { name: "Fintech News Vietnam", url: "https://fintechnews.vn/feed/" }, // unreachable from vetting sandbox — see note above
+];
+
+const AI_NEWS_FEEDS = [
+  { name: "TechCrunch - AI", url: "https://techcrunch.com/tag/artificial-intelligence/feed" },
+  { name: "VentureBeat AI", url: "https://venturebeat.com/category/ai/feed/" },
+  { name: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml" },
+  { name: "Ars Technica AI", url: "https://arstechnica.com/tag/ai/feed/" },
+  { name: "Wired AI", url: "https://www.wired.com/feed/tag/ai/latest/rss" },
+  { name: "Hugging Face Blog", url: "https://huggingface.co/blog/feed.xml" },
+  { name: "Google AI Blog", url: "https://blog.google/technology/ai/rss/" },
+  { name: "OpenAI Blog", url: "https://openai.com/blog/rss.xml" },
+  { name: "Import AI", url: "https://importai.substack.com/feed" },
+  { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/" },
+];
+
 export const CATEGORIES = {
   ai: {
     label: "AI",
@@ -98,6 +164,7 @@ export const CATEGORIES = {
     googleTrends: true,
     xList: true,
     arxiv: true,
+    newsFeeds: AI_NEWS_FEEDS,
   },
   web3: {
     label: "Web3 / Crypto",
@@ -156,6 +223,7 @@ export const CATEGORIES = {
     googleTrends: true,
     xList: true,
     dexscreener: true,
+    newsFeeds: WEB3_NEWS_FEEDS,
   },
   fintech: {
     label: "FinTech",
@@ -187,6 +255,7 @@ export const CATEGORIES = {
     coingecko: false,
     googleTrends: true,
     xList: true,
+    newsFeeds: FINTECH_NEWS_FEEDS,
   },
   saas: {
     label: "B2B SaaS / DevTools",
@@ -245,6 +314,9 @@ export const SOURCE_WEIGHT = {
   lobsters: 0.85,   // SaaS/DevTools only — same "real human ranking" shape as HN, smaller community
   arxiv: 0.8,       // AI only — legit research signal, but rank-position proxy only (no vote count)
   producthunt: 0.7, // launch signal, no vote count exposed in RSS
+  newsfeeds: 0.7,   // real editorial outlets, same "no vote count, position-in-feed
+                     // proxy only" shape as Product Hunt — weighted the same for now,
+                     // revisit once there's a few weeks of data on signal quality.
   xlist: 0.65,      // curated-list attention signal — real posts + real engagement,
                      // higher-intent than a raw national search feed, but still an
                      // attention/audience axis, not a category-quality one. Judgment
@@ -263,6 +335,7 @@ export const SOURCE_SIGNAL = {
   lobsters: "category",
   arxiv: "category",
   producthunt: "category",
+  newsfeeds: "category",
   xlist: "attention",
   googletrends: "attention",
 };

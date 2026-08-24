@@ -8,6 +8,7 @@ import { fetchXList } from "./sources/x-list.js";
 import { fetchLobsters } from "./sources/lobsters.js";
 import { fetchArxiv } from "./sources/arxiv.js";
 import { fetchDexScreener } from "./sources/dexscreener.js";
+import { fetchNewsFeeds } from "./sources/news-feeds.js";
 import { pipeline } from "./rank.js";
 import { firstItemMatch } from "./matcher.js";
 import { structuralDisqualify } from "./qualify.js";
@@ -70,6 +71,7 @@ export async function collect(catKey) {
   if (cfg.lobsters) jobs.push(fetchLobsters(cfg));
   if (cfg.arxiv) jobs.push(fetchArxiv(cfg));
   if (cfg.dexscreener) jobs.push(fetchDexScreener(cfg, { telemetry }));
+  if (cfg.newsFeeds) jobs.push(fetchNewsFeeds(cfg));
   const all = (await Promise.all(jobs)).flat();
 
   // Google Trends is still fetched every crawl (cheap, kept as a raw record)
