@@ -26,6 +26,16 @@
 // prompt — told a number, it pads. Neither prompt states a target count;
 // this module discards anything that doesn't clear the floor and routes to
 // the quiet path.
+//
+// Phase 2.5 — qualifying-signal filter (is_event). The matcher (matcher.js,
+// upstream in collect.js) answers "is this item on-category." Nothing
+// upstream answers "did anything actually happen" — a GitHub repo that
+// merely exists, or a daily digest, passes the matcher fine and burns a
+// pool slot Pass 2 has nothing to write from. `is_event` is a second field
+// on the EXISTING Pass 1 response (no new API call, no new model call) and
+// is applied as a hard gate, independent of relevance scoring: an item
+// with is_event === false is dropped before selectTopN ever sees it,
+// regardless of how relevant it scored.
 
 import { dedupe, applyCorroborationBoost } from "./rank.js";
 import { CATEGORIES } from "./categories.js";
@@ -126,8 +136,9 @@ const SCORE_TOOL = {
             relevance_score: { type: "number" },
             relevance: { type: "string", enum: ["direct", "indirect", "none"] },
             one_line_reason: { type: "string" },
+            is_event: { type: "boolean" },
           },
-          required: ["index", "relevance_score", "relevance", "one_line_reason"],
+          required: ["index", "relevance_score", "relevance", "one_line_reason", "is_event"],
         },
       },
     },
@@ -144,6 +155,9 @@ For every item, score:
 - "relevance": "direct" if it sits squarely in the brand's own category or business model, "indirect" if it's adjacent or a second-order signal worth knowing about but not squarely on-topic, "none" if it has no real connection to this specific brand.
 - "relevance_score": 0 to 1 — how confidently this item matters to THIS brand specifically, not how big or newsworthy the item is in general.
 - "one_line_reason": one short, concrete sentence grounding the score in what the item actually is and how it relates (or doesn't) to the brand.
+- "is_event": true only if a named org shipped, launched, raised, acquired, was exploited, or a regulator acted, OR a measurable market move occurred. Otherwise false. This is independent of relevance — an item can be highly relevant to the brand's category and still not be an event.
+
+Explicitly NOT events (is_event: false), regardless of how relevant they otherwise score: a repo or tool merely existing; link roundups and daily digests; opinion, explainer, or tutorial content; listicles.
 
 Score every item in the pool, using its index exactly as given — do not skip any. Do not force "direct" onto an item just because it's in the right category if it isn't actually about the brand's specific business. Most category news is indirect or none, not direct; an honest score distribution reflects that.`;
 }
@@ -158,7 +172,12 @@ function buildPass1UserMessage(ctx, items) {
 export async function runPass1({ pool, fetchImpl, anthropicApiKey, model = PASS1_MODEL, ...ctx }) {
   const body = {
     model,
-    max_tokens: Math.min(8000, 500 + pool.length * 60),
+    // Per-item budget raised 60 -> 80 after the is_event field was added
+    // (Phase 2.5): live-verified this was previously marginal, not safely
+    // headroomed — a real 40-item run hit the old 2900-token cap exactly
+    // and got truncated mid-JSON, silently producing zero valid scores.
+    // Same failure mode is now fixed with headroom for the extra field.
+    max_tokens: Math.min(8000, 500 + pool.length * 80),
     system: buildPass1SystemPrompt(),
     messages: [{ role: "user", content: buildPass1UserMessage(ctx, pool) }],
     tools: [SCORE_TOOL],
@@ -181,6 +200,9 @@ export async function runPass1({ pool, fetchImpl, anthropicApiKey, model = PASS1
       relevance_score: clamp01(s.relevance_score),
       relevance: ["direct", "indirect", "none"].includes(s.relevance) ? s.relevance : "none",
       one_line_reason: typeof s.one_line_reason === "string" ? s.one_line_reason : "",
+      // Hard gate, default deny: anything other than a literal `true` does
+      // not survive. Missing/malformed is not "benefit of the doubt."
+      is_event: s.is_event === true,
     });
   }
   return { scored, debug: { model, usage: data.usage || null } };
@@ -202,6 +224,16 @@ export function selectTopN(scored, n = PASS2_TOP_N) {
     .filter((s) => s.relevance !== "none")
     .sort((a, b) => b.relevance_score - a.relevance_score)
     .slice(0, n);
+}
+
+// Independent hard gate, not a score input — applied before selectTopN's
+// ranking, so an item that fails it never reaches Pass 2 no matter how
+// relevant it scored.
+export function applyEventGate(scored) {
+  const kept = [];
+  const dropped = [];
+  for (const s of scored) (s.is_event ? kept : dropped).push(s);
+  return { kept, dropped };
 }
 
 // ---------- Pass 2: the write ----------
@@ -403,11 +435,27 @@ export async function generatePulseRead({
   const { scored, debug: pass1Debug } = await runPass1({ ...ctx, pool, fetchImpl, anthropicApiKey, model: pass1Model });
   const distribution = scoreDistribution(scored);
   const pass1Cost = computeCost(pass1Debug.usage, pass1Debug.model);
-  debug.pass1 = { model: pass1Debug.model, usage: pass1Debug.usage, cost: pass1Cost, score_distribution: distribution };
 
-  const top = selectTopN(scored, topN);
+  const { kept: eventGated, dropped: eventDropped } = applyEventGate(scored);
+  debug.pass1 = {
+    model: pass1Debug.model,
+    usage: pass1Debug.usage,
+    cost: pass1Cost,
+    score_distribution: distribution,
+    is_event: {
+      in: scored.length,
+      dropped: eventDropped.length,
+      out: eventGated.length,
+      dropped_titles: eventDropped.map((s) => s.item.title),
+    },
+  };
+
+  const top = selectTopN(eventGated, topN);
   if (!top.length) {
-    debug.standards = { pass: false, failed_standard: "no_items_above_none" };
+    debug.standards = {
+      pass: false,
+      failed_standard: eventGated.length === 0 && scored.length > 0 ? "no_items_survived_event_gate" : "no_items_above_none",
+    };
     debug.total_cost = Number((pass1Cost?.usd || 0).toFixed(6));
     return { result: quietResult(brandName), debug };
   }

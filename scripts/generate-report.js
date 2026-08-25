@@ -114,6 +114,14 @@ function formatDebug({ cls, primaryPoolInfo, secondaryPoolInfo, readDebug, class
       lines.push(`  scored: ${d.total} total — direct: ${d.direct}, indirect: ${d.indirect}, none: ${d.none}`);
       lines.push(`  top 10 scores: ${JSON.stringify(d.top_10_scores)}`);
     }
+    const ev = readDebug.pass1.is_event;
+    if (ev) {
+      lines.push(`  is_event gate: ${ev.in} in / ${ev.dropped} dropped / ${ev.out} out`);
+      if (ev.dropped_titles.length) {
+        lines.push("  dropped titles:");
+        for (const t of ev.dropped_titles) lines.push(`    - ${t}`);
+      }
+    }
   } else {
     lines.push("  (not run — pool was empty)");
   }
