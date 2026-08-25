@@ -176,8 +176,20 @@ export async function runPass1({ pool, fetchImpl, anthropicApiKey, model = PASS1
     // (Phase 2.5): live-verified this was previously marginal, not safely
     // headroomed — a real 40-item run hit the old 2900-token cap exactly
     // and got truncated mid-JSON, silently producing zero valid scores.
-    // Same failure mode is now fixed with headroom for the extra field.
-    max_tokens: Math.min(8000, 500 + pool.length * 80),
+    //
+    // Depth-50 brief: the 8000-token CEILING (not the per-item multiplier)
+    // was the next thing to break. selectPool() combines primary + secondary
+    // category pools ("the full 40-76 item pool" per this file's own header
+    // at depth 40) — a dual-category brand (e.g. Notion, saas+ai) at depth
+    // 50 can reach ~90-100 combined items pre-dedupe, and 500+80*100=8500
+    // would have silently truncated against the old ceiling exactly like
+    // the 40-item run above. Checked live via the Models API
+    // (models.retrieve("claude-haiku-4-5")): actual max_tokens is 64000, so
+    // an 8000 ceiling was never a model limit, just an arbitrary one. Raised
+    // multiplier and ceiling together for real margin, still far under the
+    // model's real cap: 800+100*120=12800, room to ~130 combined items
+    // before the ceiling itself binds.
+    max_tokens: Math.min(16000, 800 + pool.length * 120),
     system: buildPass1SystemPrompt(),
     messages: [{ role: "user", content: buildPass1UserMessage(ctx, pool) }],
     tools: [SCORE_TOOL],

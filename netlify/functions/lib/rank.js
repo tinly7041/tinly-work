@@ -146,12 +146,48 @@ export function applyCorroborationBoost(items) {
 // more candidates. A category that can't fill to CACHE_TARGET without
 // breaching the cap ends up with a smaller, honest cache rather than a
 // padded, lopsided one — see Step 8: a shrinking pool is not a regression.
+// BUG FOUND (Step 1 of the depth-50 brief): a fixed cap of floor(limit *
+// SHARE) only holds the "no source > 40% of the cache" invariant when the
+// OTHER sources combined can supply enough volume to fill the rest. Live
+// case that exposed it — SaaS candidate pool was lobsters:25 / hn:2 /
+// github:1. The fixed cap (floor(40*0.4)=16) correctly stopped lobsters at
+// 16 instead of 25, and the loop correctly stopped the whole cache at 19
+// once every bucket was either capped or exhausted ("smaller, honest cache"
+// per the Step 7 comment above) — but 16 of 19 is 84%, not <=40%, because
+// hn+github (3 items) can never fill the 24 remaining slots a 16-cap
+// assumes are coming. The comment's own logic ("stops contributing, even
+// if slots remain") was written assuming other sources are merely a little
+// thin, not this thin — it never re-checks the cap against what the cache
+// actually ends up being.
+//
+// Fix: resolve the cap against the real achievable total via fixed-point
+// iteration, not the aspirational target. Shrink the assumed total until
+// the cap it implies reproduces that same total (capping the dominant
+// source shrinks the total, which should shrink the cap, which may shrink
+// the total further — iterate to convergence, typically 2-4 steps).
+// Skips entirely for a single-source bucket set: a share cap is a
+// diversity constraint between sources, meaningless (and actively harmful —
+// it would crush a legitimately sole-sourced category toward zero) when
+// there is only one source to begin with.
+function resolveShareCap(bucketSizes, limit, share) {
+  if (bucketSizes.length <= 1) return Infinity;
+  const totalAvailable = bucketSizes.reduce((a, b) => a + b, 0);
+  let total = Math.min(limit, totalAvailable);
+  for (let i = 0; i < 50; i++) {
+    const cap = Math.max(1, Math.floor(total * share));
+    const achievable = Math.min(limit, bucketSizes.reduce((a, n) => a + Math.min(n, cap), 0));
+    if (achievable === total) return cap;
+    total = achievable;
+  }
+  return Math.max(1, Math.floor(total * share));
+}
+
 export function rank(items, limit = CACHE_TARGET, { telemetry } = {}) {
   const buckets = {};
   for (const i of items) (buckets[i.source] ||= []).push(i);
   for (const b of Object.values(buckets)) b.sort((a, z) => z.score - a.score);
   const names = Object.keys(buckets).sort((a, z) => (SOURCE_WEIGHT[z] ?? 0) - (SOURCE_WEIGHT[a] ?? 0));
-  const cap = Math.floor(limit * SOURCE_SHARE_CAP);
+  const cap = resolveShareCap(names.map((n) => buckets[n].length), limit, SOURCE_SHARE_CAP);
   const perSourceCount = {};
   const out = [];
   let round = 0;

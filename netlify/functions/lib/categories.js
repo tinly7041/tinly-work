@@ -340,4 +340,4 @@ export const SOURCE_SIGNAL = {
   googletrends: "attention",
 };
 
-export const CACHE_TARGET = 40; // over-fetch so Sonnet has room to filter down to 5
+export const CACHE_TARGET = 50; // over-fetch so Sonnet has room to filter down to 5
