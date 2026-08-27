@@ -14,6 +14,18 @@
 // whatever the cache has (possibly nothing) and degrades to a normal quiet
 // result exactly like a thin category pool does today. There is no
 // "broken report" path.
+//
+// Fix-pass brief, item 1b: `status` on the cache entry distinguishes a
+// genuine verdict from an unresolved one — see entity-cache.js for how the
+// TTL responds to it. Values:
+//   "ok"                     — real items, or confirmed empty after every
+//                               retry attempt succeeded HTTP-wise
+//   "empty_retries_exhausted" — every retry attempt succeeded but parsed to
+//                               zero items — Google's intermittent-empty
+//                               behavior, not a real "no coverage" verdict
+//   "fetch_error"            — an HTTP/network error, or an orchestration-
+//                               level error (e.g. an unknown categoryKey) —
+//                               equally not a real verdict, same short TTL
 
 import { getCachedEntity, setCachedEntity } from "./entity-cache.js";
 import { fetchCompetitorNews } from "./sources/competitor-news.js";
@@ -38,16 +50,23 @@ export async function refreshCompetitorEntity(entityName, categoryKey, { getStor
   let items = [];
   let rejected = [];
   let error = null;
+  let fetch_meta = null;
   try {
-    ({ query, items, rejected } = await fetchCompetitorNews(entityName, categoryKey));
+    ({ query, items, rejected, fetch_meta } = await fetchCompetitorNews(entityName, categoryKey));
   } catch (e) {
-    // fetchCompetitorNews already wraps its own HTTP call in safe() (see
-    // sources/_http.js), so reaching here means something outside that —
-    // e.g. an unknown categoryKey. Degrade to an empty result rather than
-    // let one bad entity kill the whole background invocation.
+    // Reaching here means something outside the Google News call itself —
+    // e.g. an unknown categoryKey thrown by buildCompetitorQuery. Degrade to
+    // an empty result rather than let one bad entity kill the whole
+    // background invocation.
     error = e.message;
   }
 
-  const entry = await setCachedEntity(entityName, { category: categoryKey, query, items, rejected, error }, { getStore });
+  const status = error || fetch_meta?.http_error ? "fetch_error" : fetch_meta?.exhausted_empty ? "empty_retries_exhausted" : "ok";
+  // Fix-pass brief, item 1c: an empty window must be visible, not silent.
+  if (status !== "ok") {
+    console.warn(`[competitor-fetch] "${entityName}" (${categoryKey}) — status=${status}, fetch_meta=${JSON.stringify(fetch_meta)}, error=${error || "none"}`);
+  }
+
+  const entry = await setCachedEntity(entityName, { category: categoryKey, query, items, rejected, error, status, fetch_meta }, { getStore });
   return { ...entry, from_cache: false };
 }

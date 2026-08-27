@@ -43,7 +43,19 @@ export const handler = async (event) => {
   for (const { name, category } of entities) {
     try {
       const result = await refreshCompetitorEntity(name, category);
-      results.push({ name, category, ok: true, from_cache: result.from_cache, item_count: result.items?.length || 0 });
+      results.push({
+        name,
+        category,
+        ok: true,
+        from_cache: result.from_cache,
+        item_count: result.items?.length || 0,
+        // Fix-pass brief, item 1c: surfaces the "ok" vs. "empty_retries_exhausted"
+        // vs. "fetch_error" distinction here too, so an unresolved empty
+        // window is visible in function logs, not indistinguishable from a
+        // genuine quiet result.
+        status: result.status,
+        fetch_meta: result.fetch_meta,
+      });
     } catch (e) {
       console.error(`[competitor-fetch-background] ${name} (${category}) failed —`, e.message);
       results.push({ name, category, ok: false, error: e.message });

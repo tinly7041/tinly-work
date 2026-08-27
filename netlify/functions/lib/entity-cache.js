@@ -21,6 +21,19 @@ import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 
 export const ENTITY_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// Fix-pass brief, item 1b: a "successfully fetched, zero items" result is
+// NOT the same claim as a genuine "no coverage" verdict — Google News RSS
+// intermittently returns a syntactically valid empty channel for a query
+// that has real coverage seconds later (see competitor-news.js). Caching
+// that ambiguous result for the full 7-day TTL would turn one bad window
+// into a week-long false "this entity has no news." An entry whose `status`
+// is anything other than "ok" (see lib/competitor-fetch.js for the status
+// values) gets this much shorter TTL instead — long enough to survive a
+// burst of leads naming the same brand-new entity in quick succession,
+// short enough that the next real chance isn't locked out for a week.
+export const UNCERTAIN_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 const STORE_NAME = process.env.BLOBS_STORE_NAME || "trends";
 const ENTITY_STORE = "competitor-entities";
 const CACHE_DIR = path.resolve(process.cwd(), ".cache", "entities");
@@ -36,16 +49,24 @@ function cachePath(key) {
   return path.join(CACHE_DIR, `${encodeURIComponent(key)}.json`);
 }
 
-function isFresh(entry, ttlMs = ENTITY_CACHE_TTL_MS) {
+// ttlMs, when explicitly passed, always wins (used by tests to force a
+// specific freshness check regardless of status). When omitted, the
+// effective TTL depends on the entry's own status: an "ok" verdict gets the
+// full 7-day TTL; anything else (an unresolved empty window, a fetch error,
+// or an older entry written before this field existed — treated the same
+// as "ok" for backward compatibility, not as newly-uncertain) gets the much
+// shorter uncertain-result TTL.
+function isFresh(entry, ttlMs) {
   if (!entry?.fetched_at) return false;
+  const effectiveTtl = ttlMs !== undefined ? ttlMs : entry.status && entry.status !== "ok" ? UNCERTAIN_CACHE_TTL_MS : ENTITY_CACHE_TTL_MS;
   const age = Date.now() - Date.parse(entry.fetched_at);
-  return Number.isFinite(age) && age <= ttlMs;
+  return Number.isFinite(age) && age <= effectiveTtl;
 }
 
 // Returns the cached entry only if present AND fresh; stale or missing both
 // return null — the caller can't tell the difference and shouldn't need to
 // (either way, there's nothing usable to read right now).
-export async function getCachedEntity(entityName, { getStore, ttlMs = ENTITY_CACHE_TTL_MS } = {}) {
+export async function getCachedEntity(entityName, { getStore, ttlMs } = {}) {
   const key = normalizeEntityName(entityName);
   if (!key) return null;
 

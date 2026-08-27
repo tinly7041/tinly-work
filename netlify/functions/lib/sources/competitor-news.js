@@ -27,7 +27,7 @@
 // (netlify/functions/competitor-fetch-background.js) — never by read-pulse.js
 // or generate-pulse.js directly.
 
-import { get, safe } from "./_http.js";
+import { get, _failures } from "./_http.js";
 import { parseItems, tag, link } from "../rss.js";
 import { firstItemMatch, itemMatchesTerm } from "../matcher.js";
 import { CATEGORIES } from "../categories.js";
@@ -36,6 +36,26 @@ const GOOGLE_NEWS_RSS = "https://news.google.com/rss/search";
 const WINDOW_DAYS = 14; // same freshness window as sources/news-feeds.js
 const RESULT_LIMIT = 20;
 const DESCRIPTION_LIMIT = 500;
+
+// Fix-pass brief, item 1: Google News RSS returns HTTP 200 with a
+// syntactically valid, EMPTY channel (zero <item> blocks) intermittently and
+// unpredictably for well-covered queries — live-caught, same process, same
+// query string: "Uniswap" crypto returned 0, 0, 0, then 101 minutes later.
+// This is a launch blocker, not an edge case: the product sends one report
+// per lead, and the 7-day entity cache only helps the NEXT lead naming the
+// same entity — the lead whose fetch landed on the empty window gets "your
+// category is quiet" and never returns, indistinguishable from a genuine
+// quiet result.
+//
+// Retry ONLY on a successfully-parsed-but-empty response. An HTTP/network
+// error is a different failure mode, already handled (logged to _failures,
+// [] returned, same as every other adapter) — NOT retried, per instruction.
+const EMPTY_RETRY_ATTEMPTS = 3; // total attempts, including the first
+const EMPTY_RETRY_BACKOFF_MS = 600; // short, linear backoff between attempts
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export function buildCompetitorQuery(entity, categoryKey) {
   const cfg = CATEGORIES[categoryKey];
@@ -57,22 +77,63 @@ function stripSourceSuffix(title) {
   return (title || "").replace(/\s+-\s+[^-]+$/, "").trim();
 }
 
-async function fetchGoogleNewsRaw(query) {
-  return safe("competitor-news:google", async () => {
-    const url = `${GOOGLE_NEWS_RSS}?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
-    const xml = await get(url);
-    const blocks = parseItems(xml).slice(0, RESULT_LIMIT);
-    return blocks
-      .map((b) => ({
-        title: stripSourceSuffix(tag(b, "title")),
-        description: (tag(b, "description") || "").slice(0, DESCRIPTION_LIMIT),
-        url: link(b) || "",
-        source: "competitor-news",
-        date: tag(b, "pubDate") || new Date().toISOString(),
-      }))
-      .filter((i) => i.title && i.url)
-      .filter((i) => withinWindow(i.date, WINDOW_DAYS));
-  });
+// Returns { items, fetch_meta }. fetch_meta.exhausted_empty is true only
+// when every attempt succeeded (HTTP-wise) and every attempt parsed to zero
+// <item>/<entry> blocks — the ambiguous "we genuinely don't know" case this
+// brief is about. An HTTP/network error is reported via fetch_meta.http_error
+// and is NOT retried; items is [] in that case, same as before this change.
+//
+// getImpl/sleepImpl are injectable ONLY so the retry loop's logic (attempt
+// counting, break-on-success, break-on-error, no-retry-past-the-cap) can be
+// mock-verified without a live network call — see competitor-news.test.js.
+// The real path (fetchCompetitorNews, and everything upstream of it) always
+// uses the real `get` and real `setTimeout`; production behavior is
+// unaffected by this seam.
+export async function fetchGoogleNewsRaw(query, { getImpl = get, sleepImpl = sleep } = {}) {
+  const url = `${GOOGLE_NEWS_RSS}?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+  let blocks = [];
+  let attempt = 0;
+  let httpError = null;
+
+  for (attempt = 1; attempt <= EMPTY_RETRY_ATTEMPTS; attempt++) {
+    try {
+      const xml = await getImpl(url);
+      blocks = parseItems(xml);
+    } catch (e) {
+      // Same logging/tracking shape every other adapter's safe() call uses —
+      // written out manually here (not via safe()) because safe() collapses
+      // "failed" and "succeeded with zero items" into the same bare [],
+      // which is exactly the ambiguity this fix needs to resolve, not repeat.
+      console.warn(`[source:competitor-news:google] failed — ${e.message}`);
+      _failures.push({ source: "competitor-news:google", error: e.message });
+      httpError = e.message;
+      blocks = [];
+      break; // HTTP/network error — not retried
+    }
+    if (blocks.length > 0) break;
+    if (attempt < EMPTY_RETRY_ATTEMPTS) await sleepImpl(EMPTY_RETRY_BACKOFF_MS * attempt);
+  }
+
+  const items = blocks
+    .slice(0, RESULT_LIMIT)
+    .map((b) => ({
+      title: stripSourceSuffix(tag(b, "title")),
+      description: (tag(b, "description") || "").slice(0, DESCRIPTION_LIMIT),
+      url: link(b) || "",
+      source: "competitor-news",
+      date: tag(b, "pubDate") || new Date().toISOString(),
+    }))
+    .filter((i) => i.title && i.url)
+    .filter((i) => withinWindow(i.date, WINDOW_DAYS));
+
+  return {
+    items,
+    fetch_meta: {
+      attempts: attempt > EMPTY_RETRY_ATTEMPTS ? EMPTY_RETRY_ATTEMPTS : attempt,
+      exhausted_empty: !httpError && blocks.length === 0,
+      http_error: httpError,
+    },
+  };
 }
 
 // Two independent gates, both required — belt and suspenders on top of the
@@ -128,17 +189,21 @@ export function filterForEntity(items, entity, categoryKey) {
 // lib/competitor-fetch.js for why: no separate classification call for the
 // competitor, it inherits the brand's own primary category).
 //
-// Returns { query, items, rejected } — items are shaped like any other pool
-// item (title/description/url/source/date) plus `entity`; rejected carries
-// enough to print for the VERIFY report (title + reason), never silently
-// dropped without a trace.
+// Returns { query, items, rejected, fetch_meta } — items are shaped like any
+// other pool item (title/description/url/source/date) plus `entity`;
+// rejected carries enough to print for the VERIFY report (title + reason),
+// never silently dropped without a trace. fetch_meta.exhausted_empty tells
+// the caller (lib/competitor-fetch.js) whether this is a genuine "no
+// coverage" result or an unresolved empty window — see that file for how
+// the cache treats the difference.
 export async function fetchCompetitorNews(entity, categoryKey) {
   const query = buildCompetitorQuery(entity, categoryKey);
-  const raw = await fetchGoogleNewsRaw(query);
+  const { items: raw, fetch_meta } = await fetchGoogleNewsRaw(query);
   const { kept, rejected } = filterForEntity(raw, entity, categoryKey);
   return {
     query,
     items: kept.map((item) => ({ ...item, entity })),
     rejected: rejected.map((r) => ({ title: r.item.title, url: r.item.url, reason: r.reason })),
+    fetch_meta,
   };
 }

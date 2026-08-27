@@ -9,6 +9,13 @@
 //     node scripts/competitor-report.js --entity "Aerodrome" --category web3
 //     node scripts/competitor-report.js --entity "Retool" --category saas --refresh
 //
+//   Hammer mode — fix-pass brief item 1's VERIFY: bypasses the cache
+//   entirely and calls fetchCompetitorNews live N times, spaced, printing
+//   each call's retry attempts and whether it still came back empty after
+//   retries. Used to try to catch Google News RSS's intermittent-empty
+//   behavior in the wild, not to simulate one:
+//     node scripts/competitor-report.js --entity "Uniswap" --category web3 --hammer 12
+//
 //   Brand mode — full end-to-end run (classify -> category pool -> entity
 //   cache -> read-pulse), requires ANTHROPIC_API_KEY:
 //     node scripts/competitor-report.js --brand "Uniswap" --url uniswap.org --competitor "Aerodrome"
@@ -24,10 +31,10 @@ import { generatePulseRead } from "../netlify/functions/lib/read-pulse.js";
 import { CATEGORIES } from "../netlify/functions/lib/categories.js";
 import { computeCost } from "../netlify/functions/lib/pricing.js";
 import { refreshCompetitorEntity } from "../netlify/functions/lib/competitor-fetch.js";
-import { fetchCompetitorNews } from "../netlify/functions/lib/sources/competitor-news.js";
+import { fetchCompetitorNews, buildCompetitorQuery } from "../netlify/functions/lib/sources/competitor-news.js";
 
 function parseArgs(argv) {
-  const args = { entity: null, category: null, brand: null, url: null, competitor: null, refresh: false, json: false, debug: false };
+  const args = { entity: null, category: null, brand: null, url: null, competitor: null, refresh: false, json: false, debug: false, hammer: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--entity") args.entity = argv[++i];
@@ -38,8 +45,37 @@ function parseArgs(argv) {
     else if (a === "--refresh") args.refresh = true;
     else if (a === "--json") args.json = true;
     else if (a === "--debug") args.debug = true;
+    else if (a === "--hammer") args.hammer = Number(argv[++i]);
   }
   return args;
+}
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ---------- hammer mode: try to catch the empty-window in the wild ----------
+
+async function runHammerMode(args) {
+  if (!CATEGORIES[args.category]) {
+    console.error(`Unknown category "${args.category}". Known: ${Object.keys(CATEGORIES).join(", ")}`);
+    process.exitCode = 1;
+    return;
+  }
+  console.log(`Hammering "${args.entity}" (${args.category}) x${args.hammer}, bypassing cache, spaced 2s apart...\n`);
+  let emptyAfterRetries = 0;
+  let recoveredByRetry = 0;
+  let immediateHits = 0;
+  for (let i = 1; i <= args.hammer; i++) {
+    const { query, items, fetch_meta } = await fetchCompetitorNews(args.entity, args.category);
+    const tag = fetch_meta.exhausted_empty ? "EMPTY AFTER RETRIES" : fetch_meta.attempts > 1 ? "RECOVERED ON RETRY" : "OK (1st attempt)";
+    console.log(`[${i}/${args.hammer}] attempts=${fetch_meta.attempts} exhausted_empty=${fetch_meta.exhausted_empty} http_error=${fetch_meta.http_error || "none"} raw_kept=${items.length} — ${tag}`);
+    if (items[0]) console.log(`         e.g. "${items[0].title}"`);
+    if (fetch_meta.exhausted_empty) emptyAfterRetries++;
+    else if (fetch_meta.attempts > 1) recoveredByRetry++;
+    else immediateHits++;
+    if (i < args.hammer) await sleep(2000);
+  }
+  console.log(`\nQuery used throughout: ${buildCompetitorQuery(args.entity, args.category)}`);
+  console.log(`Summary: ${immediateHits} ok on first attempt, ${recoveredByRetry} recovered by retry, ${emptyAfterRetries} still empty after all retries — out of ${args.hammer} total live calls.`);
 }
 
 // ---------- entity mode: live query + matcher precision ----------
@@ -51,22 +87,25 @@ async function runEntityMode(args) {
     return;
   }
 
-  const { query, items, rejected } = args.refresh
-    ? await fetchCompetitorNews(args.entity, args.category)
+  const { query, items, rejected, fetch_meta, status } = args.refresh
+    ? await fetchCompetitorNews(args.entity, args.category).then((r) => ({ ...r, status: undefined }))
     : await refreshCompetitorEntity(args.entity, args.category, { force: false }).then((r) => ({
         query: r.query,
         items: r.items,
         rejected: r.rejected,
         from_cache: r.from_cache,
+        fetch_meta: r.fetch_meta,
+        status: r.status,
       }));
 
   if (args.json) {
-    console.log(JSON.stringify({ entity: args.entity, category: args.category, query, items, rejected }, null, 2));
+    console.log(JSON.stringify({ entity: args.entity, category: args.category, query, items, rejected, fetch_meta, status }, null, 2));
     return;
   }
 
   console.log(`${"=".repeat(72)}\nEntity: ${args.entity}  (category: ${args.category})\n${"=".repeat(72)}`);
   console.log(`Query sent: ${query}`);
+  if (fetch_meta) console.log(`Fetch: attempts=${fetch_meta.attempts} exhausted_empty=${fetch_meta.exhausted_empty} http_error=${fetch_meta.http_error || "none"}${status ? ` status=${status}` : ""}`);
   console.log(`Items returned (post entity+category filter): ${items.length}`);
   console.log(`Items rejected: ${rejected.length}`);
   console.log("");
@@ -177,10 +216,11 @@ async function runBrandMode(args) {
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  if (args.entity && args.hammer) return runHammerMode(args);
   if (args.entity) return runEntityMode(args);
   if (args.brand && args.url) return runBrandMode(args);
   console.error(
-    'Usage:\n  node scripts/competitor-report.js --entity "<name>" --category <ai|web3|fintech|saas> [--refresh] [--json]\n  node scripts/competitor-report.js --brand "<name>" --url <domain> [--competitor "<name>"] [--refresh] [--debug] [--json]'
+    'Usage:\n  node scripts/competitor-report.js --entity "<name>" --category <ai|web3|fintech|saas> [--refresh] [--json]\n  node scripts/competitor-report.js --entity "<name>" --category <cat> --hammer <N>\n  node scripts/competitor-report.js --brand "<name>" --url <domain> [--competitor "<name>"] [--refresh] [--debug] [--json]'
   );
   process.exitCode = 1;
 }
