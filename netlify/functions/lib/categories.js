@@ -301,7 +301,14 @@ export const REFERENCE_ONLY_SOURCES = ["googletrends"];
 // Step 7: no source may contribute more than this share of a category's
 // ranked cache. GitHub was 65% of FinTech in the 23 Aug dump. Enforced in
 // rank.js's rank(), generally, for every source — not a GitHub-only patch.
-export const SOURCE_SHARE_CAP = 0.4;
+//
+// Config-batch brief, deliberate temporary loosening 0.4 -> 0.7: at 0.4, the
+// depth-50 fixed-point cap (resolveShareCap(), unchanged) was correctly
+// enforcing the invariant but cutting honestly-thin pools (Web3, FinTech,
+// SaaS) down to 5-8 items — a pool that small is worse than a pool that's
+// 70% one voice. Revisit once the competitor layer lands and pools have
+// another source of volume to lean on.
+export const SOURCE_SHARE_CAP = 0.7;
 
 // Source weights. Applied AFTER per-source rank-percentile, never to raw values.
 // Rationale: a 2015 repo with 27k stars and an HN post with 300 points are not

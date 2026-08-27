@@ -49,10 +49,15 @@ export const PASS2_TOP_N = 12; // headroom above the floor of 5, tune from data
 // of the adaptive-thinking family) removed them — see file header.
 const TEMPERATURE_SUPPORTED_MODELS = new Set(["claude-haiku-4-5"]);
 
+// Config-batch brief: minItems 5->3, minDirect 3->2, minUniqueSources removed
+// entirely (not lowered to 1) — the source-share cap (rank.js's
+// resolveShareCap, via SOURCE_SHARE_CAP in categories.js) already bounds any
+// single source's share of the pool a brand's items are drawn from, so a
+// separate unique-source floor on the final N items was doing redundant work
+// at a different layer.
 export const ACTION_STANDARDS = {
-  minItems: 5,
-  minDirect: 3,
-  minUniqueSources: 2,
+  minItems: 3,
+  minDirect: 2,
 };
 
 const RELEVANCE_RANK = { direct: 2, indirect: 1, none: 0 };
@@ -395,14 +400,9 @@ function checkStandards(items, validUrls) {
       detail: `got ${directCount} direct, need >= ${ACTION_STANDARDS.minDirect}`,
     };
   }
+  // unique_sources is reported (formatDebug prints it on a pass) but no
+  // longer gates — see the ACTION_STANDARDS comment above.
   const uniqueSources = new Set(items.map((i) => i.source)).size;
-  if (uniqueSources < ACTION_STANDARDS.minUniqueSources) {
-    return {
-      pass: false,
-      failed_standard: "min_unique_sources",
-      detail: `got ${uniqueSources} unique sources, need >= ${ACTION_STANDARDS.minUniqueSources}`,
-    };
-  }
   return { pass: true, failed_standard: null, direct_count: directCount, unique_sources: uniqueSources };
 }
 

@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { rank } from "./rank.js";
+import { SOURCE_SHARE_CAP } from "./categories.js";
 
 function fakeItems(source, n, scoreStart = 1) {
   return Array.from({ length: n }, (_, i) => ({
@@ -18,13 +19,19 @@ function maxShare(out) {
   return Math.max(...Object.values(counts)) / out.length;
 }
 
-test("depth-50 brief bug: a fixed cap of floor(limit*share) let one source own 84% of a thin category", () => {
+test("depth-50 brief bug: a fixed cap of floor(limit*share) let one source own way more than SOURCE_SHARE_CAP of a thin category", () => {
   // The exact live shape that exposed the bug — SaaS candidate pool was
-  // lobsters:25 / hn:2 / github:1 against limit=40. The old cap
-  // (floor(40*0.4)=16) let lobsters reach 16 of a 19-item final cache.
+  // lobsters:25 / hn:2 / github:1 against limit=40. At the original 0.4 cap
+  // this let lobsters reach 16 of a 19-item final cache (84%). Asserts
+  // against the live SOURCE_SHARE_CAP constant, not a hardcoded number, so
+  // this doesn't go stale the next time that config value is revisited
+  // (config-batch brief: 0.4 -> 0.7, temporary loosening).
   const items = [...fakeItems("lobsters", 25), ...fakeItems("hn", 2), ...fakeItems("github", 1)];
   const out = rank(items, 40);
-  assert.ok(maxShare(out) <= 0.4, `max share was ${maxShare(out)}, expected <= 0.4`);
+  assert.ok(
+    maxShare(out) <= SOURCE_SHARE_CAP,
+    `max share was ${maxShare(out)}, expected <= ${SOURCE_SHARE_CAP}`
+  );
 });
 
 test("a single-source category is not crushed by the share cap", () => {
@@ -39,5 +46,5 @@ test("an abundant, balanced pool is unaffected by the cap", () => {
   const items = [...fakeItems("hn", 20), ...fakeItems("github", 20), ...fakeItems("arxiv", 20)];
   const out = rank(items, 40);
   assert.equal(out.length, 40);
-  assert.ok(maxShare(out) <= 0.4);
+  assert.ok(maxShare(out) <= SOURCE_SHARE_CAP);
 });
