@@ -172,6 +172,13 @@ export async function classifyBrand({
       max_tokens: 300,
       system: buildSystemPrompt(),
       messages: [{ role: "user", content: userMessage }],
+      // Fix-pass brief: this call had no temperature field at all (API
+      // default 1.0), inconsistent with read-pulse.js Pass 1's explicit 0
+      // on the same model (claude-haiku-4-5). Matching that convention —
+      // does NOT claim this makes classification deterministic (Pass 1's
+      // own header already documents temperature 0 not being perfectly
+      // stable for a genuinely borderline case).
+      temperature: 0,
     }),
   });
 

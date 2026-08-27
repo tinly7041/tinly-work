@@ -369,6 +369,43 @@ async function runPass2({ top, fetchImpl, anthropicApiKey, model = READ_MODEL, .
   return { parsed, debug: { model, usage: data.usage || null } };
 }
 
+// Fix-pass brief: exactly one retry, ONLY on a parse failure — every source
+// adapter already retries its own transient-failure case (see
+// sources/competitor-news.js's empty-response retry); Pass 2 was the only
+// place in this pipeline that didn't. Not configurable, not two retries.
+// Scoped narrowly via the exception type, not a broader "anything went
+// wrong, try again": a Pass2ParseError means the call succeeded and
+// produced text that didn't parse as JSON — a genuinely transient,
+// worth-a-second-try case. Anything else (an API error, a network failure)
+// is NOT a Pass2ParseError and rethrows immediately, unretried, exactly as
+// before this change — that's a different failure class this fix
+// deliberately leaves alone. An empty `items` array in a response that DID
+// parse is not a parse failure either; it flows through untouched into the
+// normal action-standards check below, same as always.
+const PASS2_PARSE_RETRY_ATTEMPTS = 2; // total attempts: 1 initial + 1 retry
+
+async function runPass2WithRetry(args) {
+  let lastError;
+  for (let attempt = 1; attempt <= PASS2_PARSE_RETRY_ATTEMPTS; attempt++) {
+    try {
+      const { parsed, debug } = await runPass2(args);
+      if (attempt > 1) {
+        console.warn(`[read-pulse] Pass 2 JSON parse failed once, recovered on retry (attempt ${attempt}/${PASS2_PARSE_RETRY_ATTEMPTS})`);
+      }
+      return { parsed, debug: { ...debug, parse_attempts: attempt, recovered_by_retry: attempt > 1 } };
+    } catch (e) {
+      if (!(e instanceof Pass2ParseError)) throw e; // API/network error — never retried
+      lastError = e;
+      if (attempt < PASS2_PARSE_RETRY_ATTEMPTS) {
+        console.warn(`[read-pulse] Pass 2 returned unparseable JSON (attempt ${attempt}/${PASS2_PARSE_RETRY_ATTEMPTS}) — retrying once — ${e.message}`);
+      }
+    }
+  }
+  console.warn(`[read-pulse] Pass 2 JSON still unparseable after ${PASS2_PARSE_RETRY_ATTEMPTS} attempts — degrading to quiet — ${lastError.message}`);
+  lastError.parse_attempts = PASS2_PARSE_RETRY_ATTEMPTS;
+  throw lastError;
+}
+
 function enforceRelevanceDowngradeOnly(items, pass1ByUrl) {
   const corrections = [];
   for (const it of items) {
@@ -497,10 +534,10 @@ export async function generatePulseRead({
 
   let parsed, pass2Debug;
   try {
-    ({ parsed, debug: pass2Debug } = await runPass2({ ...ctx, top, fetchImpl, anthropicApiKey, model: pass2Model }));
+    ({ parsed, debug: pass2Debug } = await runPass2WithRetry({ ...ctx, top, fetchImpl, anthropicApiKey, model: pass2Model }));
   } catch (e) {
     if (!(e instanceof Pass2ParseError)) throw e; // genuine API/network failure — surface it, don't swallow
-    debug.pass2 = { model: pass2Model, usage: null, cost: null, parse_error: e.message, raw_snippet: e.raw };
+    debug.pass2 = { model: pass2Model, usage: null, cost: null, parse_error: e.message, raw_snippet: e.raw, parse_attempts: e.parse_attempts || 1 };
     debug.standards = { pass: false, failed_standard: "pass2_unparseable", detail: e.message };
     debug.total_cost = Number((pass1Cost?.usd || 0).toFixed(6));
     return { result: quietResult(brandName), debug };
@@ -514,7 +551,15 @@ export async function generatePulseRead({
   const relevance_downgrades = enforceRelevanceDowngradeOnly(candidateItems, pass1ByUrl);
   const { kept, dropped: payoff_violations_dropped } = filterPayoffViolations(candidateItems);
 
-  debug.pass2 = { model: pass2Debug.model, usage: pass2Debug.usage, cost: pass2Cost, relevance_downgrades, payoff_violations_dropped };
+  debug.pass2 = {
+    model: pass2Debug.model,
+    usage: pass2Debug.usage,
+    cost: pass2Cost,
+    relevance_downgrades,
+    payoff_violations_dropped,
+    parse_attempts: pass2Debug.parse_attempts,
+    recovered_by_retry: pass2Debug.recovered_by_retry,
+  };
   debug.usage = pass2Debug.usage; // back-compat alias — Pass 2 is the closest semantic match to the old single-call cost
   debug.model = pass2Debug.model;
   debug.total_cost = Number(((pass1Cost?.usd || 0) + (pass2Cost?.usd || 0)).toFixed(6));

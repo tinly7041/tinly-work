@@ -111,7 +111,9 @@ async function runPass1Mode(args) {
     });
     const directCount = result.items?.filter((it) => it.relevance === "direct").length || 0;
     const pass = debug.standards?.pass;
-    console.log(`[run ${i}] pass1_direct=${debug.pass1?.score_distribution?.direct ?? "n/a"} pass1_indirect=${debug.pass1?.score_distribution?.indirect ?? "n/a"} pass1_none=${debug.pass1?.score_distribution?.none ?? "n/a"} | final_direct=${directCount} | standards=${pass ? "PASS" : `FAIL(${debug.standards?.failed_standard})`}`);
+    const parseAttempts = debug.pass2?.parse_attempts ?? "n/a";
+    const recovered = debug.pass2?.recovered_by_retry;
+    console.log(`[run ${i}] pass1_direct=${debug.pass1?.score_distribution?.direct ?? "n/a"} pass1_indirect=${debug.pass1?.score_distribution?.indirect ?? "n/a"} pass1_none=${debug.pass1?.score_distribution?.none ?? "n/a"} | final_direct=${directCount} | standards=${pass ? "PASS" : `FAIL(${debug.standards?.failed_standard})`} | pass2_parse_attempts=${parseAttempts}${recovered ? " (RECOVERED BY RETRY)" : ""}`);
     if (!result.quiet) {
       for (const it of result.items) console.log(`         [${it.relevance}] ${it.headline}`);
     } else {
