@@ -1,0 +1,26 @@
+{
+  "name": "tinly-work",
+  "version": "1.0.0",
+  "description": "Fractional brand management landing page for Tin Ly. Static HTML/CSS/JS — no build step, no dependencies.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test netlify/functions/lib/*.test.js netlify/functions/lib/**/*.test.js",
+    "probe": "node scripts/probe-sources.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tinly7041/tinly-work.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tinly7041/tinly-work/issues"
+  },
+  "homepage": "https://github.com/tinly7041/tinly-work#readme",
+  "dependencies": {
+    "@netlify/blobs": "^11.0.1"
+  },
+  "engines": { "node": ">=18" }
+}
