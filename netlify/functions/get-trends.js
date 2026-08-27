@@ -4,7 +4,10 @@ import { CATEGORIES } from "./lib/categories.js";
 // Read path. Zero source calls. If the blob is missing or stale the caller gets
 // told plainly — it does not trigger a live crawl. A user request must never be
 // the thing that warms the cache.
-const MAX_STALE_HOURS = 36;
+// 2-day crawl cadence (see crawl-trends.js / lib/health.js) means cache age
+// routinely reaches ~48h under normal, healthy operation — 36 fired `stale`
+// through roughly half of every healthy cycle.
+const MAX_STALE_HOURS = 60;
 // Must match crawl-trends.js's STORE_NAME exactly, or the read path silently
 // reads a different store than the one the crawl just wrote.
 const STORE_NAME = process.env.BLOBS_STORE_NAME || "trends";
