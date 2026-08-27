@@ -42,9 +42,10 @@ Task:
 2. "secondary": a second category, ONLY if the site itself genuinely evidences real activity in a second category. Otherwise null. Most brands should get null — never force a fit just to fill the field. Markets move; don't apply a fixed rule about which categories pair together, read what's actually there.
 3. "confidence": a number from 0 to 1 for the primary category.
 4. "brand_read": one to two sentences, third person, describing what the product actually does and where it sits in its stack or market (for example: infrastructure layer vs. end-user application, aggregator vs. originator). Describe, don't flatter — strip adjectives and superlatives lifted from the site's own copy ("leading", "seamless", "best-in-class", "revolutionary", and the like). If no site content was available, base this on the brand name and URL alone and say so plainly rather than inventing detail.
+5. "inferred_competitors": 1 to 3 real, named companies or products that most directly compete with this brand for the same customer — used as a fallback ONLY when a user doesn't name their own competitor, to search real news coverage for what that competitor has shipped. Each name MUST be the short, single canonical name that actually appears in headlines about it — the name a reporter would use, not a description of what it is (write "Aerodrome" or "Aerodrome Finance", not "the leading DEX on Base"; write "ChatGPT", not "OpenAI's conversational search feature"; a company name alone is fine when that IS how it's covered, e.g. "Ramp" not "Ramp's corporate card product"). Be specific and confident: a named competitor that actually takes the same volume or customer (for a DEX, the other DEX that takes its trading volume — not a token, a chain, or an adjacent-but-different business model). Empty array if you don't have enough signal to name one confidently — do not guess just to fill the field.
 
 Respond with ONLY a JSON object, no markdown fences, no other text:
-{"primary": "<key>", "secondary": "<key or null>", "confidence": <0-1 number>, "brand_read": "<1-2 sentences>"}`;
+{"primary": "<key>", "secondary": "<key or null>", "confidence": <0-1 number>, "brand_read": "<1-2 sentences>", "inferred_competitors": ["<name>", ...]}`;
 }
 
 // ---------- site fetch ----------
@@ -196,12 +197,26 @@ export async function classifyBrand({
       ? parsed.brand_read.trim()
       : "No description available.";
 
+  // Defensive validation, same shape as every other field here: a model
+  // that returns garbage (non-array, non-strings, the brand naming itself)
+  // degrades to an empty list rather than polluting the competitor layer's
+  // entity cache with junk keys.
+  const inferred_competitors = Array.isArray(parsed.inferred_competitors)
+    ? [...new Set(
+        parsed.inferred_competitors
+          .filter((c) => typeof c === "string" && c.trim())
+          .map((c) => c.trim())
+          .filter((c) => c.toLowerCase() !== brandName.trim().toLowerCase())
+      )].slice(0, 3)
+    : [];
+
   return {
     primary,
     secondary,
     confidence,
     brand_read,
     site_read,
+    inferred_competitors,
     _usage: data.usage || null,
     _model: model,
   };

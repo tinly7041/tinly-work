@@ -47,6 +47,7 @@ export const handler = async (event) => {
         confidence: 0.1,
         brand_read: "Classification failed — no read available.",
         site_read: false,
+        inferred_competitors: [],
       }),
     };
   }

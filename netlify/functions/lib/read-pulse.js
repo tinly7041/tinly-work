@@ -71,16 +71,26 @@ export const PAYOFF_QUANT_PATTERN =
 
 // ---------- pool selection ----------
 //
-// Primary category's items, plus secondary's if present. Cross-category dupes
-// are real signal for THIS brand specifically (the same story showed up under
-// two different category searches) — reuse the existing dedupe/corroboration
-// machinery from rank.js rather than forking it; a cross-category match unions
-// into `corroborated_sources` and picks up the same +0.05/source boost a
+// Primary category's items, plus secondary's if present, plus (Phase 2.7)
+// any competitor-entity items already sitting in the shared entity cache —
+// NEVER fetched here. This module never calls a source; competitorItems is
+// whatever the caller already loaded from lib/entity-cache.js (cache-only,
+// per the brief: "the 2 inline items come from cache only"). A brand-new
+// entity with nothing cached yet simply contributes zero items this cycle —
+// the background function (competitor-fetch-background.js) populates the
+// cache for the NEXT lead that names the same entity, not this one.
+//
+// Cross-category dupes are real signal for THIS brand specifically (the same
+// story showed up under two different category searches) — reuse the
+// existing dedupe/corroboration machinery from rank.js rather than forking
+// it; a cross-category (or competitor-vs-category) match unions into
+// `corroborated_sources` and picks up the same +0.05/source boost a
 // same-category corroboration would.
-export function selectPool(primaryPool, secondaryPool) {
+export function selectPool(primaryPool, secondaryPool, competitorItems) {
   const primaryItems = primaryPool?.items || [];
   const secondaryItems = secondaryPool?.items || [];
-  const combined = [...primaryItems, ...secondaryItems].map((i) => ({ ...i }));
+  const competitor = competitorItems || [];
+  const combined = [...primaryItems, ...secondaryItems, ...competitor].map((i) => ({ ...i }));
 
   const { items, removed } = dedupe(combined);
   applyCorroborationBoost(items);
@@ -95,15 +105,17 @@ function clamp01(n) {
   return Math.min(1, Math.max(0, x));
 }
 
-function contextHeader({ brandName, website, brandRead, primaryCategory, secondaryCategory }) {
+function contextHeader({ brandName, website, brandRead, primaryCategory, secondaryCategory, competitors }) {
   const primaryLabel = CATEGORIES[primaryCategory]?.label || primaryCategory;
   const secondaryLabel = secondaryCategory ? CATEGORIES[secondaryCategory]?.label || secondaryCategory : null;
+  const competitorNames = (competitors || []).map((c) => (typeof c === "string" ? c : c.name)).filter(Boolean);
   return [
     `Brand: ${brandName}`,
     `Website: ${website}`,
     `What it does: ${brandRead}`,
     `Primary category: ${primaryCategory} (${primaryLabel})`,
     secondaryLabel ? `Secondary category: ${secondaryCategory} (${secondaryLabel})` : null,
+    competitorNames.length ? `Named competitors: ${competitorNames.join(", ")}` : null,
   ].filter((l) => l !== null);
 }
 
@@ -158,9 +170,10 @@ You'll be given the brand's name, URL, a one- or two-sentence read on what it ac
 
 For every item, score:
 - "relevance": "direct" if it sits squarely in the brand's own category or business model, "indirect" if it's adjacent or a second-order signal worth knowing about but not squarely on-topic, "none" if it has no real connection to this specific brand.
+  If the brand's "Named competitors" list is given: an item squarely about one of those named competitors shipping, launching, raising, being acquired, being exploited, or a regulator acting on them is ALWAYS "direct" — a competitor's own move is, by definition, squarely about this brand's market position, even if the item's surface topic is broader than the brand's own product. Do not downgrade a genuine named-competitor event to "indirect" just because the brand itself isn't mentioned.
 - "relevance_score": 0 to 1 — how confidently this item matters to THIS brand specifically, not how big or newsworthy the item is in general.
 - "one_line_reason": one short, concrete sentence grounding the score in what the item actually is and how it relates (or doesn't) to the brand.
-- "is_event": true only if a named org shipped, launched, raised, acquired, was exploited, or a regulator acted, OR a measurable market move occurred. Otherwise false. This is independent of relevance — an item can be highly relevant to the brand's category and still not be an event.
+- "is_event": true only if a named org shipped, launched, raised, acquired, was exploited, or a regulator acted, OR a measurable market move occurred. Otherwise false. This is independent of relevance — an item can be highly relevant to the brand's category and still not be an event. A named competitor merely existing, or appearing in a roundup/digest, is still not an event — the same "did something actually happen" bar applies to competitor items as to everything else.
 
 Explicitly NOT events (is_event: false), regardless of how relevant they otherwise score: a repo or tool merely existing; link roundups and daily digests; opinion, explainer, or tutorial content; listicles.
 
@@ -168,7 +181,13 @@ Score every item in the pool, using its index exactly as given — do not skip a
 }
 
 function buildPass1UserMessage(ctx, items) {
-  const poolLines = items.map((i, idx) => `${idx}. [${i.source}] ${i.title} (${i.date})`);
+  // Phase 2.7: an item sourced from the competitor-entity cache carries
+  // `.entity` — surfaced explicitly here (not left for the model to infer
+  // from the headline text alone) so the "named competitor" direct-relevance
+  // rule in the system prompt has something unambiguous to key off.
+  const poolLines = items.map(
+    (i, idx) => `${idx}. [${i.source}${i.entity ? `:${i.entity}` : ""}] ${i.title} (${i.date})`
+  );
   return [...contextHeader(ctx), "", `Pool (${items.length} items, indices 0-${items.length - 1}):`, poolLines.join("\n")].join(
     "\n"
   );
@@ -301,7 +320,7 @@ function buildPass2UserMessage(ctx, top) {
   const lines = top.map((s, idx) => {
     const i = s.item;
     const corroborated = (i.corroborated_sources?.length ?? 1) > 1;
-    return `${idx + 1}. [${i.source}] ${i.title}\n   url: ${i.url}\n   date: ${i.date}\n   prior scoring: relevance=${s.relevance}, score=${s.relevance_score}, reason="${s.one_line_reason}"${
+    return `${idx + 1}. [${i.source}${i.entity ? `:${i.entity}` : ""}] ${i.title}\n   url: ${i.url}\n   date: ${i.date}\n   prior scoring: relevance=${s.relevance}, score=${s.relevance_score}, reason="${s.one_line_reason}"${
       corroborated ? `\n   corroborated across: ${i.corroborated_sources.join(", ")}` : ""
     }`;
   });
@@ -424,19 +443,23 @@ export async function generatePulseRead({
   secondaryCategory,
   primaryPool,
   secondaryPool,
+  competitors, // Phase 2.7: [{ name, source: "user"|"inferred" }, ...] — context only, never fetched here
+  competitorItems, // Phase 2.7: pre-loaded from lib/entity-cache.js by the caller, cache-only
   fetchImpl = fetch,
   anthropicApiKey,
   pass1Model = PASS1_MODEL,
   pass2Model = READ_MODEL,
   topN = PASS2_TOP_N,
 } = {}) {
-  const ctx = { brandName, website, brandRead, primaryCategory, secondaryCategory };
-  const { items: pool, cross_category_dupes_removed } = selectPool(primaryPool, secondaryPool);
+  const ctx = { brandName, website, brandRead, primaryCategory, secondaryCategory, competitors };
+  const { items: pool, cross_category_dupes_removed } = selectPool(primaryPool, secondaryPool, competitorItems);
 
   const debug = {
     pool_size: pool.length,
     primary_pool_size: primaryPool?.items?.length || 0,
     secondary_pool_size: secondaryPool?.items?.length || 0,
+    competitor_pool_size: competitorItems?.length || 0,
+    competitors: competitors || [],
     cross_category_dupes_removed,
   };
 

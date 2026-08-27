@@ -126,9 +126,30 @@ const AI_NEWS_FEEDS = [
   { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/" },
 ];
 
+// ---------- competitor-layer query context (Phase 2.7) ----------
+//
+// One short, high-precision term per category, used ONLY to build the
+// competitor entity-search query (`"<entity>" <queryContext>`) — see
+// lib/sources/competitor-news.js. Deliberately separate from the `context`
+// list above: `context` is a broad OR-set used to validate an ambiguous
+// keyword match after the fact; queryContext is a single narrow term
+// combined with a quoted entity name at query time, so it needs to be
+// unambiguous on its own ("crypto" for web3, not "DeFi" or "on-chain" — a
+// competitor's own funding/regulatory news may not mention either). Every
+// fetched result is still independently re-validated against the full
+// include/ambiguous/context/exclude taxonomy before being kept — this term
+// only shapes what gets fetched, it never substitutes for that check.
+const QUERY_CONTEXT = {
+  ai: "AI",
+  web3: "crypto",
+  fintech: "fintech",
+  saas: "software",
+};
+
 export const CATEGORIES = {
   ai: {
     label: "AI",
+    queryContext: QUERY_CONTEXT.ai,
     include: [
       "foundation model", "open-weight", "model weights", "frontier model",
       "inference", "fine-tuning", "distillation", "quantization", "RAG", "retrieval augmented",
@@ -168,6 +189,7 @@ export const CATEGORIES = {
   },
   web3: {
     label: "Web3 / Crypto",
+    queryContext: QUERY_CONTEXT.web3,
     include: [
       "DEX", "AMM", "liquidity pool", "TVL", "L2", "L3", "rollup", "zk-rollup", "optimistic rollup",
       "sovereign rollup", "appchain", "modular blockchain", "data availability", "Celestia",
@@ -227,6 +249,7 @@ export const CATEGORIES = {
   },
   fintech: {
     label: "FinTech",
+    queryContext: QUERY_CONTEXT.fintech,
     include: [
       "payments", "payment rails", "payment gateway", "neobank", "digital bank", "challenger bank",
       "stablecoin", "remittance", "cross-border payment", "money transfer",
@@ -259,6 +282,7 @@ export const CATEGORIES = {
   },
   saas: {
     label: "B2B SaaS / DevTools",
+    queryContext: QUERY_CONTEXT.saas,
     include: [
       "B2B SaaS", "ARR", "NRR", "net revenue retention", "PLG", "product-led growth",
       "churn", "seat-based pricing", "usage-based pricing", "enterprise tier",
