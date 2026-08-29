@@ -160,6 +160,13 @@ export async function classifyBrand({
     site_read ? formatSiteContent(siteContent) : "(site could not be read — classify on name/URL alone)",
   ].join("\n\n");
 
+  // Masked diagnostic only — first 10 chars of an Anthropic key is just the
+  // key-type prefix ("sk-ant-api03-"), not secret material. Confirms which
+  // key actually got read from env without printing the real value; useful
+  // when a 401 could mean either a bad key or the wrong .env got loaded
+  // (see netlify.toml's [dev] comment on git-worktree env resolution).
+  console.log(`[classify] using ANTHROPIC_API_KEY: ${anthropicApiKey ? anthropicApiKey.slice(0, 10) + "..." : "(unset)"}`);
+
   const res = await fetchImpl("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {

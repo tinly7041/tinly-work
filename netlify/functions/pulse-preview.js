@@ -73,7 +73,10 @@ export default async (req, context) => {
   // Gate 2: Turnstile
   try {
     const result = await verifyTurnstile(fetch, body.turnstileToken, ip, process.env.TURNSTILE_SECRET);
-    if (!result?.success) return json(403, { error: "verification_failed" });
+    if (!result?.success) {
+      console.error("turnstile verify failed:", JSON.stringify(result?.["error-codes"] || result));
+      return json(403, { error: "verification_failed" });
+    }
   } catch (err) {
     console.error("turnstile verify failed:", err);
     return json(403, { error: "verification_failed" });

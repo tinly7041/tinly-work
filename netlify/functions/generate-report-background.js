@@ -5,11 +5,17 @@
 // On failure: retries per RETRYABLE taxonomy, then escalates to Tin alert
 // and marks the pending-leads entry so the follow-up checker can send the
 // lead-facing fallback.
+//
+// Does NOT write the lead row — lead-submit.js already did that
+// synchronously before invoking this function, so a submission is captured
+// even if this background invoke never fires (fire-and-forget from
+// lead-submit.js can fail silently; the lead row must not depend on it).
+// This function's only job is Pass 2 + delivery.
 
 import { getStore } from "@netlify/blobs";
 import { refreshCompetitorEntity } from "./lib/competitor-fetch.js";
 import { runPostGate } from "./lib/read-pulse.js";
-import { buildLeadRow, postLead, postLeadFailure } from "./lib/lead-store.js";
+import { buildReportHtml, postReport, postLeadFailure } from "./lib/lead-store.js";
 
 const MAX_RETRIES = 2;
 const RETRYABLE_ERRORS = ["Pass2ParseError", "ECONNRESET", "UND_ERR_SOCKET", "fetch failed"];
@@ -29,10 +35,10 @@ export default async (req) => {
   }
 
   const {
-    leadId, name, email, company, role,
+    leadId, email,
     brandName, website, category, secondaryCategory, brandRead,
-    confidence, competitors, competitorsSource, competitorsList,
-    top, quiet_cause,
+    competitors,
+    top,
   } = body;
 
   const env = process.env;
@@ -46,22 +52,6 @@ export default async (req) => {
     } catch (err) {
       console.error(`[generate-report-bg] competitor refresh failed for ${compName}: ${err.message}`);
     }
-  }
-
-  // Write lead row to Sheet
-  try {
-    const leadRow = buildLeadRow({
-      name, email, role, company, brandName, website,
-      category, confidence,
-      directCount: (top || []).filter((s) => s.relevance === "direct").length,
-      reportSent: false,
-      competitorsSource: competitorsSource || "",
-      competitorsList: competitorsList || "",
-      quietCause: quiet_cause || "",
-    });
-    await postLead(fetch, env.APPS_SCRIPT_URL, env.APPS_SCRIPT_SECRET, leadRow);
-  } catch (err) {
-    console.error("[generate-report-bg] lead row write failed:", err.message);
   }
 
   // Run post-gate (Pass 2) with retries
@@ -107,11 +97,11 @@ export default async (req) => {
 
   // Deliver the report via Apps Script
   try {
-    await postLead(fetch, env.APPS_SCRIPT_URL, env.APPS_SCRIPT_SECRET, {
-      action: "report",
+    const reportHtml = buildReportHtml({ brandName, result: postGate.result });
+    await postReport(fetch, env.APPS_SCRIPT_URL, env.APPS_SCRIPT_SECRET, {
       email,
       brandName,
-      report: postGate.result,
+      reportHtml,
     });
 
     await pendingStore.setJSON(leadId, {

@@ -1,11 +1,14 @@
 // netlify/functions/lead-submit.js
 //
-// State 3 contact-gate POST. Validates the 4 required fields, writes a
-// pending-leads Blobs entry (for the follow-up checker), fires the
-// background report generation, and responds 200 immediately so the
-// client can show State 4.
+// State 3 contact-gate POST. Validates the required fields, writes the lead
+// row to the Sheet SYNCHRONOUSLY (so a submission is captured even if the
+// background invoke below never fires — a network error on that
+// fire-and-forget fetch must not lose the lead), writes a pending-leads
+// Blobs entry (for the follow-up checker), fires the background report
+// generation, and responds 200 immediately so the client can show State 4.
 
 import { getStore } from "@netlify/blobs";
+import { buildLeadRow, postLead } from "./lib/lead-store.js";
 
 function json(status, body) {
   return new Response(JSON.stringify(body), {
@@ -30,6 +33,27 @@ export default async (req) => {
   }
 
   const leadId = `${Date.now()}-${email.replace(/[^a-z0-9]/gi, "_").slice(0, 30)}`;
+  const directCount = Array.isArray(body.top) ? body.top.filter((s) => s.relevance === "direct").length : "";
+
+  // Write the lead row now, not from the background function — this is the
+  // only guaranteed-synchronous point in the flow.
+  try {
+    const leadRow = buildLeadRow({
+      name, email, role, company,
+      brandName: body.brandName,
+      website: body.website,
+      category: body.category,
+      confidence: body.confidence,
+      directCount,
+      reportSent: false,
+      competitorsSource: body.competitorsSource,
+      competitorsList: body.competitorsList,
+      quietCause: body.quiet_cause,
+    });
+    await postLead(fetch, process.env.APPS_SCRIPT_URL, process.env.APPS_SCRIPT_SECRET, leadRow);
+  } catch (err) {
+    console.error("[lead-submit] lead row write failed:", err.message);
+  }
 
   // Write pending-leads entry for the follow-up checker
   try {

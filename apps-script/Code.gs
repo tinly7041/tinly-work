@@ -13,11 +13,15 @@
 //   4. The old /exec URL stops working once the old deployment is removed
 //
 // Action branches:
-//   (default/no action) — write a lead row to the main sheet
+//   "lead" (default when action is omitted) — write a lead row to the main sheet
 //   "lead_failure"      — write to the "failures" tab + send Tin alert email
 //   "lead_fallback"     — send the lead-facing fallback email
 //   "health"            — existing health alert (from crawl-trends.js)
-//   "report"            — deliver the pulse report to the lead via email
+//   "report"            — deliver the pulse report to the lead via email;
+//                          payload.reportHtml is fully composed by Netlify
+//                          (lib/lead-store.js's buildReportHtml) — this
+//                          branch only relays it via MailApp, never builds
+//                          or reformats the copy itself
 //
 // Column order (16 columns total):
 //   A: Timestamp, B: Name, C: Email, D: Whatsapp, E: Telegram,
@@ -164,27 +168,13 @@ function handleReport(payload) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
-  var report = payload.report || {};
-  var items = report.items || [];
-  var body = "Your Trend Pulse for " + (payload.brandName || "your brand") + "\n\n";
-  body += (report.pulse_summary || "") + "\n\n";
-
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    body += "---\n";
-    body += (item.headline || "") + "\n";
-    body += "Source: " + (item.source || "") + "\n";
-    body += "Link: " + (item.url || "") + "\n";
-    body += "Relevance: " + (item.relevance || "") + " | Effort: " + (item.effort || "") + "\n";
-    body += "Why now: " + (item.why_now || "") + "\n";
-    body += "So what: " + (item.so_what || "") + "\n";
-    body += "Payoff: " + (item.payoff || "") + "\n\n";
-  }
-
+  // reportHtml is fully composed by Netlify (lib/lead-store.js's
+  // buildReportHtml) — this branch only relays it. Report copy/formatting
+  // lives in exactly one place, same principle as the fallback email body.
   MailApp.sendEmail({
     to: payload.email,
     subject: "Your Trend Pulse: " + (payload.brandName || "Report"),
-    body: body
+    htmlBody: payload.reportHtml || "(no report content)"
   });
 
   return ContentService.createTextOutput(JSON.stringify({ status: "ok" }))

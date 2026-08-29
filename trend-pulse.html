@@ -270,11 +270,14 @@ input:focus{border-color:var(--signal-blue);}
       <div class="competitor-editor" id="competitor-editor">
         <p style="font-size:14px;font-weight:500;margin-bottom:var(--s1);">Named competitors</p>
         <div id="competitor-tags"></div>
-        <div class="add-competitor">
-          <input type="text" id="add-competitor-input" placeholder="Add a competitor name">
-          <button class="btn-secondary" id="add-competitor-btn" type="button">Add</button>
+        <button class="link-action" id="toggle-add-competitor" type="button">+ Add competitors</button>
+        <div id="competitor-expand" style="display:none;margin-top:var(--s2);">
+          <div class="add-competitor">
+            <input type="text" id="add-competitor-input" placeholder="Add a competitor name">
+            <button class="btn-secondary" id="add-competitor-btn" type="button">Add</button>
+          </div>
+          <button class="link-action" id="rescan-btn" type="button" style="margin-top:var(--s2);">Re-score with updated competitors</button>
         </div>
-        <button class="link-action" id="rescan-btn" type="button" style="margin-top:var(--s2);">Re-score with updated competitors</button>
       </div>
 
       <div style="margin-top:var(--s4);display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;">
@@ -335,6 +338,14 @@ input:focus{border-color:var(--signal-blue);}
         Check your inbox at <strong id="s4-email"></strong> in the next few minutes.
         The report covers what's worth acting on in <strong id="s4-brand"></strong>'s competitive landscape right now.
       </p>
+      <p id="s4-competitor-count" style="color:var(--warm-gray);font-size:14px;margin-bottom:var(--s3);"></p>
+      <div class="glass-box" style="text-align:left;margin-bottom:var(--s3);">
+        <p class="section-label" style="margin-top:0;">What's inside</p>
+        <p style="font-size:15px;line-height:1.6;">
+          Each item explains <strong>why now</strong> — what actually changed, <strong>so what</strong> — the
+          idea worth acting on, and the <strong>payoff</strong> — what's at stake either way.
+        </p>
+      </div>
       <a href="/" class="link-action">Back to tinly.work</a>
     </div>
   </div>
@@ -407,12 +418,12 @@ input:focus{border-color:var(--signal-blue);}
   let previewData = null;
 
   const LOADING_MESSAGES = [
-    "Classifying your brand...",
-    "Scoring category signals...",
-    "Filtering for real events...",
-    "Almost there...",
+    "What's the tea...",
+    "Ooh, this looks interesting...",
+    "Let's see what we've got...",
+    "Just a bit more...",
   ];
-  let loadingInterval = null;
+  let loadingTimers = [];
 
   function showState(id) {
     document.querySelectorAll(".state").forEach(s => s.classList.remove("active"));
@@ -422,21 +433,25 @@ input:focus{border-color:var(--signal-blue);}
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  // 3 messages on a fixed interval, then the 4th ("Just a bit more...") only
+  // appears as an overrun fallback if the request is still running once the
+  // first 3 have had their turn — it does not cycle back, it just holds.
+  const LOADING_STEP_MS = 2500;
+
   function startLoading() {
     showState("state-loading");
-    let step = 0;
     const msgEl = document.getElementById("loading-msg");
     msgEl.textContent = LOADING_MESSAGES[0];
-    loadingInterval = setInterval(() => {
-      step++;
-      if (step < LOADING_MESSAGES.length) {
-        msgEl.textContent = LOADING_MESSAGES[step];
-      }
-    }, 2500);
+    loadingTimers = [
+      setTimeout(() => { msgEl.textContent = LOADING_MESSAGES[1]; }, LOADING_STEP_MS),
+      setTimeout(() => { msgEl.textContent = LOADING_MESSAGES[2]; }, LOADING_STEP_MS * 2),
+      setTimeout(() => { msgEl.textContent = LOADING_MESSAGES[3]; }, LOADING_STEP_MS * 3),
+    ];
   }
 
   function stopLoading() {
-    if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+    loadingTimers.forEach(clearTimeout);
+    loadingTimers = [];
   }
 
   // Quiet cause → state mapping
@@ -560,6 +575,14 @@ input:focus{border-color:var(--signal-blue);}
     });
   }
 
+  // Collapse/expand the "add competitor" editor
+  document.getElementById("toggle-add-competitor").addEventListener("click", () => {
+    const expand = document.getElementById("competitor-expand");
+    const isOpen = expand.style.display !== "none";
+    expand.style.display = isOpen ? "none" : "block";
+    document.getElementById("toggle-add-competitor").textContent = isOpen ? "+ Add competitors" : "- Hide";
+  });
+
   // Add competitor
   document.getElementById("add-competitor-btn").addEventListener("click", () => {
     const input = document.getElementById("add-competitor-input");
@@ -592,8 +615,22 @@ input:focus{border-color:var(--signal-blue);}
       });
       const data = await res.json();
       stopLoading();
+      // A "no_change" response means none of the edited competitor names
+      // have anything in the cache yet — pulse-rescan.js deliberately
+      // skipped re-running Pass 1 rather than spend on an unchanged pool.
+      // previewData.top/preGateItems/quiet_cause are left as-is since data
+      // doesn't carry those keys.
       previewData = { ...previewData, ...data };
       renderState2(previewData);
+      const priorNote = document.getElementById("rescan-note");
+      if (priorNote) priorNote.remove();
+      if (data.status === "no_change") {
+        const note = document.createElement("p");
+        note.id = "rescan-note";
+        note.style.cssText = "font-size:13px;color:var(--warm-gray);margin-top:var(--s2);";
+        note.textContent = "No fresh data for those competitors yet — showing your existing results.";
+        document.getElementById("competitor-editor").appendChild(note);
+      }
     } catch {
       stopLoading();
       alert("Re-scan failed. Please try again.");
@@ -645,6 +682,10 @@ input:focus{border-color:var(--signal-blue);}
 
       document.getElementById("s4-email").textContent = email;
       document.getElementById("s4-brand").textContent = previewData.brand;
+      const compCount = (previewData.competitors || []).length;
+      document.getElementById("s4-competitor-count").textContent = compCount
+        ? "We're tracking " + compCount + " named competitor" + (compCount === 1 ? "" : "s") + " for you."
+        : "";
       showState("state-4");
     } catch {
       alert("Something went wrong. Please try again.");

@@ -63,6 +63,26 @@ export default async (req) => {
     }
   }
 
+  // Fires only on a cache hit. Zero hits means none of the edited
+  // competitor names have anything in the entity cache yet (a brand-new
+  // name the weekly watchlist crawl hasn't reached, or a typo) — re-running
+  // Pass 1 here would burn a Haiku call for a pool that's byte-identical to
+  // what pulse-preview.js already scored. No-op instead: echo the updated
+  // competitor list back so the client can render it, but leave the
+  // existing pre-gate results (preGateItems/top) untouched client-side.
+  if (competitorItems.length === 0) {
+    return json(200, {
+      status: "no_change",
+      reason: "no_cache_hit",
+      brand: brandName,
+      website,
+      category: primaryCategory,
+      secondaryCategory,
+      brandRead,
+      competitors: competitors.map((c) => ({ name: c.name, source: c.source })),
+    });
+  }
+
   // Re-run pre-gate with updated competitor set
   const preGate = await runPreGate({
     primaryPool,

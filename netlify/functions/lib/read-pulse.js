@@ -120,6 +120,10 @@ function contextHeader({ brandName, website, brandRead, primaryCategory, seconda
 }
 
 async function callAnthropic({ fetchImpl, anthropicApiKey, body }) {
+  // Masked diagnostic only — see classify.js's identical log for why this is
+  // safe to leave in (key-type prefix only, never secret material).
+  console.log(`[read-pulse] using ANTHROPIC_API_KEY: ${anthropicApiKey ? anthropicApiKey.slice(0, 10) + "..." : "(unset)"}`);
+
   const res = await fetchImpl("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
