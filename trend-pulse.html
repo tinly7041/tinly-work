@@ -6,7 +6,13 @@
 <title>Trend Pulse — tinly.work</title>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  // Resolved by api.js once the Turnstile runtime is ready. Must be defined
+  // before api.js loads, hence the inline script here rather than at the
+  // bottom with the rest of the page logic.
+  window.__turnstileReady = new Promise((resolve) => { window.onTurnstileReady = resolve; });
+</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileReady" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
@@ -237,7 +243,8 @@ input:focus{border-color:var(--signal-blue);}
           <label for="fax">Fax</label>
           <input type="text" id="fax" name="fax" tabindex="-1" autocomplete="off">
         </div>
-        <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" style="margin:var(--s2) 0;"></div>
+        <!-- Site key is injected at runtime from TURNSTILE_SITE — see turnstile-config.js -->
+        <div id="turnstile-container" style="margin:var(--s2) 0;"></div>
         <button type="submit" class="btn-primary" id="submit-btn">Score my landscape</button>
       </form>
     </div>
@@ -463,6 +470,38 @@ input:focus{border-color:var(--signal-blue);}
     return null;
   }
 
+  // ===== Turnstile: explicit render with the runtime-injected site key =====
+  let turnstileWidgetId = null;
+
+  async function mountTurnstile() {
+    const submitBtn = document.getElementById("submit-btn");
+    submitBtn.disabled = true;
+    try {
+      const [, cfg] = await Promise.all([
+        window.__turnstileReady,
+        fetch("/.netlify/functions/turnstile-config").then((r) => {
+          if (!r.ok) throw new Error("turnstile-config " + r.status);
+          return r.json();
+        }),
+      ]);
+      if (!cfg.siteKey) throw new Error("no site key in turnstile-config response");
+      turnstileWidgetId = window.turnstile.render("#turnstile-container", { sitekey: cfg.siteKey });
+      submitBtn.disabled = false;
+    } catch (err) {
+      console.error("turnstile mount failed:", err);
+      document.getElementById("turnstile-container").innerHTML =
+        '<p style="font-size:13px;color:#B00020;">Verification unavailable. Please reload the page.</p>';
+    }
+  }
+
+  function resetTurnstile() {
+    if (window.turnstile && turnstileWidgetId !== null) {
+      window.turnstile.reset(turnstileWidgetId);
+    }
+  }
+
+  mountTurnstile();
+
   // ===== State 1: Brand submit =====
   document.getElementById("brand-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -486,7 +525,7 @@ input:focus{border-color:var(--signal-blue);}
 
       if (res.status === 403) {
         stopLoading();
-        if (window.turnstile) window.turnstile.reset();
+        resetTurnstile();
         alert("Verification expired. Please try again.");
         showState("state-1");
         document.getElementById("submit-btn").disabled = false;
@@ -643,7 +682,7 @@ input:focus{border-color:var(--signal-blue);}
   document.getElementById("back-to-s1").addEventListener("click", () => {
     previewData = null;
     showState("state-1");
-    if (window.turnstile) window.turnstile.reset();
+    resetTurnstile();
   });
 
   // ===== State 3: Contact submit =====
