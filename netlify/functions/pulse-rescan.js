@@ -12,7 +12,7 @@ import { getStore } from "@netlify/blobs";
 import { loadCategoryPool } from "./lib/pool.js";
 import { getCachedEntity } from "./lib/entity-cache.js";
 import { runPreGate, ACTION_STANDARDS } from "./lib/read-pulse.js";
-import { classifyQuiet } from "./lib/quiet-taxonomy.js";
+import { classifyQuiet, hasCompetitorSignalInPool } from "./lib/quiet-taxonomy.js";
 
 const MAX_STALE_HOURS = 60;
 
@@ -99,10 +99,12 @@ export default async (req) => {
   });
 
   const directCount = preGate.scored.filter((s) => s.relevance === "direct").length;
+  const poolCompetitorHit = hasCompetitorSignalInPool(preGate.scored, competitors);
   const quietCause = classifyQuiet({
     poolThin,
     poolStale,
     competitorItemCount: competitorItems.length,
+    poolCompetitorHit,
     direct: directCount,
     minDirect: ACTION_STANDARDS.minDirect,
   });
@@ -127,6 +129,7 @@ export default async (req) => {
     debug: {
       pool_size: preGate.pool.length,
       competitor_item_count: competitorItems.length,
+      pool_competitor_hit: poolCompetitorHit,
       pool_stale: poolStale,
       pool_thin: poolThin,
       pass1_cost: preGate.pass1Cost,

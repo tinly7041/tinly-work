@@ -131,6 +131,43 @@ function formatSiteContent(siteContent) {
   return lines.join("\n");
 }
 
+// ---------- inferred_competitors cleanup ----------
+//
+// The prompt above already instructs the model to return the short canonical
+// name a headline would use, not a description — but Haiku doesn't always
+// comply. Live-caught, Session 9b/10 Avis run: `inferred_competitors` came
+// back as "Anthropic's API marketplace" and "OpenAI's app ecosystem" instead
+// of "Anthropic" and "OpenAI". Neither the entity cache nor the pool
+// competitor-signal check (quiet-taxonomy.js) can match a literal descriptive
+// phrase against real headline text, so a correct Pass 1 read (it separately,
+// correctly, named "Anthropic" as a competitor in its own reasoning) never
+// reaches `competitor_item_count`.
+//
+// This strips exactly that shape — `X's <description>` -> `X` — keyed off
+// the possessive as the one unambiguous signal. Deliberately NOT a
+// keep-only-the-first-word trim: that would also mutilate genuinely
+// multi-word canonical names the entity layer depends on verbatim
+// ("Aerodrome Finance", "Curve Finance", "Hugging Face" — see watchlist.js
+// and phase2.7-report.md's live finding that the bare "Aerodrome" alone
+// returns near-zero Google News coverage).
+//
+// Does NOT attempt to fix the other known-bad shape from the earlier
+// Perplexity case (phase2.7-report.md): a purely descriptive multi-word
+// phrase with no possessive marker, e.g. "Google Search Generative
+// Experience". That shape has no reliable syntactic tell apart from a real
+// canonical multi-word name — fixing it needs better classification, not a
+// blind trim, so it's explicitly out of scope for this narrow rule.
+const POSSESSIVE_DESCRIPTOR_RE = /^(.+?)['’]s\s+.+$/;
+
+export function stripPossessiveDescriptor(name) {
+  const m = name.match(POSSESSIVE_DESCRIPTOR_RE);
+  if (!m) return name;
+  const stripped = m[1].trim();
+  if (!stripped) return name;
+  console.log(`[classify] inferred_competitors: stripped possessive descriptor "${name}" -> "${stripped}"`);
+  return stripped;
+}
+
 // ---------- classify ----------
 
 function clamp01(n) {
@@ -174,9 +211,17 @@ export async function classifyBrand({
       "x-api-key": anthropicApiKey,
       "anthropic-version": "2023-06-01",
     },
+    // temperature: 0 — live-caught, Session 10: two identical Avis re-runs
+    // (same brand, same URL, back to back) returned two entirely different
+    // inferred_competitors sets ("Anthropic's API marketplace"/"OpenAI's app
+    // ecosystem" vs. "Replicate"/"Together AI"/"Modal"). Haiku accepts 0 here
+    // (same model read-pulse.js's Pass 1 pins for the same reason) — pinning
+    // it doesn't guarantee identical output every time, but removes sampling
+    // as a source of run-to-run drift in which competitors get tracked.
     body: JSON.stringify({
       model,
       max_tokens: 300,
+      temperature: 0,
       system: buildSystemPrompt(),
       messages: [{ role: "user", content: userMessage }],
     }),
@@ -213,6 +258,7 @@ export async function classifyBrand({
         parsed.inferred_competitors
           .filter((c) => typeof c === "string" && c.trim())
           .map((c) => c.trim())
+          .map(stripPossessiveDescriptor)
           .filter((c) => c.toLowerCase() !== brandName.trim().toLowerCase())
       )].slice(0, 3)
     : [];

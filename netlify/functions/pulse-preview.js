@@ -11,11 +11,16 @@ import { classifyBrand } from "./lib/classify.js";
 import { loadCategoryPool } from "./lib/pool.js";
 import { getCachedEntity } from "./lib/entity-cache.js";
 import { runPreGate, ACTION_STANDARDS } from "./lib/read-pulse.js";
-import { classifyQuiet } from "./lib/quiet-taxonomy.js";
+import { classifyQuiet, hasCompetitorSignalInPool } from "./lib/quiet-taxonomy.js";
 
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const RATE_LIMIT_STORE = "rate-limits";
-const RATE_LIMIT_PER_DAY = 5;
+// Raised 5 -> 10 (Session 10): the counter increments on every attempt that
+// clears Turnstile, including ones that fail downstream for reasons that
+// aren't the visitor's fault (a Pass 1 timeout, a stale-token retry). At 5,
+// a real visitor hitting a couple of transient errors could burn the whole
+// daily budget before ever seeing a result.
+const RATE_LIMIT_PER_DAY = 10;
 const RATE_LIMIT_CAS_ATTEMPTS = 5;
 const MAX_STALE_HOURS = 60;
 
@@ -153,10 +158,12 @@ export default async (req, context) => {
 
   // Determine quiet cause
   const directCount = preGate.scored.filter((s) => s.relevance === "direct").length;
+  const poolCompetitorHit = hasCompetitorSignalInPool(preGate.scored, competitors);
   const quietCause = classifyQuiet({
     poolThin,
     poolStale,
     competitorItemCount: competitorItems.length,
+    poolCompetitorHit,
     direct: directCount,
     minDirect: ACTION_STANDARDS.minDirect,
   });
@@ -183,6 +190,7 @@ export default async (req, context) => {
     debug: {
       pool_size: preGate.pool.length,
       competitor_item_count: competitorItems.length,
+      pool_competitor_hit: poolCompetitorHit,
       pool_stale: poolStale,
       pool_thin: poolThin,
       pass1_cost: preGate.pass1Cost,

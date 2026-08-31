@@ -70,10 +70,30 @@ export default async (req) => {
     console.error("[lead-submit] failed to write pending-leads entry:", err);
   }
 
-  // Fire background report generation
-  const baseUrl = process.env.URL || "http://localhost:8888";
+  // Fire background report generation.
+  //
+  // Deliberately NOT process.env.URL (or DEPLOY_PRIME_URL/DEPLOY_URL/etc) —
+  // every one of Netlify's self-referencing URL env vars is populated by
+  // Netlify's BUILD process, and this site is deployed via a manual CLI
+  // `netlify deploy --dir` upload, which skips the build step entirely.
+  // Live-confirmed, Session 10: on this branch, process.env.URL is set (to
+  // the PRODUCTION domain, always — that one env var is an exception, baked
+  // into the runtime regardless of build) but DEPLOY_URL/DEPLOY_PRIME_URL/
+  // CONTEXT/BRANCH are all simply absent. The first version of this fix
+  // used DEPLOY_PRIME_URL as a fallback-safe choice per Netlify's docs, and
+  // it silently fell straight through to the same broken production URL —
+  // generate-report-background.js only exists on this branch, so that 404s,
+  // and fetch() doesn't throw on a 404. An Avis lead wrote its row and
+  // captured its email, then sat at reportSent: false forever with zero
+  // trace anywhere.
+  //
+  // The actually-reliable source: the incoming request's own URL. It's
+  // always correct — whatever hostname the browser used to reach THIS
+  // function is exactly where its sibling functions live too — and it has
+  // no dependency on which deploy mechanism Netlify used.
+  const baseUrl = new URL(req.url).origin;
   try {
-    await fetch(`${baseUrl}/.netlify/functions/generate-report-background`, {
+    const bgRes = await fetch(`${baseUrl}/.netlify/functions/generate-report-background`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -95,6 +115,14 @@ export default async (req) => {
         quiet_cause: body.quiet_cause,
       }),
     });
+    // fetch() does not throw on a non-2xx response (this is exactly how the
+    // DEPLOY_PRIME_URL bug above went undetected — a 404 looked identical to
+    // success). Log it loud enough to actually be seen next time.
+    if (!bgRes.ok) {
+      console.error(
+        `[lead-submit] background function invoke returned ${bgRes.status} for ${baseUrl} — report will not generate for leadId ${leadId}`
+      );
+    }
   } catch (err) {
     console.error("[lead-submit] failed to invoke background function:", err);
   }

@@ -183,7 +183,7 @@ input:focus{border-color:var(--signal-blue);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-msg{font-size:15px;color:var(--warm-gray);}
 
-/* Quiet states (5a/5b/5c) */
+/* Quiet states (5a/5b/5c/5d) */
 .quiet-state{text-align:center;padding:var(--s5) 0;}
 .quiet-state h2{font-family:var(--display);font-size:28px;font-weight:500;margin-bottom:var(--s2);}
 .quiet-state p{color:var(--warm-gray);max-width:480px;margin:0 auto var(--s3);}
@@ -394,13 +394,35 @@ input:focus{border-color:var(--signal-blue);}
   </div>
 </div>
 
-<!-- ===== State 5c: Quiet — genuine ===== -->
+<!-- ===== State 5c: Quiet — thin field (THIN_FIELD) ===== -->
 <div class="state" id="state-5c">
+  <div class="container">
+    <div class="glass-box quiet-state">
+      <h2>Not enough on your competitive field yet</h2>
+      <p>
+        <span id="s5c-brand"></span>'s category is active, but we don't have enough tracking your specific
+        competitors yet to build a pulse worth reading. That can mean two things: the market hasn't caught
+        up to what you're building yet, or we don't have you positioned against the right players yet.
+      </p>
+      <p style="font-size:14px;">Talk to the team and we'll get your competitors right, or leave your email and we'll send your Trend Pulse as soon as we do.</p>
+      <div class="quiet-cta-row" style="display:flex;justify-content:center;gap:var(--s2);flex-wrap:wrap;align-items:center;">
+        <a class="btn-primary" href="mailto:tinly.work@gmail.com?subject=Trend%20Pulse%20-%20talk%20to%20the%20team" style="text-decoration:none;">Talk to the team</a>
+      </div>
+      <form class="quiet-email-form" data-quiet="THIN_FIELD">
+        <input type="email" placeholder="you@company.com" required>
+        <button class="btn-secondary" type="submit">Notify me instead</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 5d: Quiet — genuine ===== -->
+<div class="state" id="state-5d">
   <div class="container">
     <div class="glass-box quiet-state">
       <h2>Not enough direct signals yet</h2>
       <p>
-        We found category activity for <span id="s5c-brand"></span>, but not enough that's directly
+        We found category activity for <span id="s5d-brand"></span>, but not enough that's directly
         relevant to your specific position to build a pulse worth reading. We'd rather say that
         than pad the report.
       </p>
@@ -466,7 +488,7 @@ input:focus{border-color:var(--signal-blue);}
     if (cause === "QUIET_THIN_POOL") return "state-5a";
     if (cause === "QUIET_STALE") return "state-5b";
     if (cause === "THIN_FIELD") return "state-5c";
-    if (cause === "QUIET_GENUINE") return "state-5c";
+    if (cause === "QUIET_GENUINE") return "state-5d";
     return null;
   }
 
