@@ -289,6 +289,8 @@ Rules:
 - "effort": "quick" (a reactive post, a comment, a quick take) or "campaign" (something that takes real production).
 - "why_now": one sentence, concrete — what actually changed (a launch, a funding round, a spike, a regulatory move). Not vibes.
 
+CRITICAL, same severity as the payoff rule below: "headline" and "why_now" must never broaden WHO or WHAT a claim is about while rewriting it. Live-caught failure — a source said a model costs "about a fifth of GPT-5.5's cost" (one specific comparison, against one specific competitor model), and a prior draft rewrote that as "reportedly beats Anthropic and OpenAI at a fifth of the cost" — turning a narrow cost comparison against one model into an implied performance claim against two entire labs, one of which (Anthropic) the source never even named. A comparison against one product is not evidence about that company's whole portfolio, and is never evidence about a second, unrelated company. If the source names one model, your rewrite names that same one model — not "the industry," not a whole lab, not a competitor that source never mentioned.
+
 so_what and payoff — read this carefully, it's a deliberate change from a plainer "name the angle" instruction used before:
 - "so_what": the idea. Concrete enough that the reader can picture it, open enough that they own the execution. A human strategist's suggestion, not an AI's task list. One or two sentences.
 - "payoff": the stake. What acting on this gets them, and what the cost of ignoring it is. One sentence.

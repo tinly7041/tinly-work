@@ -5,12 +5,15 @@ fix it, and get a real brand through the full pipeline end to end.
 
 **Outcome: first confirmed end-to-end completion, ever.** AI Hay went classify → pre-gate
 → contact gate → Pass 2 → real email delivered, with three correctly-scored, on-topic
-items. Five separate bugs found and fixed along the way, three of them only surfaced by
-actually running the pipeline live and reading real output — not something a code review
-would have caught.
+items. Nine separate bugs found and fixed along the way — most of them only surfaced by
+actually running the pipeline live and reading real output (including the real email), not
+something a code review would have caught.
 
-**Branch:** `turnstile-test` @ `3d0fed5` at session start (working tree not yet committed —
-see Files Changed below). **`main`:** untouched at `9a45572`.
+**Not ready to merge to `main` yet — see section 6.**
+
+**Branch:** `turnstile-test` @ `3d0fed5` at session start, `52d2433` after the first commit
+(pushed), plus one further commit layered on top for the Pass 2 fix in section 2.9 — see
+Files Changed. **`main`:** untouched at `9a45572`.
 
 ---
 
@@ -97,6 +100,18 @@ setting requires Pro or higher). Fix: tightened `one_line_reason`'s prompt instr
 internally and passed to Pass 2. Left `max_tokens` untouched (lowering it risks the exact
 mid-JSON truncation failure documented in this file's own history).
 
+**This is a real tradeoff, not a free fix — flagging plainly.** `one_line_reason` is Pass 1's
+own grounding for *why* it called an item direct/indirect/none, and Pass 2 reads that
+reasoning as context when deciding what to write about and how. Cutting it to 12 words
+removes nuance from that reasoning, which can plausibly change Pass 2's output — a shorter,
+blunter Pass 1 justification could mean a borderline item gets written up differently, or a
+distinction that needed a full sentence to make gets lost. This fix was chosen specifically
+*because* it's the only lever available on the Free tier that doesn't risk the truncation
+failure mode — it wasn't chosen because it's risk-free. Worth watching Pass 2 output quality
+over the next several real runs to see if this shows up as a real degradation, not just a
+theoretical one; if it does, the honest fix is a paid-tier timeout increase, not more
+prompt-shrinking.
+
 ### 2.7 `RATE_LIMIT_PER_DAY` 5 → 10
 
 Side effect of 2.6: every attempt that clears Turnstile increments the daily IP rate limit,
@@ -127,6 +142,30 @@ Always correct, no dependency on deploy mechanism, build step, or which env vars
 happens to inject. Also added a loud log line for any future non-2xx response from this
 call, so a silent failure like this can't happen again undetected.
 
+### 2.9 Pass 2: forbid broadening WHO/WHAT a claim is about (`read-pulse.js`)
+
+Found by Tin reading the AI Hay email closely and checking the GLM-5.3 item's actual source
+sentence against the delivered headline (see section 4's original #1, now resolved). The
+source said GLM-5.3 costs "about a fifth of GPT-5.5's cost" — one specific, narrow
+comparison against one specific OpenAI model. Pass 2 rewrote that as "reportedly beats
+Anthropic and OpenAI at a fifth of the cost" — a cost comparison against one model became an
+implied performance claim against two entire labs, one of which (Anthropic) the source never
+even mentioned.
+
+This is a real accuracy problem, not a style one, and it happened in the write step, not
+retrieval — the crawling/matching layer correctly found and delivered the source text; Pass 2
+distorted it while rewriting. Added a CRITICAL-severity rule to `buildPass2SystemPrompt`,
+matching the existing no-fabricated-numbers rule on `payoff`: `headline` and `why_now` must
+never broaden who or what a claim is about — if the source names one model, the rewrite names
+that same one model, not a whole company, a whole lab, or a competitor the source never
+mentioned. Included the live-caught GLM-5.3 case itself as the calibration example in the
+prompt, following the same worked-example pattern the `so_what`/`payoff` rules already use.
+
+Not yet re-verified live (would need another real Pass 2 run against a similar source item to
+confirm the guardrail actually holds) — flagging that this is prompt-only, unit-untestable
+the way a pure function is, and its real test is the next live report that touches a
+narrow numeric/comparative claim.
+
 ## 3. AI Hay — first full live completion
 
 Brand: AI Hay (`ai-hay.vn`), Vietnamese AI Q&A assistant, category `ai`, 3 named competitors.
@@ -155,12 +194,17 @@ buyer-empathy language — matches the Session 4 locked writing standard.
 
 Flagging these now rather than silently fixing or silently ignoring them.
 
-1. **Item 3's source URL looks wrong.** `reinvently.co.uk/tools/ed-o-meter/` has no visible
-   connection to a GLM-5.3 benchmark story — the headline and why_now text are coherent and
-   plausible, but that specific link is suspicious. Worth checking whether this is a
-   title/url pairing bug somewhere in the HN adapter or in `rank.js`'s dedupe/merge path (a
-   mismatched pairing between two separately-fetched items would be a real, reproducible
-   bug, not noise) before this ships to a real customer.
+1. **Item 3's source URL still looks wrong — separate from the content-distortion issue,
+   and still unresolved.** `reinvently.co.uk/tools/ed-o-meter/` has no visible connection to
+   a GLM-5.3 benchmark story. Tin confirmed the underlying source *sentence* is real ("if
+   you run one model, run glm-5.3 — 100% pass, a 9.3 rubric, $0.28 for the lap, about a
+   fifth of gpt-5.5's cost") — that part checks out. What's unconfirmed is whether
+   `reinvently.co.uk/tools/ed-o-meter/` is genuinely where that sentence lives, or whether
+   this is a title/url pairing bug somewhere in the HN adapter or `rank.js`'s dedupe/merge
+   path (a mismatched pairing between two separately-fetched items would be a real,
+   reproducible bug). The *content* distortion this item also had — "beats Anthropic and
+   OpenAI" for what was actually a narrow one-model cost comparison — is fixed in 2.9 above;
+   the URL question is still open.
 2. **Product Hunt as a source for large-lab releases is an open quality question.** A
    community PH listing for a Google model release is a different signal class than an
    official announcement — not necessarily wrong, but worth a second look at whether
@@ -174,9 +218,11 @@ Flagging these now rather than silently fixing or silently ignoring them.
    testing pressure with Tin's sign-off in this session — but it wasn't in the 27 Aug locked
    spec. Worth a deliberate second look outside the heat of a live-testing session, not just
    this session's retroactive justification.
-5. **The 30s Netlify Free-tier ceiling is mitigated, not eliminated.** A large enough pool
-   (secondary category present, many competitors, long pool) could still tip over it. The
-   real fix — making pre-gate genuinely async, or upgrading the plan — is still open.
+5. **The 30s Netlify Free-tier ceiling is mitigated, not eliminated — and the mitigation has
+   its own cost.** A large enough pool (secondary category present, many competitors, long
+   pool) could still tip over it. And the fix that bought headroom (2.6, shortening
+   `one_line_reason`) is itself a quality tradeoff, not a clean win — see 2.6's tradeoff note.
+   The real fix — making pre-gate genuinely async, or upgrading the plan — is still open.
 6. **Weekly watchlist pre-warm cron has still never fired** (branch is ~1 day old as of this
    session). Once it does, competitor cache coverage for the 24 seed entities should improve
    pre-gate pass rates independent of anything else in this report.
@@ -184,14 +230,14 @@ Flagging these now rather than silently fixing or silently ignoring them.
    Coin98 is `web3`, the actual test of whether the action standard is reachable on a thin
    pool — still the open question from Session 7.
 
-## 5. Files changed this session (uncommitted as of this report)
+## 5. Files changed this session
 
 ```
 modified:   netlify/functions/lead-submit.js
 modified:   netlify/functions/lib/classify.js
 modified:   netlify/functions/lib/quiet-taxonomy.js
 modified:   netlify/functions/lib/quiet-taxonomy.test.js
-modified:   netlify/functions/lib/read-pulse.js
+modified:   netlify/functions/lib/read-pulse.js       (2.6 latency trim, then 2.9 headline-scope rule)
 modified:   netlify/functions/pulse-preview.js
 modified:   netlify/functions/pulse-rescan.js
 modified:   trend-pulse.html
@@ -204,10 +250,40 @@ turnstile-test --dir <sanitized-static-dir> --functions netlify/functions` (manu
 context confirmed each time via `netlify api getDeploy`, never assumed). 76/76 unit tests
 passing (`npm test`).
 
-**Not yet committed to git.** Per standing rule, commit at session end.
+**Committed and pushed to `origin/turnstile-test`** — first commit `52d2433` (2.1–2.8), a
+second commit on top for 2.9 (the Pass 2 headline-scope fix and this report). No merge or
+push to `main` at any point.
 
-## 6. Standard boundaries — held
+## 6. Merge to `main` — not ready. Here's what's actually blocking it.
 
-No merge or push to `main`. No changes to `lead-store.js` schema or the live Sheet
-structure. No Apps Script changes. No changes to the Session 4 staging site. `THIN_FIELD`
-precedence was changed, but only with explicit live sign-off, not unilaterally.
+Assessed explicitly this session, not left implicit. Two categories:
+
+**Infrastructure that has to move first, or the widget breaks on first load:**
+- `TURNSTILE_SITE`, `ANTHROPIC_API_KEY`, `TURNSTILE_SECRET`, `APPS_SCRIPT_SECRET`,
+  `APPS_SCRIPT_URL`, `IP_SALT` are scoped to `branch:turnstile-test` only. None exist in the
+  production context. Merging without adding them there breaks Turnstile immediately — this
+  is the exact trap flagged at the top of this session and it is still true.
+- `main` still carries the dead `generate-pulse.js` Phase 3.5 stub that `pulse-preview.js`
+  superseded. Decide whether to delete it as part of the merge or leave dead code in place.
+- Production deploys build via Netlify's normal CI (this branch's testing all happened via
+  manual CLI upload, a meaningfully different deploy path — see 2.8's whole root cause).
+  Worth one live sanity pass immediately after merging, before calling it done, specifically
+  re-checking that `generate-report-background` actually fires for a real production lead.
+
+**Product-quality items still open (from section 4) that argue for waiting, not just
+infrastructure gaps:**
+- **Coin98 has never run.** Every live test tonight (Avis, AI Hay) was `ai` category — the
+  one deep, forgiving pool. `web3` is the actual test of whether the action standard is
+  reachable at all (open since Session 7). Shipping to production without ever having
+  exercised the thin-pool path is shipping an untested code path to real visitors.
+- **The Free-tier timeout is mitigated, not solved** (item 5), **and the mitigation itself
+  trades against output quality** (2.6's tradeoff note) — in production this becomes real
+  visitors' actual experience, not something retryable on a test run.
+- **The Pass 2 headline-distortion fix (2.9) is unverified against a second live case.** One
+  fix, one prompt change, zero re-confirmation yet that it holds under a different source
+  shape.
+
+**Recommendation:** run Coin98 for real, watch the next few Pass 2 outputs for whether 2.9's
+guardrail actually holds and whether 2.6's shortened reasoning visibly costs anything, then
+merge — with the env var migration and the dead-stub decision done as part of that merge, not
+after it.
