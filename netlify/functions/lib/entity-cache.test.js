@@ -51,8 +51,8 @@ test("a missing entity reads as null, not a throw", async () => {
   assert.equal(result, null);
 });
 
-test("ENTITY_CACHE_TTL_MS is exactly 7 days", () => {
-  assert.equal(ENTITY_CACHE_TTL_MS, 7 * 24 * 60 * 60 * 1000);
+test("ENTITY_CACHE_TTL_MS is exactly 10 days", () => {
+  assert.equal(ENTITY_CACHE_TTL_MS, 10 * 24 * 60 * 60 * 1000);
 });
 
 test.after(async () => {

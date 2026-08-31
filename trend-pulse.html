@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trend Pulse — tinly.work</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  // Resolved by api.js once the Turnstile runtime is ready. Must be defined
+  // before api.js loads, hence the inline script here rather than at the
+  // bottom with the rest of the page logic.
+  window.__turnstileReady = new Promise((resolve) => { window.onTurnstileReady = resolve; });
+</script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileReady" async defer></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --signal-blue:#2C56E8;
+  --royal-navy:#142E99;
+  --navy-ink:#0A1440;
+  --azure-light:#7FB2FF;
+  --warm-mist:#F0ECE4;
+  --near-black:#141414;
+  --warm-gray:#6B6560;
+  --off-white:#F5F3EF;
+  --display:'Clash Display',sans-serif;
+  --body:'Be Vietnam Pro',sans-serif;
+  --s1:8px;--s2:16px;--s3:24px;--s4:32px;--s5:48px;--s6:64px;--s7:96px;--s8:128px;
+}
+
+body{
+  font-family:var(--body);
+  font-size:18px;
+  line-height:1.65;
+  color:var(--near-black);
+  background:var(--warm-mist);
+  -webkit-font-smoothing:antialiased;
+}
+
+.container{max-width:720px;margin:0 auto;padding:0 var(--s3);}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;
+  justify-content:space-between;padding:var(--s2) var(--s4);transition:background .3s;}
+.nav.is-scrolled{background:rgba(10,20,64,.92);backdrop-filter:blur(14px);}
+.nav-brand{font-family:var(--display);font-weight:500;font-size:18px;color:var(--off-white);text-decoration:none;}
+.nav-link{font-family:var(--body);font-size:14px;color:var(--off-white);text-decoration:none;opacity:.8;}
+.nav-link:hover{opacity:1;}
+
+/* Hero */
+.hero{
+  position:relative;
+  padding:var(--s8) 0 var(--s7);
+  background:
+    radial-gradient(circle at 78% 20%, rgba(127,178,255,0.65) 0%, transparent 55%),
+    linear-gradient(150deg, #0A1440 0%, #142E99 35%, #2C56E8 68%, #3E6BF0 100%);
+  color:var(--off-white);
+  overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity:.08;mix-blend-mode:multiply;pointer-events:none;z-index:1;
+}
+.hero .container{position:relative;z-index:2;}
+.hero h1{font-family:var(--display);font-size:56px;font-weight:600;line-height:1.05;margin-bottom:var(--s3);}
+.hero p{font-size:20px;line-height:1.5;max-width:560px;opacity:.9;}
+
+/* Glass elements */
+.glass-box{
+  background:linear-gradient(145deg,rgba(255,255,255,0.7),rgba(255,255,255,0.4));
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(0,0,0,0.06);border-radius:20px;padding:var(--s4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.8),0 4px 16px rgba(0,0,0,0.03);
+}
+
+/* Form elements */
+label{display:block;font-size:14px;font-weight:500;margin-bottom:var(--s1);color:var(--near-black);}
+input,select{
+  width:100%;padding:12px 16px;font-family:var(--body);font-size:16px;
+  border:1px solid rgba(0,0,0,0.12);border-radius:12px;background:rgba(255,255,255,0.8);
+  transition:border-color .2s;outline:none;
+}
+input:focus{border-color:var(--signal-blue);}
+.fax-field{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden;}
+
+.field-group{margin-bottom:var(--s3);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2);}
+
+/* Buttons */
+.btn-primary{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--display);font-weight:500;font-size:15px;
+  background:var(--signal-blue);color:var(--off-white);
+  border:none;border-radius:999px;padding:14px 32px;cursor:pointer;
+  transition:background .2s,transform .1s;
+}
+.btn-primary:hover{background:var(--royal-navy);}
+.btn-primary:active{transform:scale(0.98);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;}
+
+.btn-secondary{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--body);font-size:14px;font-weight:500;
+  background:none;border:1px solid rgba(0,0,0,0.12);border-radius:999px;
+  padding:10px 20px;cursor:pointer;color:var(--near-black);
+  transition:border-color .2s;
+}
+.btn-secondary:hover{border-color:var(--signal-blue);color:var(--signal-blue);}
+
+.link-action{
+  font-size:14px;color:var(--signal-blue);text-decoration:none;font-weight:500;cursor:pointer;
+}
+.link-action:hover{text-decoration:underline;}
+
+/* State container */
+.state{display:none;padding:var(--s6) 0;}
+.state.active{display:block;}
+
+/* State 2: preview proof */
+.preview-items{margin:var(--s3) 0;}
+.preview-item{
+  padding:var(--s2);margin-bottom:var(--s2);
+  border-left:3px solid var(--signal-blue);
+  background:rgba(44,86,232,0.04);border-radius:0 12px 12px 0;
+}
+.preview-item .title{font-weight:500;font-size:16px;}
+.preview-item .meta{font-size:13px;color:var(--warm-gray);margin-top:4px;}
+
+.competitor-editor{margin:var(--s3) 0;}
+.competitor-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;
+  background:rgba(44,86,232,0.08);color:var(--signal-blue);margin:4px;
+}
+.competitor-tag button{
+  background:none;border:none;cursor:pointer;color:var(--signal-blue);
+  font-size:16px;line-height:1;padding:0;
+}
+.add-competitor{display:flex;gap:var(--s1);margin-top:var(--s2);}
+.add-competitor input{flex:1;padding:8px 12px;font-size:14px;}
+.add-competitor button{white-space:nowrap;}
+
+/* State 3: contact gate */
+.gate-label{
+  font-family:var(--display);font-size:14px;font-weight:500;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--warm-gray);
+  margin-bottom:var(--s2);
+}
+
+/* State 4: report */
+.report-item{
+  padding:var(--s3);margin-bottom:var(--s3);
+}
+.report-item .headline{font-family:var(--display);font-size:20px;font-weight:500;margin-bottom:var(--s1);}
+.report-item .source-line{font-size:13px;color:var(--warm-gray);margin-bottom:var(--s2);}
+.report-item .section-label{
+  font-family:var(--display);font-size:12px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--signal-blue);
+  margin:var(--s2) 0 var(--s1);
+}
+.report-item .section-text{font-size:16px;line-height:1.6;}
+.relevance-badge{
+  display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.relevance-badge.direct{background:rgba(44,86,232,0.12);color:var(--signal-blue);}
+.relevance-badge.indirect{background:rgba(107,101,96,0.12);color:var(--warm-gray);}
+.effort-badge{
+  display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;
+  background:rgba(0,0,0,0.06);color:var(--warm-gray);margin-left:6px;
+}
+
+/* Loading */
+.loading{text-align:center;padding:var(--s5) 0;}
+.loading-spinner{
+  width:40px;height:40px;border:3px solid rgba(44,86,232,0.15);
+  border-top-color:var(--signal-blue);border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto var(--s2);
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-msg{font-size:15px;color:var(--warm-gray);}
+
+/* Quiet states (5a/5b/5c/5d) */
+.quiet-state{text-align:center;padding:var(--s5) 0;}
+.quiet-state h2{font-family:var(--display);font-size:28px;font-weight:500;margin-bottom:var(--s2);}
+.quiet-state p{color:var(--warm-gray);max-width:480px;margin:0 auto var(--s3);}
+.quiet-email-form{display:flex;gap:var(--s1);max-width:400px;margin:var(--s3) auto 0;}
+.quiet-email-form input{flex:1;}
+
+/* Footer */
+.page-footer{
+  padding:var(--s4) 0;text-align:center;font-size:13px;color:var(--warm-gray);
+  border-top:1px solid rgba(0,0,0,0.06);margin-top:var(--s6);
+}
+.page-footer a{color:var(--signal-blue);text-decoration:none;}
+
+/* Responsive */
+@media(max-width:768px){
+  .hero h1{font-size:36px;}
+  .hero p{font-size:17px;}
+  .field-row{grid-template-columns:1fr;}
+  .nav{padding:var(--s2) var(--s2);}
+  .quiet-email-form{flex-direction:column;}
+}
+@media(max-width:480px){
+  .hero{padding:var(--s7) 0 var(--s5);}
+  .hero h1{font-size:30px;}
+}
+</style>
+</head>
+<body>
+
+<div class="nav" id="nav">
+  <a href="/" class="nav-brand">tin ly</a>
+  <a href="/" class="nav-link">Back to tinly.work</a>
+</div>
+
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <div class="container">
+    <h1>Your competitive landscape,<br>scored and ready.</h1>
+    <p>Enter your brand and website. We score real, recent signals from your category against your specific position and surface what's worth acting on.</p>
+  </div>
+</div>
+
+<!-- ===== State 1: Brand input ===== -->
+<div class="state active" id="state-1">
+  <div class="container">
+    <div class="glass-box" style="margin-top:calc(-1 * var(--s5));">
+      <form id="brand-form">
+        <div class="field-group">
+          <label for="brandName">Brand name</label>
+          <input type="text" id="brandName" name="brandName" required placeholder="e.g. Notion, Binance, Stripe">
+        </div>
+        <div class="field-group">
+          <label for="website">Website</label>
+          <input type="url" id="website" name="website" placeholder="https://yourbrand.com">
+        </div>
+        <div class="fax-field" aria-hidden="true">
+          <label for="fax">Fax</label>
+          <input type="text" id="fax" name="fax" tabindex="-1" autocomplete="off">
+        </div>
+        <!-- Site key is injected at runtime from TURNSTILE_SITE — see turnstile-config.js -->
+        <div id="turnstile-container" style="margin:var(--s2) 0;"></div>
+        <button type="submit" class="btn-primary" id="submit-btn">Score my landscape</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Loading between states ===== -->
+<div class="state" id="state-loading">
+  <div class="container">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-msg" id="loading-msg">Classifying your brand...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 2: Pre-gate proof ===== -->
+<div class="state" id="state-2">
+  <div class="container">
+    <div class="glass-box">
+      <h2 style="font-family:var(--display);font-size:28px;font-weight:500;margin-bottom:var(--s1);">
+        We found signals for <span id="s2-brand"></span>
+      </h2>
+      <p style="color:var(--warm-gray);margin-bottom:var(--s3);">
+        Category: <strong id="s2-category"></strong> <span id="s2-secondary"></span>
+      </p>
+
+      <div class="preview-items" id="s2-items"></div>
+
+      <div class="competitor-editor" id="competitor-editor">
+        <p style="font-size:14px;font-weight:500;margin-bottom:var(--s1);">Named competitors</p>
+        <div id="competitor-tags"></div>
+        <button class="link-action" id="toggle-add-competitor" type="button">+ Add competitors</button>
+        <div id="competitor-expand" style="display:none;margin-top:var(--s2);">
+          <div class="add-competitor">
+            <input type="text" id="add-competitor-input" placeholder="Add a competitor name">
+            <button class="btn-secondary" id="add-competitor-btn" type="button">Add</button>
+          </div>
+          <button class="link-action" id="rescan-btn" type="button" style="margin-top:var(--s2);">Re-score with updated competitors</button>
+        </div>
+      </div>
+
+      <div style="margin-top:var(--s4);display:flex;gap:var(--s2);align-items:center;flex-wrap:wrap;">
+        <button class="btn-primary" id="continue-to-gate">Get the full report</button>
+        <button class="link-action" id="back-to-s1" type="button">Start over</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 3: Contact gate ===== -->
+<div class="state" id="state-3">
+  <div class="container">
+    <div class="glass-box">
+      <div class="gate-label">Almost there</div>
+      <h2 style="font-family:var(--display);font-size:28px;font-weight:500;margin-bottom:var(--s2);">
+        Where should we send your Trend Pulse?
+      </h2>
+      <p style="color:var(--warm-gray);margin-bottom:var(--s3);font-size:15px;">
+        The full report scores each signal, explains why it matters to your brand specifically,
+        and suggests what to do about it. We'll email it to you within a few minutes.
+      </p>
+      <form id="contact-form">
+        <div class="field-row">
+          <div class="field-group">
+            <label for="lead-name">Name</label>
+            <input type="text" id="lead-name" required>
+          </div>
+          <div class="field-group">
+            <label for="lead-email">Work email</label>
+            <input type="email" id="lead-email" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label for="lead-company">Company</label>
+            <input type="text" id="lead-company" required>
+          </div>
+          <div class="field-group">
+            <label for="lead-role">Role</label>
+            <input type="text" id="lead-role" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" id="submit-lead-btn">Send my Trend Pulse</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 4: Confirmation ===== -->
+<div class="state" id="state-4">
+  <div class="container">
+    <div class="glass-box" style="text-align:center;">
+      <h2 style="font-family:var(--display);font-size:32px;font-weight:500;margin-bottom:var(--s2);">
+        Your Trend Pulse is on its way
+      </h2>
+      <p style="color:var(--warm-gray);margin-bottom:var(--s3);">
+        Check your inbox at <strong id="s4-email"></strong> in the next few minutes.
+        The report covers what's worth acting on in <strong id="s4-brand"></strong>'s competitive landscape right now.
+      </p>
+      <p id="s4-competitor-count" style="color:var(--warm-gray);font-size:14px;margin-bottom:var(--s3);"></p>
+      <div class="glass-box" style="text-align:left;margin-bottom:var(--s3);">
+        <p class="section-label" style="margin-top:0;">What's inside</p>
+        <p style="font-size:15px;line-height:1.6;">
+          Each item explains <strong>why now</strong> — what actually changed, <strong>so what</strong> — the
+          idea worth acting on, and the <strong>payoff</strong> — what's at stake either way.
+        </p>
+      </div>
+      <a href="/" class="link-action">Back to tinly.work</a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 5a: Quiet — thin pool ===== -->
+<div class="state" id="state-5a">
+  <div class="container">
+    <div class="glass-box quiet-state">
+      <h2>Your category is quiet right now</h2>
+      <p>
+        We track real signals, not noise. <span id="s5a-brand"></span>'s category doesn't have enough
+        high-quality recent activity to build a useful pulse this week. That changes as sources refresh.
+      </p>
+      <p style="font-size:14px;">Leave your email and we'll send your Trend Pulse as soon as there's enough to act on.</p>
+      <form class="quiet-email-form" data-quiet="QUIET_THIN_POOL">
+        <input type="email" placeholder="you@company.com" required>
+        <button class="btn-primary" type="submit">Notify me</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 5b: Quiet — stale pool ===== -->
+<div class="state" id="state-5b">
+  <div class="container">
+    <div class="glass-box quiet-state">
+      <h2>Sources are refreshing</h2>
+      <p>
+        Our data for <span id="s5b-brand"></span>'s category is being updated. Rather than showing you
+        stale results, we'll send your Trend Pulse once the refresh completes.
+      </p>
+      <p style="font-size:14px;">Leave your email and we'll send it as soon as the data is fresh.</p>
+      <form class="quiet-email-form" data-quiet="QUIET_STALE">
+        <input type="email" placeholder="you@company.com" required>
+        <button class="btn-primary" type="submit">Notify me</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 5c: Quiet — thin field (THIN_FIELD) ===== -->
+<div class="state" id="state-5c">
+  <div class="container">
+    <div class="glass-box quiet-state">
+      <h2>Not enough on your competitive field yet</h2>
+      <p>
+        <span id="s5c-brand"></span>'s category is active, but we don't have enough tracking your specific
+        competitors yet to build a pulse worth reading. That can mean two things: the market hasn't caught
+        up to what you're building yet, or we don't have you positioned against the right players yet.
+      </p>
+      <p style="font-size:14px;">Talk to the team and we'll get your competitors right, or leave your email and we'll send your Trend Pulse as soon as we do.</p>
+      <div class="quiet-cta-row" style="display:flex;justify-content:center;gap:var(--s2);flex-wrap:wrap;align-items:center;">
+        <a class="btn-primary" href="mailto:tinly.work@gmail.com?subject=Trend%20Pulse%20-%20talk%20to%20the%20team" style="text-decoration:none;">Talk to the team</a>
+      </div>
+      <form class="quiet-email-form" data-quiet="THIN_FIELD">
+        <input type="email" placeholder="you@company.com" required>
+        <button class="btn-secondary" type="submit">Notify me instead</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== State 5d: Quiet — genuine ===== -->
+<div class="state" id="state-5d">
+  <div class="container">
+    <div class="glass-box quiet-state">
+      <h2>Not enough direct signals yet</h2>
+      <p>
+        We found category activity for <span id="s5d-brand"></span>, but not enough that's directly
+        relevant to your specific position to build a pulse worth reading. We'd rather say that
+        than pad the report.
+      </p>
+      <p style="font-size:14px;">Leave your email and we'll send your Trend Pulse when we have enough to be useful.</p>
+      <form class="quiet-email-form" data-quiet="QUIET_GENUINE">
+        <input type="email" placeholder="you@company.com" required>
+        <button class="btn-primary" type="submit">Notify me</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Footer ===== -->
+<div class="page-footer">
+  <a href="/">tinly.work</a>
+</div>
+
+<script>
+(function(){
+  // State machine
+  let currentState = null;
+  let previewData = null;
+
+  const LOADING_MESSAGES = [
+    "What's the tea...",
+    "Ooh, this looks interesting...",
+    "Let's see what we've got...",
+    "Just a bit more...",
+  ];
+  let loadingTimers = [];
+
+  function showState(id) {
+    document.querySelectorAll(".state").forEach(s => s.classList.remove("active"));
+    const el = document.getElementById(id);
+    if (el) el.classList.add("active");
+    currentState = id;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // 3 messages on a fixed interval, then the 4th ("Just a bit more...") only
+  // appears as an overrun fallback if the request is still running once the
+  // first 3 have had their turn — it does not cycle back, it just holds.
+  const LOADING_STEP_MS = 2500;
+
+  function startLoading() {
+    showState("state-loading");
+    const msgEl = document.getElementById("loading-msg");
+    msgEl.textContent = LOADING_MESSAGES[0];
+    loadingTimers = [
+      setTimeout(() => { msgEl.textContent = LOADING_MESSAGES[1]; }, LOADING_STEP_MS),
+      setTimeout(() => { msgEl.textContent = LOADING_MESSAGES[2]; }, LOADING_STEP_MS * 2),
+      setTimeout(() => { msgEl.textContent = LOADING_MESSAGES[3]; }, LOADING_STEP_MS * 3),
+    ];
+  }
+
+  function stopLoading() {
+    loadingTimers.forEach(clearTimeout);
+    loadingTimers = [];
+  }
+
+  // Quiet cause → state mapping
+  function quietState(cause) {
+    if (cause === "QUIET_THIN_POOL") return "state-5a";
+    if (cause === "QUIET_STALE") return "state-5b";
+    if (cause === "THIN_FIELD") return "state-5c";
+    if (cause === "QUIET_GENUINE") return "state-5d";
+    return null;
+  }
+
+  // ===== Turnstile: explicit render with the runtime-injected site key =====
+  let turnstileWidgetId = null;
+
+  async function mountTurnstile() {
+    const submitBtn = document.getElementById("submit-btn");
+    submitBtn.disabled = true;
+    try {
+      const [, cfg] = await Promise.all([
+        window.__turnstileReady,
+        fetch("/.netlify/functions/turnstile-config").then((r) => {
+          if (!r.ok) throw new Error("turnstile-config " + r.status);
+          return r.json();
+        }),
+      ]);
+      if (!cfg.siteKey) throw new Error("no site key in turnstile-config response");
+      turnstileWidgetId = window.turnstile.render("#turnstile-container", { sitekey: cfg.siteKey });
+      submitBtn.disabled = false;
+    } catch (err) {
+      console.error("turnstile mount failed:", err);
+      document.getElementById("turnstile-container").innerHTML =
+        '<p style="font-size:13px;color:#B00020;">Verification unavailable. Please reload the page.</p>';
+    }
+  }
+
+  function resetTurnstile() {
+    if (window.turnstile && turnstileWidgetId !== null) {
+      window.turnstile.reset(turnstileWidgetId);
+    }
+  }
+
+  mountTurnstile();
+
+  // ===== State 1: Brand submit =====
+  document.getElementById("brand-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const brandName = document.getElementById("brandName").value.trim();
+    const website = document.getElementById("website").value.trim();
+    const fax = document.getElementById("fax").value;
+    const turnstileEl = document.querySelector('[name="cf-turnstile-response"]');
+    const turnstileToken = turnstileEl ? turnstileEl.value : "";
+
+    if (!brandName) return;
+
+    document.getElementById("submit-btn").disabled = true;
+    startLoading();
+
+    try {
+      const res = await fetch("/.netlify/functions/pulse-preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brandName, website, fax, turnstileToken }),
+      });
+
+      if (res.status === 403) {
+        stopLoading();
+        resetTurnstile();
+        alert("Verification expired. Please try again.");
+        showState("state-1");
+        document.getElementById("submit-btn").disabled = false;
+        return;
+      }
+      if (res.status === 429) {
+        stopLoading();
+        alert("Rate limit reached. Please try again tomorrow.");
+        showState("state-1");
+        document.getElementById("submit-btn").disabled = false;
+        return;
+      }
+
+      const data = await res.json();
+      stopLoading();
+      document.getElementById("submit-btn").disabled = false;
+
+      if (data.status === "unknown_brand") {
+        alert("We couldn't classify that brand. Check the name and website and try again.");
+        showState("state-1");
+        return;
+      }
+
+      previewData = data;
+
+      // Check for quiet cause
+      if (data.quiet_cause) {
+        const qs = quietState(data.quiet_cause);
+        if (qs) {
+          const brandSpan = document.querySelector("#" + qs + " [id$='-brand']");
+          if (brandSpan) brandSpan.textContent = data.brand;
+          showState(qs);
+          return;
+        }
+      }
+
+      renderState2(data);
+    } catch (err) {
+      stopLoading();
+      document.getElementById("submit-btn").disabled = false;
+      alert("Something went wrong. Please try again.");
+      showState("state-1");
+    }
+  });
+
+  // ===== State 2: Render =====
+  function renderState2(data) {
+    document.getElementById("s2-brand").textContent = data.brand;
+    document.getElementById("s2-category").textContent = data.category;
+    const sec = document.getElementById("s2-secondary");
+    sec.textContent = data.secondaryCategory ? " + " + data.secondaryCategory : "";
+
+    const itemsEl = document.getElementById("s2-items");
+    itemsEl.innerHTML = "";
+    if (data.preGateItems && data.preGateItems.length) {
+      data.preGateItems.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "preview-item";
+        div.innerHTML =
+          '<div class="title">' + escapeHtml(item.title) + '</div>' +
+          '<div class="meta">' + escapeHtml(item.source) +
+          ' <span class="relevance-badge ' + item.relevance + '">' + item.relevance + '</span></div>';
+        itemsEl.appendChild(div);
+      });
+    } else {
+      itemsEl.innerHTML = '<p style="color:var(--warm-gray);font-size:14px;">No preview items available for this combination.</p>';
+    }
+
+    renderCompetitors(data.competitors || []);
+    showState("state-2");
+  }
+
+  function renderCompetitors(competitors) {
+    const container = document.getElementById("competitor-tags");
+    container.innerHTML = "";
+    competitors.forEach((c, i) => {
+      const tag = document.createElement("span");
+      tag.className = "competitor-tag";
+      tag.innerHTML = escapeHtml(c.name) +
+        ' <button type="button" data-idx="' + i + '" title="Remove">&times;</button>';
+      tag.querySelector("button").addEventListener("click", () => {
+        previewData.competitors.splice(i, 1);
+        renderCompetitors(previewData.competitors);
+      });
+      container.appendChild(tag);
+    });
+  }
+
+  // Collapse/expand the "add competitor" editor
+  document.getElementById("toggle-add-competitor").addEventListener("click", () => {
+    const expand = document.getElementById("competitor-expand");
+    const isOpen = expand.style.display !== "none";
+    expand.style.display = isOpen ? "none" : "block";
+    document.getElementById("toggle-add-competitor").textContent = isOpen ? "+ Add competitors" : "- Hide";
+  });
+
+  // Add competitor
+  document.getElementById("add-competitor-btn").addEventListener("click", () => {
+    const input = document.getElementById("add-competitor-input");
+    const name = input.value.trim();
+    if (!name) return;
+    if (!previewData.competitors) previewData.competitors = [];
+    previewData.competitors.push({ name, source: "user" });
+    renderCompetitors(previewData.competitors);
+    input.value = "";
+  });
+  document.getElementById("add-competitor-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); document.getElementById("add-competitor-btn").click(); }
+  });
+
+  // Re-scan with updated competitors
+  document.getElementById("rescan-btn").addEventListener("click", async () => {
+    startLoading();
+    try {
+      const res = await fetch("/.netlify/functions/pulse-rescan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          brandName: previewData.brand,
+          website: previewData.website,
+          brandRead: previewData.brandRead,
+          primaryCategory: previewData.category,
+          secondaryCategory: previewData.secondaryCategory,
+          competitors: previewData.competitors,
+        }),
+      });
+      const data = await res.json();
+      stopLoading();
+      // A "no_change" response means none of the edited competitor names
+      // have anything in the cache yet — pulse-rescan.js deliberately
+      // skipped re-running Pass 1 rather than spend on an unchanged pool.
+      // previewData.top/preGateItems/quiet_cause are left as-is since data
+      // doesn't carry those keys.
+      previewData = { ...previewData, ...data };
+      renderState2(previewData);
+      const priorNote = document.getElementById("rescan-note");
+      if (priorNote) priorNote.remove();
+      if (data.status === "no_change") {
+        const note = document.createElement("p");
+        note.id = "rescan-note";
+        note.style.cssText = "font-size:13px;color:var(--warm-gray);margin-top:var(--s2);";
+        note.textContent = "No fresh data for those competitors yet — showing your existing results.";
+        document.getElementById("competitor-editor").appendChild(note);
+      }
+    } catch {
+      stopLoading();
+      alert("Re-scan failed. Please try again.");
+      showState("state-2");
+    }
+  });
+
+  // Continue to gate
+  document.getElementById("continue-to-gate").addEventListener("click", () => showState("state-3"));
+  document.getElementById("back-to-s1").addEventListener("click", () => {
+    previewData = null;
+    showState("state-1");
+    resetTurnstile();
+  });
+
+  // ===== State 3: Contact submit =====
+  document.getElementById("contact-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = document.getElementById("lead-name").value.trim();
+    const email = document.getElementById("lead-email").value.trim();
+    const company = document.getElementById("lead-company").value.trim();
+    const role = document.getElementById("lead-role").value.trim();
+    if (!name || !email || !company || !role) return;
+
+    document.getElementById("submit-lead-btn").disabled = true;
+
+    try {
+      const competitorsList = (previewData.competitors || []).map(c => c.name).join(", ");
+      const competitorsSource = (previewData.competitors || []).map(c => c.source).join(", ");
+
+      await fetch("/.netlify/functions/lead-submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name, email, company, role,
+          brandName: previewData.brand,
+          website: previewData.website,
+          category: previewData.category,
+          secondaryCategory: previewData.secondaryCategory,
+          brandRead: previewData.brandRead,
+          confidence: previewData.confidence,
+          competitors: previewData.competitors,
+          competitorsSource,
+          competitorsList,
+          top: previewData.top,
+          quiet_cause: previewData.quiet_cause || "",
+        }),
+      });
+
+      document.getElementById("s4-email").textContent = email;
+      document.getElementById("s4-brand").textContent = previewData.brand;
+      const compCount = (previewData.competitors || []).length;
+      document.getElementById("s4-competitor-count").textContent = compCount
+        ? "We're tracking " + compCount + " named competitor" + (compCount === 1 ? "" : "s") + " for you."
+        : "";
+      showState("state-4");
+    } catch {
+      alert("Something went wrong. Please try again.");
+    }
+    document.getElementById("submit-lead-btn").disabled = false;
+  });
+
+  // ===== Quiet state email forms =====
+  document.querySelectorAll(".quiet-email-form").forEach(form => {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const emailInput = form.querySelector("input[type=email]");
+      const email = emailInput.value.trim();
+      if (!email || !previewData) return;
+
+      try {
+        await fetch("/.netlify/functions/lead-submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: "",
+            email,
+            company: "",
+            role: "",
+            brandName: previewData.brand,
+            website: previewData.website,
+            category: previewData.category,
+            secondaryCategory: previewData.secondaryCategory,
+            brandRead: previewData.brandRead,
+            confidence: previewData.confidence,
+            competitors: previewData.competitors,
+            competitorsSource: "",
+            competitorsList: "",
+            top: [],
+            quiet_cause: form.dataset.quiet || "",
+          }),
+        });
+        form.innerHTML = '<p style="color:var(--signal-blue);font-weight:500;">Got it. We\'ll email you when your pulse is ready.</p>';
+      } catch {
+        alert("Something went wrong. Please try again.");
+      }
+    });
+  });
+
+  // ===== Nav scroll effect =====
+  window.addEventListener("scroll", () => {
+    document.getElementById("nav").classList.toggle("is-scrolled", window.scrollY > 60);
+  });
+
+  // ===== Utility =====
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str || "";
+    return div.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>

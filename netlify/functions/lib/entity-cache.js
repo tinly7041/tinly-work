@@ -4,10 +4,12 @@
 // name (not by brand or lead), so two different brands naming the same
 // competitor within the TTL window share one fetch — "Uniswap" and some
 // other DEX both naming "Aerodrome" as a competitor read the same cached
-// entry, no refetch. 7-day TTL, checked on read: an entry older than that
+// entry, no refetch. 10-day TTL, checked on read: an entry older than that
 // is treated as absent (the caller — lib/competitor-fetch.js — decides
 // whether to refetch; this module only knows freshness, never fetches
-// itself).
+// itself). Raised from 7 to 10 days (Action A, watchlist pre-warm) — the
+// watchlist crawl runs weekly, and a 7-day TTL racing a 7-day cron means
+// entries expire right as the next crawl lands; 10 days gives slack.
 //
 // Same file-then-Blobs pattern as pool.js: local dev reads/writes
 // .cache/entity-<name>.json when present, production reads/writes Netlify
@@ -20,7 +22,7 @@
 import { readFile, writeFile, mkdir } from "fs/promises";
 import path from "path";
 
-export const ENTITY_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+export const ENTITY_CACHE_TTL_MS = 10 * 24 * 60 * 60 * 1000; // 10 days
 const STORE_NAME = process.env.BLOBS_STORE_NAME || "trends";
 const ENTITY_STORE = "competitor-entities";
 const CACHE_DIR = path.resolve(process.cwd(), ".cache", "entities");

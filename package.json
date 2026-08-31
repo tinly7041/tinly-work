@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node --test netlify/functions/lib/*.test.js netlify/functions/lib/**/*.test.js",
-    "probe": "node scripts/probe-sources.js"
+    "probe": "node scripts/probe-sources.js",
+    "dev": "netlify dev --cwd . --dir . --functions ./netlify/functions"
   },
   "repository": {
     "type": "git",

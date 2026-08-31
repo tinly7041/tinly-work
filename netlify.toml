@@ -1,6 +1,20 @@
 [build]
+  base = "."
   publish = "."
   functions = "netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
+
+# Explicit dev-context override. Netlify CLI's site-root detection can walk
+# up past a git worktree's own directory to the main worktree (this repo
+# lives under a git worktree at .claude/worktrees/<name>, sharing one .git
+# with the main checkout) and serve/read env from THERE instead — silently
+# picking up a different, possibly stale .env. Repeating publish/functions
+# here under [dev] pins them to this directory regardless of that. If
+# `netlify dev` still resolves to the wrong repo, run it with
+# `netlify dev --cwd .` or use `npm run dev` (package.json), which passes
+# --dir/--functions explicitly as a second layer of defense.
+[dev]
+  publish = "."
+  functions = "netlify/functions"

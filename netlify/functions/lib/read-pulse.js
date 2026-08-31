@@ -120,6 +120,10 @@ function contextHeader({ brandName, website, brandRead, primaryCategory, seconda
 }
 
 async function callAnthropic({ fetchImpl, anthropicApiKey, body }) {
+  // Masked diagnostic only — see classify.js's identical log for why this is
+  // safe to leave in (key-type prefix only, never secret material).
+  console.log(`[read-pulse] using ANTHROPIC_API_KEY: ${anthropicApiKey ? anthropicApiKey.slice(0, 10) + "..." : "(unset)"}`);
+
   const res = await fetchImpl("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -172,7 +176,7 @@ For every item, score:
 - "relevance": "direct" if it sits squarely in the brand's own category or business model, "indirect" if it's adjacent or a second-order signal worth knowing about but not squarely on-topic, "none" if it has no real connection to this specific brand.
   If the brand's "Named competitors" list is given: an item squarely about one of those named competitors shipping, launching, raising, being acquired, being exploited, or a regulator acting on them is ALWAYS "direct" — a competitor's own move is, by definition, squarely about this brand's market position, even if the item's surface topic is broader than the brand's own product. Do not downgrade a genuine named-competitor event to "indirect" just because the brand itself isn't mentioned.
 - "relevance_score": 0 to 1 — how confidently this item matters to THIS brand specifically, not how big or newsworthy the item is in general.
-- "one_line_reason": one short, concrete sentence grounding the score in what the item actually is and how it relates (or doesn't) to the brand.
+- "one_line_reason": ONE short clause, 12 words or fewer, grounding the score in what the item actually is and how it relates (or doesn't) to the brand. Brevity is a real requirement here, not a style preference — this field is written for every item in the pool, and the cumulative length is what determines whether this whole response finishes in time.
 - "is_event": true only if a named org shipped, launched, raised, acquired, was exploited, or a regulator acted, OR a measurable market move occurred. Otherwise false. This is independent of relevance — an item can be highly relevant to the brand's category and still not be an event. A named competitor merely existing, or appearing in a roundup/digest, is still not an event — the same "did something actually happen" bar applies to competitor items as to everything else.
 
 Explicitly NOT events (is_event: false), regardless of how relevant they otherwise score: a repo or tool merely existing; link roundups and daily digests; opinion, explainer, or tutorial content; listicles.
@@ -284,6 +288,8 @@ Rules:
 - "headline": rewrite it plainly if the source title is SEO-padded or clickbait; otherwise keep it close to the source.
 - "effort": "quick" (a reactive post, a comment, a quick take) or "campaign" (something that takes real production).
 - "why_now": one sentence, concrete — what actually changed (a launch, a funding round, a spike, a regulatory move). Not vibes.
+
+CRITICAL, same severity as the payoff rule below: "headline" and "why_now" must never broaden WHO or WHAT a claim is about while rewriting it. Live-caught failure — a source said a model costs "about a fifth of GPT-5.5's cost" (one specific comparison, against one specific competitor model), and a prior draft rewrote that as "reportedly beats Anthropic and OpenAI at a fifth of the cost" — turning a narrow cost comparison against one model into an implied performance claim against two entire labs, one of which (Anthropic) the source never even named. A comparison against one product is not evidence about that company's whole portfolio, and is never evidence about a second, unrelated company. If the source names one model, your rewrite names that same one model — not "the industry," not a whole lab, not a competitor that source never mentioned.
 
 so_what and payoff — read this carefully, it's a deliberate change from a plainer "name the angle" instruction used before:
 - "so_what": the idea. Concrete enough that the reader can picture it, open enough that they own the execution. A human strategist's suggestion, not an AI's task list. One or two sentences.
@@ -433,6 +439,116 @@ function quietResult(brandName) {
   };
 }
 
+// ---------- pre-gate / post-gate split (Action B) ----------
+//
+// Two independently callable halves so the frontend can run pre-gate
+// (cheap, Haiku) before the contact gate and post-gate (expensive, Sonnet)
+// after. generatePulseRead still composes them into the same result shape
+// scripts/measure-gate-cost.js expects.
+
+export async function runPreGate({
+  primaryPool,
+  secondaryPool,
+  competitorItems,
+  brandName,
+  website,
+  brandRead,
+  primaryCategory,
+  secondaryCategory,
+  competitors,
+  fetchImpl = fetch,
+  anthropicApiKey,
+  pass1Model = PASS1_MODEL,
+  topN = PASS2_TOP_N,
+} = {}) {
+  const ctx = { brandName, website, brandRead, primaryCategory, secondaryCategory, competitors };
+  const { items: pool, cross_category_dupes_removed } = selectPool(primaryPool, secondaryPool, competitorItems);
+
+  if (!pool.length) {
+    return {
+      top: [], pool, scored: [], distribution: null,
+      eventGated: [], eventDropped: [],
+      pass1Cost: null, pass1Debug: null,
+      cross_category_dupes_removed, quiet: true,
+    };
+  }
+
+  const { scored, debug: pass1Debug } = await runPass1({ ...ctx, pool, fetchImpl, anthropicApiKey, model: pass1Model });
+  const distribution = scoreDistribution(scored);
+  const pass1Cost = computeCost(pass1Debug.usage, pass1Debug.model);
+  const { kept: eventGated, dropped: eventDropped } = applyEventGate(scored);
+  const top = selectTopN(eventGated, topN);
+
+  return {
+    top, pool, scored, distribution,
+    eventGated, eventDropped,
+    pass1Cost, pass1Debug,
+    cross_category_dupes_removed,
+    quiet: top.length === 0,
+  };
+}
+
+export async function runPostGate({
+  top,
+  brandName,
+  website,
+  brandRead,
+  primaryCategory,
+  secondaryCategory,
+  competitors,
+  fetchImpl = fetch,
+  anthropicApiKey,
+  pass2Model = READ_MODEL,
+} = {}) {
+  const ctx = { brandName, website, brandRead, primaryCategory, secondaryCategory, competitors };
+
+  if (!top.length) {
+    return {
+      result: quietResult(brandName),
+      pass2Cost: null, pass2Debug: null,
+      standards: { pass: false, failed_standard: "no_items" },
+      relevance_downgrades: [], payoff_violations_dropped: [],
+    };
+  }
+
+  let parsed, pass2Debug;
+  try {
+    ({ parsed, debug: pass2Debug } = await runPass2({ ...ctx, top, fetchImpl, anthropicApiKey, model: pass2Model }));
+  } catch (e) {
+    if (!(e instanceof Pass2ParseError)) throw e;
+    return {
+      result: quietResult(brandName),
+      pass2Cost: null,
+      pass2Debug: { model: pass2Model, usage: null, parse_error: e.message, raw_snippet: e.raw },
+      standards: { pass: false, failed_standard: "pass2_unparseable", detail: e.message },
+      relevance_downgrades: [], payoff_violations_dropped: [],
+    };
+  }
+
+  const pass2Cost = computeCost(pass2Debug.usage, pass2Debug.model);
+  const candidateItems = Array.isArray(parsed.items) ? parsed.items : [];
+  const validUrls = new Set(top.map((s) => s.item.url));
+  const pass1ByUrl = new Map(top.map((s) => [s.item.url, s]));
+  const relevance_downgrades = enforceRelevanceDowngradeOnly(candidateItems, pass1ByUrl);
+  const { kept, dropped: payoff_violations_dropped } = filterPayoffViolations(candidateItems);
+  const standards = checkStandards(kept, validUrls);
+
+  if (!standards.pass) {
+    return {
+      result: quietResult(brandName),
+      pass2Cost, pass2Debug, standards,
+      relevance_downgrades, payoff_violations_dropped,
+      raw_items: kept,
+    };
+  }
+
+  return {
+    result: { quiet: false, pulse_summary: parsed.pulse_summary, items: kept },
+    pass2Cost, pass2Debug, standards,
+    relevance_downgrades, payoff_violations_dropped,
+  };
+}
+
 // ---------- main entry point ----------
 
 export async function generatePulseRead({
@@ -443,93 +559,84 @@ export async function generatePulseRead({
   secondaryCategory,
   primaryPool,
   secondaryPool,
-  competitors, // Phase 2.7: [{ name, source: "user"|"inferred" }, ...] — context only, never fetched here
-  competitorItems, // Phase 2.7: pre-loaded from lib/entity-cache.js by the caller, cache-only
+  competitors,
+  competitorItems,
   fetchImpl = fetch,
   anthropicApiKey,
   pass1Model = PASS1_MODEL,
   pass2Model = READ_MODEL,
   topN = PASS2_TOP_N,
 } = {}) {
-  const ctx = { brandName, website, brandRead, primaryCategory, secondaryCategory, competitors };
-  const { items: pool, cross_category_dupes_removed } = selectPool(primaryPool, secondaryPool, competitorItems);
+  const preGate = await runPreGate({
+    primaryPool, secondaryPool, competitorItems,
+    brandName, website, brandRead, primaryCategory, secondaryCategory, competitors,
+    fetchImpl, anthropicApiKey, pass1Model, topN,
+  });
 
   const debug = {
-    pool_size: pool.length,
+    pool_size: preGate.pool.length,
     primary_pool_size: primaryPool?.items?.length || 0,
     secondary_pool_size: secondaryPool?.items?.length || 0,
     competitor_pool_size: competitorItems?.length || 0,
     competitors: competitors || [],
-    cross_category_dupes_removed,
+    cross_category_dupes_removed: preGate.cross_category_dupes_removed,
   };
 
-  if (!pool.length) {
+  if (!preGate.pool.length) {
     return { result: quietResult(brandName), debug: { ...debug, standards: { pass: false, failed_standard: "empty_pool" } } };
   }
 
-  const { scored, debug: pass1Debug } = await runPass1({ ...ctx, pool, fetchImpl, anthropicApiKey, model: pass1Model });
-  const distribution = scoreDistribution(scored);
-  const pass1Cost = computeCost(pass1Debug.usage, pass1Debug.model);
-
-  const { kept: eventGated, dropped: eventDropped } = applyEventGate(scored);
   debug.pass1 = {
-    model: pass1Debug.model,
-    usage: pass1Debug.usage,
-    cost: pass1Cost,
-    score_distribution: distribution,
+    model: preGate.pass1Debug.model,
+    usage: preGate.pass1Debug.usage,
+    cost: preGate.pass1Cost,
+    score_distribution: preGate.distribution,
     is_event: {
-      in: scored.length,
-      dropped: eventDropped.length,
-      out: eventGated.length,
-      dropped_titles: eventDropped.map((s) => s.item.title),
+      in: preGate.scored.length,
+      dropped: preGate.eventDropped.length,
+      out: preGate.eventGated.length,
+      dropped_titles: preGate.eventDropped.map((s) => s.item.title),
     },
   };
 
-  const top = selectTopN(eventGated, topN);
-  if (!top.length) {
+  if (preGate.quiet) {
     debug.standards = {
       pass: false,
-      failed_standard: eventGated.length === 0 && scored.length > 0 ? "no_items_survived_event_gate" : "no_items_above_none",
+      failed_standard: preGate.eventGated.length === 0 && preGate.scored.length > 0 ? "no_items_survived_event_gate" : "no_items_above_none",
     };
-    debug.total_cost = Number((pass1Cost?.usd || 0).toFixed(6));
+    debug.total_cost = Number((preGate.pass1Cost?.usd || 0).toFixed(6));
     return { result: quietResult(brandName), debug };
   }
 
-  let parsed, pass2Debug;
-  try {
-    ({ parsed, debug: pass2Debug } = await runPass2({ ...ctx, top, fetchImpl, anthropicApiKey, model: pass2Model }));
-  } catch (e) {
-    if (!(e instanceof Pass2ParseError)) throw e; // genuine API/network failure — surface it, don't swallow
-    debug.pass2 = { model: pass2Model, usage: null, cost: null, parse_error: e.message, raw_snippet: e.raw };
-    debug.standards = { pass: false, failed_standard: "pass2_unparseable", detail: e.message };
-    debug.total_cost = Number((pass1Cost?.usd || 0).toFixed(6));
-    return { result: quietResult(brandName), debug };
-  }
-  const pass2Cost = computeCost(pass2Debug.usage, pass2Debug.model);
+  const postGate = await runPostGate({
+    top: preGate.top,
+    brandName, website, brandRead, primaryCategory, secondaryCategory, competitors,
+    fetchImpl, anthropicApiKey, pass2Model,
+  });
 
-  const candidateItems = Array.isArray(parsed.items) ? parsed.items : [];
-  const validUrls = new Set(top.map((s) => s.item.url));
-  const pass1ByUrl = new Map(top.map((s) => [s.item.url, s]));
-
-  const relevance_downgrades = enforceRelevanceDowngradeOnly(candidateItems, pass1ByUrl);
-  const { kept, dropped: payoff_violations_dropped } = filterPayoffViolations(candidateItems);
-
-  debug.pass2 = { model: pass2Debug.model, usage: pass2Debug.usage, cost: pass2Cost, relevance_downgrades, payoff_violations_dropped };
-  debug.usage = pass2Debug.usage; // back-compat alias — Pass 2 is the closest semantic match to the old single-call cost
-  debug.model = pass2Debug.model;
-  debug.total_cost = Number(((pass1Cost?.usd || 0) + (pass2Cost?.usd || 0)).toFixed(6));
-
-  const standards = checkStandards(kept, validUrls);
-  debug.standards = standards;
-  debug.raw_item_count = kept.length;
-  debug.raw_items = kept;
-
-  if (!standards.pass) {
-    return { result: quietResult(brandName), debug };
-  }
-
-  return {
-    result: { quiet: false, pulse_summary: parsed.pulse_summary, items: kept },
-    debug,
+  debug.pass2 = {
+    model: postGate.pass2Debug?.model || pass2Model,
+    usage: postGate.pass2Debug?.usage || null,
+    cost: postGate.pass2Cost,
+    relevance_downgrades: postGate.relevance_downgrades,
+    payoff_violations_dropped: postGate.payoff_violations_dropped,
+    ...(postGate.pass2Debug?.parse_error ? { parse_error: postGate.pass2Debug.parse_error, raw_snippet: postGate.pass2Debug.raw_snippet } : {}),
   };
+  debug.usage = postGate.pass2Debug?.usage || null;
+  debug.model = postGate.pass2Debug?.model || pass2Model;
+  debug.total_cost = Number(((preGate.pass1Cost?.usd || 0) + (postGate.pass2Cost?.usd || 0)).toFixed(6));
+  debug.standards = postGate.standards;
+
+  if (postGate.raw_items) {
+    debug.raw_item_count = postGate.raw_items.length;
+    debug.raw_items = postGate.raw_items;
+  }
+  if (!postGate.standards.pass) {
+    return { result: postGate.result, debug };
+  }
+
+  debug.raw_item_count = postGate.result.items.length;
+  debug.raw_items = postGate.result.items;
+
+  return { result: postGate.result, debug };
 }
