@@ -36,6 +36,12 @@ export default async (req) => {
     return json(500, { error: "site_key_unconfigured" }, { "Cache-Control": "no-store" });
   }
 
-  // Short cache: public value, but a key rotation should take effect quickly.
-  return json(200, { siteKey }, { "Cache-Control": "public, max-age=300" });
+  // No caching at all: this function does nothing but read one env var, so
+  // caching it buys negligible performance for real risk. Confirmed live —
+  // Netlify's edge/durable cache served this response nearly 5 hours stale
+  // despite the previous "public, max-age=300", ignoring the intended
+  // freshness window entirely. A cached response also means a future site
+  // key rotation could keep serving the old key to real visitors for
+  // however long the cache decides to hold onto it.
+  return json(200, { siteKey }, { "Cache-Control": "no-store" });
 };
