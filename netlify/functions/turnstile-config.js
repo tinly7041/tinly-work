@@ -28,7 +28,12 @@ export default async (req) => {
   const siteKey = process.env.TURNSTILE_SITE;
   if (!siteKey) {
     console.error("turnstile-config: TURNSTILE_SITE is not set");
-    return json(500, { error: "site_key_unconfigured" });
+    // Explicit no-store: this is a transient misconfiguration, not a stable
+    // fact about the endpoint. Without this, the response inherits no
+    // Cache-Control and can get cached by the CDN edge — which is exactly
+    // what happened once already: the env var was fixed, but edge nodes
+    // kept serving the pre-fix 500 to real visitors until this changed.
+    return json(500, { error: "site_key_unconfigured" }, { "Cache-Control": "no-store" });
   }
 
   // Short cache: public value, but a key rotation should take effect quickly.
