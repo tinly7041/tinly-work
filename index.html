@@ -177,6 +177,7 @@ p:last-child{margin-bottom:0;}
     color:rgba(245,243,239,.72);font-size:12px;
   }
   .nav .tp-tooltip{display:none;} /* nav bar has no room; hero copy still shows */
+  .tp-trigger-inline .tp-tooltip{transform:none;} /* matches the specificity of the unconditional rule above so it actually wins */
 }
 .tp-link{font-family:var(--body);font-weight:500;text-decoration:none;color:var(--inverse);
   border-bottom:1px solid rgba(245,243,239,.5);transition:border-color .25s;}
@@ -365,7 +366,7 @@ a.offer-price:hover{text-decoration:underline;}
 .compare-card dd{margin:4px 0 0 0;font-size:15px;color:var(--gray);
   padding-bottom:var(--s2);border-bottom:1px solid rgba(0,0,0,.06);}
 .compare-card dd:last-of-type{border-bottom:none;}
-.compare-card dd.offer-price{color:var(--signal-blue);font-size:15px;}
+.compare-card .offer-price{color:var(--signal-blue);font-size:15px;}
 
 /* ============================================================
    CONTACT
@@ -500,7 +501,7 @@ gtag('config','G-XXXXXXXXXX');
     <div class="hero-cta">
       <a href="#track-record" class="btn" data-ga-event="cta_see_how">See The Work</a>
     </div>
-    <p class="hero-secondary">Or <span class="tp-trigger tp-trigger-inline"><a href="/trend-pulse.html" class="tp-link" data-ga-event="trend_pulse_hero" data-ga-location="hero">try Trend Pulse, a live artifact by Tin Ly</a><span class="tp-tooltip"></span></span></p>
+    <p class="hero-secondary">Or <span class="tp-trigger tp-trigger-inline"><a href="/trend-pulse.html" class="tp-link" data-ga-event="trend_pulse_hero" data-ga-location="hero_secondary">try Trend Pulse, a live artifact by Tin Ly</a><span class="tp-tooltip"></span></span></p>
     <p class="hero-credibility">From Unilever Vietnam, Homecare to Ninety Eight: Coin98, Conviction, Viction — 7+ years of experience</p>
   </div>
 </div>
@@ -800,7 +801,7 @@ gtag('config','G-XXXXXXXXXX');
     <p class="contact-note">I'm cautious with unsolicited files and embedded links, so let's be transparent how we should catch up.</p>
     <div class="footer">
       <span>Open to senior in-house roles as well as fractional work.</span>
-      <span>Trend Pulse, a free tool linked from this site, has its own <a href="/trend-pulse#disclaimer">disclaimer</a>.</span>
+      <span>Trend Pulse, a free tool linked from this site, has its own <a href="/trend-pulse.html#disclaimer">disclaimer</a>.</span>
     </div>
   </div>
 </div>
