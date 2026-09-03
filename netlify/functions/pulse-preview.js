@@ -1,20 +1,27 @@
 // netlify/functions/pulse-preview.js
 //
-// State 1 submit → State 2 pre-gate proof. Runs the cheap half (Haiku
-// scoring) so anonymous visitors see real scored items before the contact
-// gate. Abuse gates (honeypot, Turnstile, IP rate limit) moved here
-// verbatim from generate-pulse.js, which this endpoint supersedes.
+// State 1 submit → kicks off State 2 pre-gate scoring. Runs the fast,
+// synchronous abuse gates (honeypot, Turnstile, IP rate limit) only — the
+// actual classification + Pass 1 scoring now happens in
+// pulse-preview-background.js, invoked fire-and-forget below.
+//
+// Why: that work is up to three sequential, uncapped Anthropic calls
+// (classifyBrand, then Pass 1's two calls inside runPreGate). For a brand
+// with no cached data that routinely exceeds Netlify's ~30s ceiling on
+// synchronous functions — live-confirmed in production (Coin98 completed in
+// 13.6s, "Diaflow" hit the wall and got killed at exactly 30000ms). A
+// synchronous function's timeout can't be raised past that ceiling on this
+// plan; a background function gets 15 minutes instead, the same trade
+// generate-report-background.js already makes for Pass 2. The client polls
+// pulse-preview-status.js with the jobId this returns until the result
+// lands.
 
 import crypto from "crypto";
 import { getStore } from "@netlify/blobs";
-import { classifyBrand } from "./lib/classify.js";
-import { loadCategoryPool } from "./lib/pool.js";
-import { getCachedEntity } from "./lib/entity-cache.js";
-import { runPreGate, ACTION_STANDARDS } from "./lib/read-pulse.js";
-import { classifyQuiet, hasCompetitorSignalInPool } from "./lib/quiet-taxonomy.js";
 
 const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const RATE_LIMIT_STORE = "rate-limits";
+const JOB_STORE = "pulse-preview-jobs";
 // Raised 5 -> 10 (Session 10): the counter increments on every attempt that
 // clears Turnstile, including ones that fail downstream for reasons that
 // aren't the visitor's fault (a Pass 1 timeout, a stale-token retry). At 5,
@@ -22,7 +29,6 @@ const RATE_LIMIT_STORE = "rate-limits";
 // daily budget before ever seeing a result.
 const RATE_LIMIT_PER_DAY = 10;
 const RATE_LIMIT_CAS_ATTEMPTS = 5;
-const MAX_STALE_HOURS = 60;
 
 function json(status, body) {
   return new Response(JSON.stringify(body), {
@@ -102,98 +108,31 @@ export default async (req, context) => {
     }
   }
 
-  // Classify the brand
-  const classification = await classifyBrand({
-    brandName: body.brandName,
-    website: body.website,
-    fetchImpl: fetch,
-    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  });
+  // Gates cleared. Hand the slow work to the background function and give
+  // the client a job to poll instead of making it wait on a request that
+  // can outlive the platform's timeout.
+  const jobId = crypto.randomUUID();
+  const jobStore = getStore(JOB_STORE);
+  await jobStore.setJSON(jobId, { status: "pending", createdAt: new Date().toISOString() });
 
-  const { primary: primaryCategory, secondary: secondaryCategory, brand_read: brandRead, confidence, inferred_competitors } = classification;
-
-  if (!primaryCategory) {
-    return json(200, { status: "unknown_brand", brand: body.brandName });
-  }
-
-  // Load category pools
-  const primaryPool = await loadCategoryPool(primaryCategory, { getStore });
-  const secondaryPool = secondaryCategory ? await loadCategoryPool(secondaryCategory, { getStore }) : null;
-
-  // Pool health signals
-  const poolAgeHours = primaryPool?.fetched_at ? (Date.now() - Date.parse(primaryPool.fetched_at)) / 3_600_000 : Infinity;
-  const poolStale = poolAgeHours > MAX_STALE_HOURS;
-  const poolThin = primaryPool?.health?.healthy === false;
-
-  // Load competitor items from cache only
-  const competitors = (inferred_competitors || []).map((name) => ({ name, source: "inferred" }));
-  const competitorItems = [];
-  for (const comp of competitors) {
-    try {
-      const cached = await getCachedEntity(comp.name, { getStore });
-      if (cached?.items) {
-        for (const item of cached.items) {
-          competitorItems.push({ ...item, entity: comp.name });
-        }
-      }
-    } catch {
-      // Cache miss or error — degrade silently
+  // Same fire-and-forget pattern as lead-submit.js -> generate-report-
+  // background.js: derive the base URL from the incoming request, not any
+  // of Netlify's build-time URL env vars — this site is deployed via CLI
+  // upload, which skips the build step those vars depend on, and one of
+  // them silently pointing at a 404 already cost a lead's report once.
+  const baseUrl = new URL(req.url).origin;
+  try {
+    const bgRes = await fetch(`${baseUrl}/.netlify/functions/pulse-preview-background`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jobId, brandName: body.brandName, website: body.website }),
+    });
+    if (!bgRes.ok) {
+      console.error(`[pulse-preview] background invoke returned ${bgRes.status} for jobId ${jobId}`);
     }
+  } catch (err) {
+    console.error("[pulse-preview] failed to invoke background function:", err);
   }
 
-  // Run pre-gate (Pass 1, Haiku)
-  const preGate = await runPreGate({
-    primaryPool,
-    secondaryPool,
-    competitorItems,
-    brandName: body.brandName,
-    website: body.website,
-    brandRead,
-    primaryCategory,
-    secondaryCategory,
-    competitors,
-    fetchImpl: fetch,
-    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-  });
-
-  // Determine quiet cause
-  const directCount = preGate.scored.filter((s) => s.relevance === "direct").length;
-  const poolCompetitorHit = hasCompetitorSignalInPool(preGate.scored, competitors);
-  const quietCause = classifyQuiet({
-    poolThin,
-    poolStale,
-    competitorItemCount: competitorItems.length,
-    poolCompetitorHit,
-    direct: directCount,
-    minDirect: ACTION_STANDARDS.minDirect,
-  });
-
-  // Build preview items (up to 2 titles for State 2 proof)
-  const previewItems = preGate.top.slice(0, 2).map((s) => ({
-    title: s.item.title,
-    source: s.item.source,
-    relevance: s.relevance,
-  }));
-
-  return json(200, {
-    status: "ok",
-    brand: body.brandName,
-    website: body.website,
-    category: primaryCategory,
-    secondaryCategory,
-    brandRead,
-    confidence,
-    competitors: competitors.map((c) => ({ name: c.name, source: c.source })),
-    preGateItems: previewItems,
-    quiet_cause: quietCause,
-    top: preGate.top,
-    debug: {
-      pool_size: preGate.pool.length,
-      competitor_item_count: competitorItems.length,
-      pool_competitor_hit: poolCompetitorHit,
-      pool_stale: poolStale,
-      pool_thin: poolThin,
-      pass1_cost: preGate.pass1Cost,
-    },
-  });
+  return json(200, { status: "pending", jobId });
 };

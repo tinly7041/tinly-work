@@ -555,6 +555,31 @@ input:focus{border-color:var(--signal-blue);}
 
   mountTurnstile();
 
+  // pulse-preview.js now hands back a jobId instead of the result directly
+  // (see pulse-preview-background.js) — poll pulse-preview-status.js until
+  // pulse-preview-background.js finishes or we give up.
+  const POLL_INTERVAL_MS = 1500;
+  const POLL_TIMEOUT_MS = 120000; // background functions get 15min; this is a UI patience budget, not the real ceiling
+
+  async function pollJobStatus(jobId) {
+    const deadline = Date.now() + POLL_TIMEOUT_MS;
+    while (Date.now() < deadline) {
+      await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+      let job;
+      try {
+        const res = await fetch("/.netlify/functions/pulse-preview-status?id=" + encodeURIComponent(jobId));
+        if (!res.ok) continue; // transient — keep polling
+        job = await res.json();
+      } catch {
+        continue; // transient network hiccup — keep polling
+      }
+      if (job.status === "done") return { ok: true, data: job.result };
+      if (job.status === "error") return { ok: false, reason: "error" };
+      // status "pending" -> keep polling
+    }
+    return { ok: false, reason: "timeout" };
+  }
+
   // ===== State 1: Brand submit =====
   document.getElementById("brand-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -592,7 +617,24 @@ input:focus{border-color:var(--signal-blue);}
         return;
       }
 
-      const data = await res.json();
+      let data = await res.json();
+
+      if (data.status === "pending" && data.jobId) {
+        const polled = await pollJobStatus(data.jobId);
+        if (!polled.ok) {
+          stopLoading();
+          document.getElementById("submit-btn").disabled = false;
+          if (polled.reason === "timeout") {
+            alert("This is taking longer than usual. Please try again in a moment.");
+          } else {
+            alert("Something went wrong. Please try again.");
+          }
+          showState("state-1");
+          return;
+        }
+        data = polled.data;
+      }
+
       stopLoading();
       document.getElementById("submit-btn").disabled = false;
 
