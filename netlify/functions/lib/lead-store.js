@@ -106,7 +106,7 @@ function chipStyle(state, sources) {
 
 // Static glyph, not animation — Gmail strips @keyframes.
 const CHIP_LABEL = {
-  fresh: "● Fresh",
+  fresh: "Fresh",
   heating: "Heating",
   cooling: "Cooling",
 };
@@ -132,6 +132,22 @@ const NEUTRAL_CHIP =
   "font-family:sans-serif;font-size:11px;font-weight:600;" +
   "letter-spacing:0.02em;line-height:1.6;background:#EEF2FE;color:#2C56E8;";
 
+// Same solid-fill tokens as the time chips' orange/red tiers, reused here
+// so "direct" relevance and "quick" effort read as visually hot in the
+// same vocabulary as a Heating time chip, not a competing color system.
+const ORANGE_CHIP =
+  "display:inline-block;padding:2px 8px;border-radius:10px;" +
+  "font-family:sans-serif;font-size:11px;font-weight:600;" +
+  "letter-spacing:0.02em;line-height:1.6;background:#FFEDD5;color:#C2410C;";
+const RED_CHIP =
+  "display:inline-block;padding:2px 8px;border-radius:10px;" +
+  "font-family:sans-serif;font-size:11px;font-weight:600;" +
+  "letter-spacing:0.02em;line-height:1.6;background:#FEE2E2;color:#B91C1C;";
+
+const EFFORT_LABEL = {
+  quick: "Quick Effort",
+};
+
 // Builds the report's HTML body here — in Netlify, not in Apps Script — so
 // the copy lives in exactly one place (same principle as
 // FALLBACK_EMAIL_BODY below: Apps Script's job is only to relay/send what
@@ -154,10 +170,10 @@ export function buildReportHtml({ brandName, result, top = [] }) {
       const chips = [
         timeChip,
         it.relevance
-          ? `<span style="${NEUTRAL_CHIP}">${escapeHtml(String(it.relevance).toUpperCase())}</span>`
+          ? `<span style="${it.relevance === "direct" ? ORANGE_CHIP : NEUTRAL_CHIP}">${escapeHtml(String(it.relevance).toUpperCase())}</span>`
           : "",
         it.effort
-          ? `<span style="${NEUTRAL_CHIP}">${escapeHtml(it.effort)}</span>`
+          ? `<span style="${it.effort === "quick" ? RED_CHIP : NEUTRAL_CHIP}">${escapeHtml(EFFORT_LABEL[it.effort] || it.effort)}</span>`
           : "",
       ]
         .filter(Boolean)
