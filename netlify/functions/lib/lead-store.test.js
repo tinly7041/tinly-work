@@ -2,7 +2,12 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildLeadRow, buildReportHtml, postLead, postReport, postLeadFailure, postLeadFallback } from "./lead-store.js";
+import { buildLeadRow, buildReportHtml, timeSignal, postLead, postReport, postLeadFailure, postLeadFallback } from "./lead-store.js";
+
+// Frozen "now" for age-based tests, so a test that passes today doesn't
+// silently start failing once real elapsed time drifts the boundary.
+const NOW = Date.parse("2026-09-05T00:00:00.000Z");
+const daysAgo = (n) => new Date(NOW - n * 864e5).toISOString();
 
 test("buildLeadRow sets action:lead and blanks whatsapp/telegram", () => {
   const row = buildLeadRow({
@@ -84,6 +89,70 @@ test("postReport sends action:report and reportHtml, never a raw report object",
   assert.equal(captured.action, "report");
   assert.equal(captured.reportHtml, "<div>hi</div>");
   assert.equal(captured.report, undefined);
+});
+
+test("timeSignal — 2d, 1 source → fresh", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: NOW });
+  const sig = timeSignal({ date: daysAgo(2) });
+  assert.equal(sig.state, "fresh");
+  assert.equal(sig.ageDays, 2);
+  assert.equal(sig.sources, 1);
+});
+
+test("timeSignal — 3d, 1 source → fresh (inclusive boundary)", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: NOW });
+  const sig = timeSignal({ date: daysAgo(3) });
+  assert.equal(sig.state, "fresh");
+});
+
+test("timeSignal — 4d, 1 source → null, the deliberate no-chip band", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: NOW });
+  const sig = timeSignal({ date: daysAgo(4) });
+  assert.equal(sig.state, null);
+});
+
+test("timeSignal — 2d, 3 sources → heating (corroboration beats fresh)", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: NOW });
+  const sig = timeSignal({ date: daysAgo(2), corroborated_sources: ["a", "b", "c"] });
+  assert.equal(sig.state, "heating");
+});
+
+test("timeSignal — 10d, 4 sources → heating (inclusive boundary)", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: NOW });
+  const sig = timeSignal({ date: daysAgo(10), corroborated_sources: ["a", "b", "c", "d"] });
+  assert.equal(sig.state, "heating");
+});
+
+test("timeSignal — 11d, 4 sources → cooling (age outranks corroboration)", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: NOW });
+  const sig = timeSignal({ date: daysAgo(11), corroborated_sources: ["a", "b", "c", "d"] });
+  assert.equal(sig.state, "cooling");
+});
+
+test("timeSignal — unparseable date → state null, ageDays null, never 0d", () => {
+  const sig = timeSignal({ date: "not a date" });
+  assert.equal(sig.state, null);
+  assert.equal(sig.ageDays, null);
+});
+
+test("timeSignal — corroborated_sources absent → sources: 1", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: NOW });
+  const sig = timeSignal({ date: daysAgo(2) });
+  assert.equal(sig.sources, 1);
+});
+
+test("buildReportHtml with top omitted renders today's output without throwing", () => {
+  const html = buildReportHtml({
+    brandName: "Brand",
+    result: {
+      pulse_summary: "summary",
+      items: [{ headline: "Headline", source: "Src", url: "https://example.com/a", relevance: "direct", effort: "quick", why_now: "n", so_what: "s", payoff: "p" }],
+    },
+  });
+  assert.ok(html.includes("Headline"));
+  assert.ok(!html.includes("Fresh"));
+  assert.ok(!html.includes("Heating"));
+  assert.ok(!html.includes("Cooling"));
 });
 
 test("postLeadFailure and postLeadFallback set the correct action field", async () => {

@@ -15,7 +15,7 @@
 import { getStore } from "@netlify/blobs";
 import { refreshCompetitorEntity } from "./lib/competitor-fetch.js";
 import { runPostGate } from "./lib/read-pulse.js";
-import { buildReportHtml, postReport, postLeadFailure } from "./lib/lead-store.js";
+import { buildReportHtml, postReport, postLeadFailure, timeSignal } from "./lib/lead-store.js";
 
 const MAX_RETRIES = 2;
 const RETRYABLE_ERRORS = ["Pass2ParseError", "ECONNRESET", "UND_ERR_SOCKET", "fetch failed"];
@@ -97,7 +97,7 @@ export default async (req) => {
 
   // Deliver the report via Apps Script
   try {
-    const reportHtml = buildReportHtml({ brandName, result: postGate.result });
+    const reportHtml = buildReportHtml({ brandName, result: postGate.result, top: top || [] });
     await postReport(fetch, env.APPS_SCRIPT_URL, env.APPS_SCRIPT_SECRET, {
       email,
       brandName,
@@ -109,7 +109,8 @@ export default async (req) => {
       reportSent: true,
     });
 
-    console.log(`[generate-report-bg] report delivered for ${brandName} (${email}): ${postGate.result.items.length} items — ${postGate.result.items.map((i) => `"${i.headline}"`).join(", ")}`);
+    const poolByUrl = new Map((top || []).map((s) => [s?.item?.url, s?.item]).filter(([k]) => k));
+    console.log(`[generate-report-bg] report delivered for ${brandName} (${email}): ${postGate.result.items.length} items — ${postGate.result.items.map((i) => `"${i.headline}" (${timeSignal(poolByUrl.get(i.url)).state || "none"})`).join(", ")}`);
   } catch (err) {
     console.error(`[generate-report-bg] report delivery failed for ${brandName}: ${err.message}`);
     try {
