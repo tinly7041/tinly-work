@@ -143,46 +143,6 @@ p:last-child{margin-bottom:0;}
 /* secondary hero CTA — text link, no glass (DESIGN.md §4); still a 44px target */
 .link-hero{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--inverse);}
 
-/* Trend Pulse hover tooltip — one component, reused by the nav pill and the
-   hero secondary line. Copy is injected by JS from a single string (below)
-   so it only ever exists once. */
-.tp-trigger{position:relative;display:inline-flex;align-items:center;}
-.tp-trigger-inline{display:inline-block;}
-.tp-tooltip{
-  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);
-  width:252px;max-width:80vw;padding:14px 16px;border-radius:14px;
-  font-family:var(--body);font-size:13px;font-weight:400;line-height:1.5;text-align:left;
-  color:var(--ink);background:var(--inverse);
-  box-shadow:0 12px 30px rgba(8,12,63,.22);
-  opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .2s ease,transform .2s ease,visibility .2s;
-  z-index:200;
-}
-.tp-trigger-inline .tp-tooltip{left:0;transform:translateY(-4px);}
-@media (hover:hover) and (pointer:fine){
-  .tp-trigger:hover .tp-tooltip,.tp-trigger:focus-within .tp-tooltip{
-    opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%) translateY(0);
-  }
-  .tp-trigger-inline:hover .tp-tooltip,.tp-trigger-inline:focus-within .tp-tooltip{
-    transform:translateY(0);
-  }
-}
-/* Touch/no-hover: no way to trigger :hover, so the copy renders inline and
-   always visible instead of disappearing. */
-@media (hover:none),(pointer:coarse){
-  .tp-tooltip{
-    position:static;display:block;margin-top:4px;transform:none;
-    opacity:1;visibility:visible;pointer-events:auto;
-    width:auto;max-width:none;padding:0;border-radius:0;box-shadow:none;background:transparent;
-    color:rgba(245,243,239,.72);font-size:12px;
-  }
-  .nav .tp-tooltip{display:none;} /* nav bar has no room; hero copy still shows */
-  .tp-trigger-inline .tp-tooltip{transform:none;} /* matches the specificity of the unconditional rule above so it actually wins */
-}
-.tp-link{font-family:var(--body);font-weight:500;text-decoration:none;color:var(--inverse);
-  border-bottom:1px solid rgba(245,243,239,.5);transition:border-color .25s;}
-.tp-link:hover{border-bottom-color:currentColor;}
-.hero-secondary{margin-top:var(--s2);font-size:15px;color:rgba(245,243,239,.78);}
 
 .glass{background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.05));
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
@@ -478,10 +438,6 @@ gtag('config','G-XXXXXXXXXX');
 <div class="nav" id="nav">
   <a href="#hero" class="nav-brand">tin ly</a>
   <div style="display:flex;align-items:center;gap:12px;">
-    <span class="tp-trigger">
-      <a href="/trend-pulse.html" class="btn btn-sm" style="opacity:.85;font-size:13px;" data-ga-event="trend_pulse_nav">Trend Pulse</a>
-      <span class="tp-tooltip"></span>
-    </span>
     <a href="https://calendar.app.google/oxErBg67ZY7z5sL97" class="btn btn-sm" target="_blank" rel="noopener" data-ga-event="cta_work_with_me" data-ga-location="nav" data-ga-channel="booking">Work with me</a>
   </div>
 </div>
@@ -501,7 +457,6 @@ gtag('config','G-XXXXXXXXXX');
     <div class="hero-cta">
       <a href="#track-record" class="btn" data-ga-event="cta_see_how">See The Work</a>
     </div>
-    <p class="hero-secondary">Or <span class="tp-trigger tp-trigger-inline"><a href="/trend-pulse.html" class="tp-link" data-ga-event="trend_pulse_hero" data-ga-location="hero_secondary">try Trend Pulse, a live artifact by Tin Ly</a><span class="tp-tooltip"></span></span></p>
     <p class="hero-credibility">From Unilever Vietnam, Homecare to Ninety Eight: Coin98, Conviction, Viction — 7+ years of experience</p>
   </div>
 </div>
@@ -801,16 +756,12 @@ gtag('config','G-XXXXXXXXXX');
     <p class="contact-note">I'm cautious with unsolicited files and embedded links, so let's be transparent how we should catch up.</p>
     <div class="footer">
       <span>Open to senior in-house roles as well as fractional work.</span>
-      <span>Trend Pulse, a free tool linked from this site, has its own <a href="/trend-pulse.html#disclaimer">disclaimer</a>.</span>
     </div>
   </div>
 </div>
 
 <script>
 (function(){
-  var TP_TOOLTIP_COPY="A free read on what's moving in your tech category this week, and what your brand can do about it.";
-  document.querySelectorAll('.tp-tooltip').forEach(function(el){el.textContent=TP_TOOLTIP_COPY;});
-
   var nav=document.getElementById('nav');
   var hero=document.getElementById('hero');
 

@@ -16,7 +16,6 @@ import { fetchGitHub } from "../netlify/functions/lib/sources/github.js";
 import { fetchGoogleTrends } from "../netlify/functions/lib/sources/google-trends.js";
 import { fetchProductHunt } from "../netlify/functions/lib/sources/product-hunt.js";
 import { fetchCoinGecko } from "../netlify/functions/lib/sources/coingecko.js";
-import { fetchXList, getXListBilling } from "../netlify/functions/lib/sources/x-list.js";
 import { fetchLobsters } from "../netlify/functions/lib/sources/lobsters.js";
 import { fetchArxiv } from "../netlify/functions/lib/sources/arxiv.js";
 import { fetchDexScreener } from "../netlify/functions/lib/sources/dexscreener.js";
@@ -34,7 +33,6 @@ const ADAPTERS = {
   producthunt: fetchProductHunt,
   coingecko: fetchCoinGecko,
   googletrends: fetchGoogleTrends,
-  xlist: (cfg, cat) => fetchXList(cfg, cat),
   lobsters: fetchLobsters,
   arxiv: fetchArxiv,
   dexscreener: fetchDexScreener,
@@ -82,13 +80,4 @@ for (const cat of cats) {
     console.log(`  ${String(n + 1).padStart(2)}. [${i.score.toFixed(3)}] ${i.source.padEnd(12)} ${i.signal.padEnd(9)}${(i.corroborated_sources?.length ?? 1) > 1 ? ` (+${i.corroborated_sources.length - 1} corroborating)` : ""} ${i.title.slice(0, 70)}`));
 }
 
-const billing = getXListBilling();
-if (!JSON_OUT) {
-  let line;
-  if (billing.fetched) line = `1 fetch, ${billing.rawCount} posts read, ~$${billing.estimatedSpendUSD}`;
-  else if (billing.attempted) line = `request failed, $0 billed (rejected before data returned) — ${JSON.stringify(billing.lastError)}`;
-  else line = "no X_BEARER_TOKEN set — adapter no-op'd, $0 spent, 0 requests made.";
-  console.log(`\nX List billing: ${line}`);
-}
-
-if (JSON_OUT) console.log(JSON.stringify({ categories: out, x_list_billing: billing }, null, 2));
+if (JSON_OUT) console.log(JSON.stringify({ categories: out }, null, 2));

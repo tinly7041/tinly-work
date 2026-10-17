@@ -183,7 +183,6 @@ export const CATEGORIES = {
     githubWindowDays: 90,
     coingecko: false,
     googleTrends: true,
-    xList: true,
     arxiv: true,
     newsFeeds: AI_NEWS_FEEDS,
   },
@@ -243,7 +242,6 @@ export const CATEGORIES = {
     weightOverride: { github: 0.5 },
     coingecko: true,
     googleTrends: true,
-    xList: true,
     dexscreener: true,
     newsFeeds: WEB3_NEWS_FEEDS,
   },
@@ -277,7 +275,6 @@ export const CATEGORIES = {
     githubWindowDays: 180,
     coingecko: false,
     googleTrends: true,
-    xList: true,
     newsFeeds: FINTECH_NEWS_FEEDS,
   },
   saas: {
@@ -303,7 +300,6 @@ export const CATEGORIES = {
     githubWindowDays: 90,
     coingecko: false,
     googleTrends: true,
-    xList: true,
     lobsters: true,
   },
 };

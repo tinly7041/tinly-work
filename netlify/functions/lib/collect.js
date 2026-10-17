@@ -4,7 +4,6 @@ import { fetchGitHub } from "./sources/github.js";
 import { fetchGoogleTrends } from "./sources/google-trends.js";
 import { fetchProductHunt } from "./sources/product-hunt.js";
 import { fetchCoinGecko } from "./sources/coingecko.js";
-import { fetchXList } from "./sources/x-list.js";
 import { fetchLobsters } from "./sources/lobsters.js";
 import { fetchArxiv } from "./sources/arxiv.js";
 import { fetchDexScreener } from "./sources/dexscreener.js";
@@ -67,7 +66,6 @@ export async function collect(catKey) {
     fetchCoinGecko(cfg, { telemetry }),
   ];
   if (cfg.googleTrends) jobs.push(fetchGoogleTrends(cfg));
-  if (cfg.xList) jobs.push(fetchXList(cfg, catKey));
   if (cfg.lobsters) jobs.push(fetchLobsters(cfg));
   if (cfg.arxiv) jobs.push(fetchArxiv(cfg));
   if (cfg.dexscreener) jobs.push(fetchDexScreener(cfg, { telemetry }));
