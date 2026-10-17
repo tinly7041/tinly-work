@@ -1,7 +1,6 @@
 import { getStore } from "@netlify/blobs";
 import { ACTIVE } from "./lib/categories.js";
 import { collect } from "./lib/collect.js";
-import { getXListBilling } from "./lib/sources/x-list.js";
 import { _resetFailures, _failures } from "./lib/sources/_http.js";
 import { shouldRunCategory, nextState, shouldSendHeartbeat, buildCategorySummary, evaluateAlerts, formatAlertEmail } from "./lib/health.js";
 
@@ -105,12 +104,8 @@ export default async (req, { fetchImpl = fetch, getStoreImpl = getStore } = {}) 
 
   await store.setJSON(CRAWL_STATE_KEY, crawlState);
 
-  // X List's fetch is process-wide (once per crawl, not per category) — log
-  // it once at the day level rather than duplicating it under every category.
-  const xList = getXListBilling();
-
   const existingLog = (await store.get(TRIAL_LOG_KEY, { type: "json" })) || [];
-  existingLog.push({ date: today, ran_at: nowIso, categories: dayEntries, x_list: xList });
+  existingLog.push({ date: today, ran_at: nowIso, categories: dayEntries });
   await store.setJSON(TRIAL_LOG_KEY, existingLog);
 
   // Health alert — alert-only, never on plain success. See lib/health.js for
