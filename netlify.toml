@@ -6,6 +6,20 @@
 [functions]
   node_bundler = "esbuild"
 
+# Trend Pulse lead magnet retired (Oct 2026). Old links (LinkedIn posts,
+# report emails) land on the homepage instead of a 404.
+[[redirects]]
+  from = "/trend-pulse.html"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/trend-pulse"
+  to = "/"
+  status = 301
+  force = true
+
 # Explicit dev-context override. Netlify CLI's site-root detection can walk
 # up past a git worktree's own directory to the main worktree (this repo
 # lives under a git worktree at .claude/worktrees/<name>, sharing one .git
